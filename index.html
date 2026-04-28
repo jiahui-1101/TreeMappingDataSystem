@@ -142,7 +142,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 .visitor-hero h1{font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:8px}
 .visitor-hero p{font-size:13px;opacity:.8;max-width:500px;line-height:1.6}
 .route-pref-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
-.pref-card{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;padding:12px;cursor:pointer;transition:.2s;text-align:center}
+.pref-card{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;padding:12px;cursor:pointer;transition:.2s;text-align:center;position:relative}
 .pref-card:hover,.pref-card.selected{background:rgba(255,255,255,.25);border-color:#fff}
 .pref-card-icon{font-size:22px;margin-bottom:4px}
 .pref-card-lbl{font-size:11px;font-weight:500}
@@ -325,6 +325,74 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 /* Shimmer loading */
 @keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
 .shimmer{animation:shimmer 1.5s infinite;background:linear-gradient(90deg,#f0ece3 25%,#e8e4db 50%,#f0ece3 75%);background-size:400px 100%}
+
+/* ── QR SCANNER ── */
+.qr-scanner-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:300}
+.qr-scanner-box{background:#fff;border-radius:20px;width:400px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.qr-scanner-header{background:var(--green-900);padding:20px 24px;display:flex;align-items:center;justify-content:space-between}
+.qr-scanner-header h3{color:#fff;font-family:'DM Serif Display',serif;font-size:18px}
+.qr-scanner-header button{background:none;border:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer;padding:0 4px}
+.qr-scanner-header button:hover{color:#fff}
+.qr-viewfinder{position:relative;background:#111;display:flex;align-items:center;justify-content:center;height:260px;overflow:hidden}
+.qr-viewfinder video{width:100%;height:100%;object-fit:cover;opacity:.85}
+.qr-viewfinder-frame{position:absolute;width:180px;height:180px;border:none;z-index:2;pointer-events:none}
+.qr-corner{position:absolute;width:24px;height:24px;border-color:#4ade80;border-style:solid}
+.qr-corner.tl{top:0;left:0;border-width:3px 0 0 3px}
+.qr-corner.tr{top:0;right:0;border-width:3px 3px 0 0}
+.qr-corner.bl{bottom:0;left:0;border-width:0 0 3px 3px}
+.qr-corner.br{bottom:0;right:0;border-width:0 3px 3px 0}
+.qr-scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4ade80,transparent);animation:scanline 2s ease-in-out infinite;z-index:3}
+@keyframes scanline{0%{top:10%}100%{top:90%}}
+.qr-scan-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1}
+.qr-scan-ring::before{content:'';width:200px;height:200px;border-radius:12px;border:2px solid rgba(74,222,128,.3);animation:ringpulse 2s ease-in-out infinite}
+@keyframes ringpulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.05);opacity:1}}
+.qr-scanner-body{padding:20px 24px}
+.qr-scanner-status{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;margin-bottom:16px;font-size:13px;font-weight:500}
+.qr-status-scanning{background:var(--green-50);border:1px solid var(--green-200);color:var(--green-700)}
+.qr-status-success{background:#d4eede;border:1px solid #4ade80;color:#1a5e30}
+.qr-status-error{background:#fee5e0;border:1px solid #f0a090;color:#8a2500}
+.qr-status-dot{width:8px;height:8px;border-radius:50%;animation:blink 1s ease-in-out infinite}
+.qr-status-dot.green{background:#4ade80}
+.qr-status-dot.amber{background:#fb8c00}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.qr-manual-input{display:flex;gap:8px}
+.qr-manual-input input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.qr-manual-input input:focus{border-color:var(--green-500)}
+.qr-manual-input button{padding:9px 14px;background:var(--green-700);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.qr-found-result{background:var(--green-50);border:1.5px solid var(--green-300);border-radius:12px;padding:16px;margin-top:14px;animation:slideup .3s ease}
+@keyframes slideup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.qr-found-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.qr-found-icon{font-size:32px}
+.qr-found-name{font-size:16px;font-weight:700;color:var(--text-dark)}
+.qr-found-sci{font-size:12px;color:var(--text-light);font-style:italic}
+.qr-found-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.qr-found-stat{background:#fff;border-radius:8px;padding:8px 10px;text-align:center}
+.qr-found-stat-val{font-size:14px;font-weight:700;color:var(--green-700)}
+.qr-found-stat-lbl{font-size:10px;color:var(--text-light);margin-top:1px}
+.qr-actions{display:flex;gap:8px;margin-top:12px}
+
+/* QR Scan button floating */
+.qr-fab{position:fixed;bottom:32px;right:32px;width:56px;height:56px;background:var(--green-700);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(36,71,47,.4);z-index:90;border:none;transition:.2s;color:#fff}
+.qr-fab:hover{background:var(--green-600);transform:scale(1.08)}
+.qr-fab-label{position:absolute;right:64px;background:var(--green-900);color:#fff;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:500;white-space:nowrap;opacity:0;transition:.2s;pointer-events:none}
+.qr-fab:hover .qr-fab-label{opacity:1}
+
+/* Ranger QR Scan card */
+.ranger-qr-card{background:linear-gradient(135deg,var(--green-900),var(--green-700));border-radius:14px;padding:20px 22px;color:#fff;margin-bottom:16px;cursor:pointer;transition:.2s;border:none;display:flex;align-items:center;gap:16px}
+.ranger-qr-card:hover{opacity:.92;transform:translateY(-1px)}
+.ranger-qr-icon{font-size:36px;flex-shrink:0}
+.ranger-qr-text h3{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:4px}
+.ranger-qr-text p{font-size:12px;opacity:.8;line-height:1.5}
+.ranger-qr-btn{margin-top:12px;padding:8px 18px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.5);border-radius:8px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s}
+.ranger-qr-btn:hover{background:rgba(255,255,255,.3)}
+
+/* Scan history */
+.scan-history-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--cream-dark)}
+.scan-history-icon{font-size:22px;flex-shrink:0}
+.scan-history-info{flex:1}
+.scan-history-name{font-size:13px;font-weight:600;color:var(--text-dark)}
+.scan-history-meta{font-size:11px;color:var(--text-light);margin-top:1px}
+.scan-history-time{font-size:11px;color:var(--text-light);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -335,29 +403,31 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-d
 const {useState,useEffect,useRef,useCallback}=React;
 
 const TREES=[
-  {id:'TBJ-001',name:'Angsana',sci:'Pterocarpus indicus',zone:'A',status:'healthy',age:45,height:'18m',health:92,icon:'🌳',lat:32,lng:22},
-  {id:'TBJ-002',name:'Rain Tree',sci:'Samanea saman',zone:'B',status:'monitor',age:62,height:'22m',health:67,icon:'🌲',lat:48,lng:42},
-  {id:'TBJ-003',name:'Cempaka Putih',sci:'Magnolia alba',zone:'A',status:'healthy',age:28,height:'12m',health:88,icon:'🌸',lat:24,lng:58},
-  {id:'TBJ-004',name:'Pokok Nangka',sci:'Artocarpus heterophyllus',zone:'C',status:'critical',age:15,height:'8m',health:32,icon:'🌿',lat:62,lng:52},
-  {id:'TBJ-005',name:'Meranti Merah',sci:'Shorea parvifolia',zone:'B',status:'healthy',age:80,height:'30m',health:95,icon:'🌴',lat:28,lng:72},
-  {id:'TBJ-006',name:'Kelapa Sawit',sci:'Elaeis guineensis',zone:'D',status:'monitor',age:20,height:'10m',health:71,icon:'🌿',lat:70,lng:30},
-  {id:'TBJ-007',name:'Pokok Ara',sci:'Ficus benjamina',zone:'A',status:'healthy',age:35,height:'15m',health:85,icon:'🌱',lat:20,lng:45},
-  {id:'TBJ-008',name:'Bunga Tanjung',sci:'Mimusops elengi',zone:'C',status:'monitor',age:22,height:'10m',health:74,icon:'🌺',lat:55,lng:65},
+  {id:'TBJ-001',name:'Angsana',sci:'Pterocarpus indicus',zone:'Arboretum',status:'healthy',age:45,height:'18m',health:92,icon:'🌳',lat:28,lng:22,desc:'Malaysia\'s national tree, blooms in golden yellow every February.'},
+  {id:'TBJ-002',name:'Rain Tree',sci:'Samanea saman',zone:'Arboretum',status:'monitor',age:62,height:'22m',health:67,icon:'🌲',lat:35,lng:40,desc:'One of the widest-canopied trees in the garden, folds leaves in rain.'},
+  {id:'TBJ-003',name:'Cempaka Putih',sci:'Magnolia alba',zone:'Pemuliharaan',status:'healthy',age:28,height:'12m',health:88,icon:'🌸',lat:18,lng:62,desc:'Fragrant white flowers used in traditional ceremonies.'},
+  {id:'TBJ-004',name:'Pokok Nangka',sci:'Artocarpus heterophyllus',zone:'Tanaman',status:'critical',age:15,height:'8m',health:32,icon:'🌿',lat:72,lng:68,desc:'Jackfruit tree, largest tree-borne fruit in the world.'},
+  {id:'TBJ-005',name:'Meranti Merah',sci:'Shorea parvifolia',zone:'Pemuliharaan',status:'healthy',age:80,height:'30m',health:95,icon:'🌴',lat:20,lng:75,desc:'Protected rare species (spesies nadir). Tallest tree in the garden.'},
+  {id:'TBJ-006',name:'Kelapa Sawit',sci:'Elaeis guineensis',zone:'Tanaman',status:'monitor',age:20,height:'10m',health:71,icon:'🌿',lat:75,lng:55,desc:'Oil palm, one of Malaysia\'s most economically significant crops.'},
+  {id:'TBJ-007',name:'Pokok Ara',sci:'Ficus benjamina',zone:'Riparian',status:'healthy',age:35,height:'15m',health:85,icon:'🌱',lat:60,lng:30,desc:'Weeping fig, grows alongside riverbanks and water features.'},
+  {id:'TBJ-008',name:'Bunga Tanjung',sci:'Mimusops elengi',zone:'Arboretum',status:'monitor',age:22,height:'10m',health:74,icon:'🌺',lat:42,lng:52,desc:'Fragrant ornamental tree, flowers used in garlands.'},
+  {id:'TBJ-009',name:'Bamboo',sci:'Bambusa vulgaris',zone:'Arboretum',status:'healthy',age:10,height:'12m',health:90,icon:'🎋',lat:25,lng:18,desc:'Giant bamboo grove, creates natural sound barriers.'},
+  {id:'TBJ-010',name:'Hibiscus',sci:'Hibiscus rosa-sinensis',zone:'Tapak Semaian',status:'healthy',age:5,height:'3m',health:96,icon:'🌺',lat:55,lng:80,desc:'Malaysia\'s national flower, the Bunga Raya.'},
 ];
 
 const RANGERS=[
-  {id:'R01',name:'Ahmad Razif',avatar:'AR',zone:'A & C',status:'on-duty',tasks:3},
-  {id:'R02',name:'Siti Nurul',avatar:'SN',zone:'B',status:'on-duty',tasks:2},
-  {id:'R03',name:'Faizal Harun',avatar:'FH',zone:'D',status:'off-duty',tasks:0},
-  {id:'R04',name:'Mei Ling',avatar:'ML',zone:'A',status:'on-duty',tasks:4},
+  {id:'R01',name:'Ahmad Razif',avatar:'AR',zone:'Arboretum',status:'on-duty',tasks:3},
+  {id:'R02',name:'Siti Nurul',avatar:'SN',zone:'Pemuliharaan',status:'on-duty',tasks:2},
+  {id:'R03',name:'Faizal Harun',avatar:'FH',zone:'Tanaman',status:'off-duty',tasks:0},
+  {id:'R04',name:'Mei Ling',avatar:'ML',zone:'Riparian',status:'on-duty',tasks:4},
 ];
 
 const DAYS=['Mon','Tue','Wed','Thu','Fri'];
 const ZONES_SCHED=[
-  ['Zone A','Zone B','Zone C','Zone D','Zone A'],
-  ['Zone B','Zone C','','Zone A','Zone B'],
-  ['Zone D','','Zone A','Zone C',''],
-  ['','Zone A','Zone B','','Zone D'],
+  ['Arboretum','Pemuliharaan','Tanaman','Riparian','Arboretum'],
+  ['Pemuliharaan','Tanaman','','Arboretum','Pemuliharaan'],
+  ['Tanaman','','Arboretum','Tanaman',''],
+  ['','Arboretum','Riparian','','Tanaman'],
 ];
 const ZONE_CLASSES=['sched-zone-a','sched-zone-b','sched-zone-c','sched-zone-d'];
 
@@ -372,11 +442,11 @@ const BADGES=[
 const LOGS=[
   {time:'09:14',type:'edit',event:'Tree TBJ-004 health status updated by Ranger Ahmad Razif'},
   {time:'09:02',type:'login',event:'Admin Dr. Lim Hui logged in from 192.168.1.12'},
-  {time:'08:47',type:'alert',event:'AI Anomaly alert triggered: Zone C disease rate 14%'},
+  {time:'08:47',type:'alert',event:'AI Anomaly alert triggered: Zon Tanaman disease rate 14%'},
   {time:'08:30',type:'login',event:'Ranger Faizal Harun logged in via mobile app'},
   {time:'07:55',type:'error',event:'QR scan API timeout — 3 retries, recovered'},
-  {time:'07:40',type:'edit',event:'Spatial planning: New Angsana proposed at Zone B-07'},
-  {time:'07:20',type:'login',event:'Ranger Mei Ling clocked in — Zone A patrol started'},
+  {time:'07:40',type:'edit',event:'Spatial planning: New Angsana proposed at Arboretum-07'},
+  {time:'07:20',type:'login',event:'Ranger Mei Ling clocked in — Riparian patrol started'},
   {time:'06:55',type:'alert',event:'Predictive: TBJ-002 drought stress score reached 84%'},
 ];
 
@@ -391,18 +461,24 @@ const CHATMSGS_DEFAULT=[
 ];
 
 const PREF_OPTIONS=[
-  {icon:'🌺',lbl:'Rare Flowers',zones:['A','B'],duration:90,desc:'Focus on rare and endemic flowering specimens'},
-  {icon:'🌳',lbl:'Ancient Trees',zones:['B','C'],duration:120,desc:'Visit century-old heritage trees'},
-  {icon:'🌿',lbl:'Medicinal Plants',zones:['C','D'],duration:60,desc:'Explore plants with medicinal properties'},
-  {icon:'🦋',lbl:'Butterfly Zone',zones:['A'],duration:45,desc:'Nectar-rich flowering plants attracting butterflies'},
-  {icon:'☁️',lbl:'Shaded Paths',zones:['A','B'],duration:75,desc:'Cool canopy-covered walking trails'},
-  {icon:'📸',lbl:'Photo Spots',zones:['A','B','C'],duration:90,desc:'Most photogenic and scenic tree clusters'},
+  {icon:'🌺',lbl:'Rare Flowers',zones:['Pemuliharaan','Arboretum'],duration:90,desc:'Focus on rare and endemic flowering specimens'},
+  {icon:'🌳',lbl:'Ancient Trees',zones:['Arboretum','Pemuliharaan'],duration:120,desc:'Visit century-old heritage trees'},
+  {icon:'🌿',lbl:'Medicinal Plants',zones:['Tanaman','Tapak Semaian'],duration:60,desc:'Explore plants with medicinal properties'},
+  {icon:'🦋',lbl:'Butterfly Zone',zones:['Riparian'],duration:45,desc:'Nectar-rich flowering plants attracting butterflies'},
+  {icon:'☁️',lbl:'Shaded Paths',zones:['Arboretum','Riparian'],duration:75,desc:'Cool canopy-covered walking trails'},
+  {icon:'📸',lbl:'Photo Spots',zones:['Arboretum','Pemuliharaan','Tanaman'],duration:90,desc:'Most photogenic and scenic tree clusters'},
 ];
 
 const PLANT_TYPES=['Tropical Hardwood','Flowering Tree','Palm Species','Fern & Ficus','Fruit Tree','Medicinal Plant','Ornamental'];
 
 const MONTHLY_HEALTH=[82,79,81,75,78,83,85,80,76,79,82,84];
 const MONTHLY_LABELS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// Scan history store
+const SCAN_HISTORY_DEFAULT=[
+  {tree:TREES[0],time:'09:02 AM',ranger:'Ahmad Razif',note:'Routine check – healthy'},
+  {tree:TREES[2],time:'08:45 AM',ranger:'Ahmad Razif',note:'Leaf sample taken'},
+];
 
 function StatusPill({status}){
   const map={healthy:'status-healthy',monitor:'status-monitor',critical:'status-critical'};
@@ -411,52 +487,359 @@ function StatusPill({status}){
   );
 }
 
-function MapSVG({pins,route,showRangers,role,onPinClick}){
-  // Garden zones as painted regions
-  const zones=[
-    {label:'Zone A',x:8,y:8,w:38,h:40,color:'rgba(67,160,71,0.18)'},
-    {label:'Zone B',x:50,y:8,w:40,h:38,color:'rgba(21,101,192,0.12)'},
-    {label:'Zone C',x:8,y:52,w:45,h:38,color:'rgba(160,104,48,0.14)'},
-    {label:'Zone D',x:58,y:50,w:35,h:40,color:'rgba(90,26,110,0.12)'},
-  ];
-  const lake={cx:42,cy:48,rx:14,ry:10};
-  const routeCoords=route&&route.length>0?route.map(t=>`${t.lng},${t.lat}`).join(' L '):null;
-
+// ── REALISTIC TBJ MAP SVG ──
+// Based on the actual Pelan Induk Pembangunan Taman Botani Johor master plan
+// Zones: Arboretum (center-left), Pemuliharaan (top corners), Tapak Semaian (right),
+// Riparian (right-mid), Tanaman (bottom-right), Pentadbiran (bottom-left),
+// Tasik Bukit Besi (center lake), Tasik Bukit Belah (left lake)
+function TBJMapSVG({pins,route,showRangers,role,onPinClick,highlightZone}){
   return React.createElement('svg',{
-    viewBox:'0 0 100 95',style:{width:'100%',height:'100%',position:'absolute',top:0,left:0}
+    viewBox:'0 0 320 240',style:{width:'100%',height:'100%',position:'absolute',top:0,left:0},
+    xmlns:'http://www.w3.org/2000/svg'
   },
-    // Zone backgrounds
-    ...zones.map(z=>React.createElement('g',{key:z.label},
-      React.createElement('rect',{x:z.x,y:z.y,width:z.w,height:z.h,fill:z.color,rx:3}),
-      React.createElement('text',{x:z.x+2,y:z.y+8,fontSize:4,fill:'rgba(26,46,31,0.6)',fontWeight:'bold',fontFamily:'DM Sans,sans-serif'},z.label)
-    )),
-    // Lake
-    React.createElement('ellipse',{cx:lake.cx,cy:lake.cy,rx:lake.rx,ry:lake.ry,fill:'rgba(100,180,220,0.45)',stroke:'rgba(80,150,200,0.6)',strokeWidth:.5}),
-    React.createElement('text',{x:lake.cx,y:lake.cy+1,textAnchor:'middle',fontSize:3,fill:'rgba(21,101,192,0.7)',fontFamily:'DM Sans,sans-serif'},'Tasik'),
-    // Walking path
-    React.createElement('path',{d:'M 10,85 Q 25,70 42,62 Q 55,55 70,45 Q 80,35 85,20',stroke:'rgba(255,255,255,0.55)',strokeWidth:2,fill:'none',strokeDasharray:'3,2',strokeLinecap:'round'}),
+    // Outer garden boundary (organic shape like real map)
+    React.createElement('ellipse',{cx:160,cy:118,rx:148,ry:108,fill:'#7cb87a',opacity:.35}),
+    
+    // Walking paths network
+    React.createElement('path',{d:'M 40,200 Q 60,170 80,155 Q 110,138 145,125 Q 175,115 210,105 Q 240,96 270,80 Q 285,70 290,55',
+      stroke:'rgba(255,255,255,0.5)',strokeWidth:4,fill:'none',strokeLinecap:'round'}),
+    React.createElement('path',{d:'M 40,200 Q 55,210 80,215 Q 120,220 160,215 Q 200,210 240,200 Q 265,192 280,178',
+      stroke:'rgba(255,255,255,0.5)',strokeWidth:4,fill:'none',strokeLinecap:'round'}),
+    React.createElement('path',{d:'M 145,125 Q 148,150 150,170 Q 152,190 155,210',
+      stroke:'rgba(255,255,255,0.4)',strokeWidth:3,fill:'none',strokeLinecap:'round'}),
+    React.createElement('path',{d:'M 100,50 Q 120,80 145,125',
+      stroke:'rgba(255,255,255,0.4)',strokeWidth:3,fill:'none',strokeLinecap:'round'}),
+    React.createElement('path',{d:'M 210,105 Q 240,130 250,160 Q 258,185 255,205',
+      stroke:'rgba(255,255,255,0.4)',strokeWidth:3,fill:'none',strokeLinecap:'round'}),
+    
+    // Tasik Bukit Besi (main central lake)
+    React.createElement('ellipse',{cx:148,cy:120,rx:38,ry:28,fill:'#4a9fd4',opacity:.7,stroke:'#2a7ab0',strokeWidth:.8}),
+    React.createElement('text',{x:148,y:117,textAnchor:'middle',fontSize:6.5,fill:'rgba(255,255,255,0.95)',fontFamily:'DM Sans,sans-serif',fontWeight:'600'},'TASIK'),
+    React.createElement('text',{x:148,y:126,textAnchor:'middle',fontSize:5.5,fill:'rgba(255,255,255,0.85)',fontFamily:'DM Sans,sans-serif'},'BUKIT BESI'),
+    
+    // Tasik Bukit Belah (smaller left lake)
+    React.createElement('ellipse',{cx:65,cy:148,rx:22,ry:16,fill:'#4a9fd4',opacity:.65,stroke:'#2a7ab0',strokeWidth:.8}),
+    React.createElement('text',{x:65,y:145,textAnchor:'middle',fontSize:5,fill:'rgba(255,255,255,0.9)',fontFamily:'DM Sans,sans-serif',fontWeight:'600'},'TASIK'),
+    React.createElement('text',{x:65,y:153,textAnchor:'middle',fontSize:4.5,fill:'rgba(255,255,255,0.85)',fontFamily:'DM Sans,sans-serif'},'BUKIT BELAH'),
+    
+    // Zon Arboretum (center-left, main zone)
+    React.createElement('path',{d:'M 55,40 Q 95,28 135,35 Q 155,40 148,90 Q 110,95 80,110 Q 55,105 45,80 Z',
+      fill:highlightZone==='Arboretum'?'rgba(46,125,50,0.4)':'rgba(46,125,50,0.18)',
+      stroke:'rgba(46,125,50,0.6)',strokeWidth:1,strokeDasharray:'4,2'}),
+    React.createElement('text',{x:95,y:55,textAnchor:'middle',fontSize:7,fill:'rgba(27,94,32,0.9)',fontFamily:'DM Sans,sans-serif',fontWeight:'700'},'ZON ARBORETUM'),
+    
+    // Zon Pemuliharaan Kiri (top-left)
+    React.createElement('path',{d:'M 18,18 Q 52,12 55,40 Q 45,80 30,95 Q 15,85 12,55 Z',
+      fill:highlightZone==='Pemuliharaan'?'rgba(27,94,32,0.4)':'rgba(27,94,32,0.15)',
+      stroke:'rgba(27,94,32,0.5)',strokeWidth:1,strokeDasharray:'4,2'}),
+    React.createElement('text',{x:33,y:48,textAnchor:'middle',fontSize:5.5,fill:'rgba(27,94,32,0.85)',fontFamily:'DM Sans,sans-serif',fontWeight:'700',transform:'rotate(-15,33,48)'},'ZON'),
+    React.createElement('text',{x:33,y:57,textAnchor:'middle',fontSize:5.5,fill:'rgba(27,94,32,0.85)',fontFamily:'DM Sans,sans-serif',fontWeight:'700',transform:'rotate(-15,33,57)'},'PEMULIHARAAN'),
+    
+    // Zon Pemuliharaan Kanan (top-right)
+    React.createElement('path',{d:'M 200,18 Q 238,22 268,35 Q 278,55 272,80 Q 255,90 230,85 Q 210,78 200,60 Z',
+      fill:highlightZone==='Pemuliharaan'?'rgba(27,94,32,0.4)':'rgba(27,94,32,0.15)',
+      stroke:'rgba(27,94,32,0.5)',strokeWidth:1,strokeDasharray:'4,2'}),
+    React.createElement('text',{x:238,y:48,textAnchor:'middle',fontSize:5.5,fill:'rgba(27,94,32,0.85)',fontFamily:'DM Sans,sans-serif',fontWeight:'700',transform:'rotate(10,238,48)'},'ZON PEMULIHARAAN'),
+    
+    // Zon Arboretum Kanan (center)
+    React.createElement('path',{d:'M 160,38 Q 200,28 230,40 Q 245,58 235,88 Q 215,95 190,88 Q 165,75 160,55 Z',
+      fill:highlightZone==='Arboretum'?'rgba(46,125,50,0.4)':'rgba(46,125,50,0.15)',
+      stroke:'rgba(46,125,50,0.5)',strokeWidth:1,strokeDasharray:'4,2'}),
+    
+    // Zon Tapak Semaian (right)
+    React.createElement('path',{d:'M 262,50 Q 305,48 312,80 Q 314,110 300,130 Q 282,138 265,125 Q 252,108 255,85 Z',
+      fill:highlightZone==='Tapak Semaian'?'rgba(255,152,0,0.4)':'rgba(255,152,0,0.15)',
+      stroke:'rgba(230,119,0,0.5)',strokeWidth:1,strokeDasharray:'4,2'}),
+    React.createElement('text',{x:284,y:85,textAnchor:'middle',fontSize:5.5,fill:'rgba(180,80,0,0.9)',fontFamily:'DM Sans,sans-serif',fontWeight:'700',transform:'rotate(10,284,85)'},'ZON TAPAK'),
+    React.createElement('text',{x:284,y:93,textAnchor:'middle',fontSize:5.5,fill:'rgba(180,80,0,0.9)',fontFamily:'DM Sans,sans-serif',fontWeight:'700',transform:'rotate(10,284,93)'},'SEMAIAN'),
+    
+    // Zon Riparian (right-mid)
+    React.createElement('path',{d:'M 235,105 Q 270,100 295,118 Q 305,138 295,158 Q 278,168 258,160 Q 240,148 238,128 Z',
+      fill:highlightZone==='Riparian'?'rgba(21,101,192,0.35)':'rgba(21,101,192,0.13)',
+      stroke:'rgba(21,101,192,0.5)',strokeWidth:1,strokeDasharray:'4,2'}),
+    React.createElement('text',{x:268,y:135,textAnchor:'middle',fontSize:5.5,fill:'rgba(13,71,161,0.9)',fontFamily:'DM Sans,sans-serif',fontWeight:'700'},'ZON RIPARIAN'),
+    
+    // Zon Tanaman (bottom-right)
+    React.createElement('path',{d:'M 195,168 Q 230,160 265,170 Q 278,188 270,210 Q 248,222 218,218 Q 195,210 192,190 Z',
+      fill:highlightZone==='Tanaman'?'rgba(139,69,19,0.35)':'rgba(139,69,19,0.14)',
+      stroke:'rgba(139,69,19,0.5)',strokeWidth:1,strokeDasharray:'4,2'}),
+    React.createElement('text',{x:232,y:192,textAnchor:'middle',fontSize:6,fill:'rgba(101,50,14,0.9)',fontFamily:'DM Sans,sans-serif',fontWeight:'700'},'ZON TANAMAN'),
+    
+    // Zon Pentadbiran (bottom-left)
+    React.createElement('path',{d:'M 20,175 Q 55,168 88,175 Q 100,195 88,218 Q 58,228 28,218 Q 12,200 20,175 Z',
+      fill:'rgba(96,125,139,0.15)',stroke:'rgba(96,125,139,0.45)',strokeWidth:1,strokeDasharray:'4,2'}),
+    React.createElement('text',{x:54,y:195,textAnchor:'middle',fontSize:5.5,fill:'rgba(55,71,79,0.9)',fontFamily:'DM Sans,sans-serif',fontWeight:'700'},'ZON'),
+    React.createElement('text',{x:54,y:204,textAnchor:'middle',fontSize:5.5,fill:'rgba(55,71,79,0.9)',fontFamily:'DM Sans,sans-serif',fontWeight:'700'},'PENTADBIRAN'),
+    
+    // Main entrance marker
+    React.createElement('path',{d:'M 38,160 L 44,152 L 50,160',fill:'none',stroke:'rgba(200,50,50,0.8)',strokeWidth:1.5}),
+    React.createElement('rect',{x:35,y:155,width:18,height:14,rx:2,fill:'rgba(200,50,50,0.85)'}),
+    React.createElement('text',{x:44,y:164,textAnchor:'middle',fontSize:5,fill:'#fff',fontFamily:'DM Sans,sans-serif',fontWeight:'700'},'MAIN'),
+    
+    // Tree canopy clusters (visual detail)
+    ...[{cx:95,cy:65},{cx:115,cy:72},{cx:108,cy:58},{cx:88,cy:78},{cx:130,cy:65},{cx:175,cy:55},{cx:200,cy:62},{cx:215,cy:72}].map((c,i)=>
+      React.createElement('circle',{key:'c'+i,cx:c.cx,cy:c.cy,r:7+Math.sin(i)*2,fill:'rgba(56,142,60,0.2)',stroke:'rgba(56,142,60,0.3)',strokeWidth:.5})
+    ),
+    
     // Route overlay
-    routeCoords&&React.createElement('polyline',{
-      points:route.map(t=>`${t.lng},${t.lat}`).join(' '),
-      stroke:'#ffeb3b',strokeWidth:2.5,fill:'none',strokeDasharray:'4,2',strokeLinecap:'round',opacity:.9
+    route&&route.length>1&&React.createElement('polyline',{
+      points:route.map(t=>`${t.lng*3.2},${t.lat*2.4}`).join(' '),
+      stroke:'#ffeb3b',strokeWidth:3,fill:'none',strokeDasharray:'6,3',strokeLinecap:'round',opacity:.95
     }),
+    
     // Tree pins
     ...pins.map((pin,i)=>{
-      const color=pin.status==='healthy'?'#43a047':pin.status==='monitor'?'#fb8c00':'#e53935';
+      const color=pin.status==='healthy'?'#2e7d32':pin.status==='monitor'?'#e65100':'#c62828';
+      const glow=pin.status==='critical'?'rgba(198,40,40,0.3)':pin.status==='monitor'?'rgba(230,81,0,0.2)':'rgba(46,125,50,0.2)';
+      const x=pin.lng*3.2;const y=pin.lat*2.4;
       return React.createElement('g',{key:pin.id,style:{cursor:'pointer'},onClick:()=>onPinClick&&onPinClick(pin)},
-        React.createElement('circle',{cx:pin.lng,cy:pin.lat,r:3.5,fill:color,stroke:'#fff',strokeWidth:1}),
-        React.createElement('text',{x:pin.lng,y:pin.lat-5,textAnchor:'middle',fontSize:3,fill:'#1a2e1f',fontFamily:'DM Sans,sans-serif',fontWeight:'bold'},pin.icon)
+        React.createElement('circle',{cx:x,cy:y,r:7,fill:glow}),
+        React.createElement('circle',{cx:x,cy:y,r:4.5,fill:color,stroke:'#fff',strokeWidth:1.5}),
+        React.createElement('text',{x:x,y:y-7,textAnchor:'middle',fontSize:7,fontFamily:'DM Sans,sans-serif'},pin.icon),
+        React.createElement('rect',{x:x-12,y:y+5,width:24,height:8,rx:2,fill:'rgba(255,255,255,0.88)'}),
+        React.createElement('text',{x:x,y:y+11,textAnchor:'middle',fontSize:4.5,fill:'#1a2e1f',fontFamily:'DM Sans,sans-serif',fontWeight:'700'},pin.id.replace('TBJ-','T-'))
       );
     }),
-    // Ranger dots (only if showRangers)
+    
+    // Ranger dots
     showRangers&&RANGERS.filter(r=>r.status==='on-duty').map((r,i)=>{
-      const poses=[{x:15,y:30},{x:62,y:22},{x:28,y:75},{x:75,y:68}];
-      const p=poses[i]||{x:20,y:20};
+      const poses=[{x:95,y:75},{x:55,y:55},{x:75,y:170},{x:268,y:135}];
+      const p=poses[i]||{x:50,y:50};
       return React.createElement('g',{key:r.id},
-        React.createElement('circle',{cx:p.x,cy:p.y,r:4,fill:'#1565c0',stroke:'#fff',strokeWidth:1.5}),
-        React.createElement('text',{x:p.x,y:p.y+1.2,textAnchor:'middle',fontSize:3.5,fill:'#fff',fontFamily:'DM Sans,sans-serif',fontWeight:'bold'},r.avatar[0])
+        React.createElement('circle',{cx:p.x,cy:p.y,r:7,fill:'rgba(21,101,192,0.25)'}),
+        React.createElement('circle',{cx:p.x,cy:p.y,r:5,fill:'#1565c0',stroke:'#fff',strokeWidth:1.5}),
+        React.createElement('text',{x:p.x,y:p.y+1.8,textAnchor:'middle',fontSize:4.5,fill:'#fff',fontFamily:'DM Sans,sans-serif',fontWeight:'700'},r.avatar[0])
       );
-    })
+    }),
+    
+    // Compass rose
+    React.createElement('g',{transform:'translate(295,220)'},
+      React.createElement('circle',{cx:0,cy:0,r:10,fill:'rgba(255,255,255,0.85)',stroke:'rgba(0,0,0,0.15)',strokeWidth:.5}),
+      React.createElement('polygon',{points:'0,-8 -3,-2 3,-2',fill:'#e53935'}),
+      React.createElement('polygon',{points:'0,8 -3,2 3,2',fill:'#555'}),
+      React.createElement('text',{x:0,y:-10,textAnchor:'middle',fontSize:5,fill:'#e53935',fontWeight:'700',fontFamily:'DM Sans,sans-serif'},'N')
+    )
+  );
+}
+
+// ── QR SCANNER COMPONENT ──
+function QRScanner({onClose,onScan,role}){
+  const [status,setStatus]=useState('scanning');// scanning | found | ai-diagnosis | error | manual
+  const [manualInput,setManualInput]=useState('');
+  const [foundTree,setFoundTree]=useState(null);
+  const [scanNote,setScanNote]=useState('');
+  const [editStatus,setEditStatus]=useState('');
+  const [editHealth,setEditHealth]=useState('');
+  const videoRef=useRef(null);
+  const scannerRef=useRef(null);
+
+  // Simulate camera + scanning
+  useEffect(()=>{
+    let active=true;
+    // Try to access camera
+    if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+      navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}})
+        .then(stream=>{
+          if(videoRef.current&&active){
+            videoRef.current.srcObject=stream;
+            videoRef.current.play().catch(()=>{});
+          }
+        })
+        .catch(()=>{}); // Camera denied — still show UI
+    }
+    // Auto-demo scan after 3 seconds (simulated)
+    const timer=setTimeout(()=>{
+      if(active&&status==='scanning'){
+        const randomTree=TREES[Math.floor(Math.random()*TREES.length)];
+        setFoundTree(randomTree);
+        setEditStatus(randomTree.status);
+        setEditHealth(randomTree.health);
+        setStatus('found');
+      }
+    },3000);
+    return()=>{
+      active=false;
+      clearTimeout(timer);
+      if(videoRef.current&&videoRef.current.srcObject){
+        videoRef.current.srcObject.getTracks().forEach(t=>t.stop());
+      }
+    };
+  },[]);
+
+  function handleManualScan(){
+    const q=manualInput.trim().toUpperCase();
+    const found=TREES.find(t=>t.id===q||t.id.replace('TBJ-','')===q||t.id===('TBJ-'+q));
+    if(found){
+        setFoundTree(found);
+        setEditStatus(found.status);
+        setEditHealth(found.health);
+        setStatus('found');
+    }
+    else{setStatus('error');setTimeout(()=>setStatus('scanning'),2000);}
+  }
+
+  function handleConfirm(){
+    onScan&&onScan(foundTree,scanNote);
+    onClose();
+  }
+
+  return React.createElement('div',{className:'qr-scanner-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose()}},
+    React.createElement('div',{className:'qr-scanner-box',onClick:e=>e.stopPropagation()},
+      React.createElement('div',{className:'qr-scanner-header'},
+        React.createElement('h3',null,'📷 '+(role==='ranger'?'Scan Tree QR':'Tree QR Scanner')),
+        React.createElement('button',{onClick:onClose},'✕')
+      ),
+      // Viewfinder
+      React.createElement('div',{className:'qr-viewfinder'},
+        React.createElement('video',{ref:videoRef,muted:true,playsInline:true,style:{width:'100%',height:'100%',objectFit:'cover'}}),
+        React.createElement('div',{className:'qr-scan-ring'}),
+        React.createElement('div',{className:'qr-viewfinder-frame'},
+          React.createElement('div',{className:'qr-corner tl'}),
+          React.createElement('div',{className:'qr-corner tr'}),
+          React.createElement('div',{className:'qr-corner bl'}),
+          React.createElement('div',{className:'qr-corner br'})
+        ),
+        status==='scanning'&&React.createElement('div',{className:'qr-scan-line'}),
+        status==='found'&&React.createElement('div',{style:{position:'absolute',inset:0,background:'rgba(74,222,128,0.15)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:10}},
+          React.createElement('div',{style:{fontSize:'48px',animation:'slideup .4s ease'}},'✅')
+        ),
+        // Dark overlay tip
+        React.createElement('div',{style:{position:'absolute',bottom:0,left:0,right:0,background:'linear-gradient(transparent,rgba(0,0,0,0.7))',padding:'16px',textAlign:'center',zIndex:4}},
+          React.createElement('p',{style:{color:'#fff',fontSize:'11px',opacity:.9}},
+            status==='scanning'?'Point camera at the QR code on the tree tag':
+            status==='found'?'✅ Tree detected!':
+            status==='error'?'❌ Tree ID not found. Try again.':''
+          )
+        )
+      ),
+      // Body
+      React.createElement('div',{className:'qr-scanner-body'},
+        // Status bar
+        React.createElement('div',{className:'qr-scanner-status '+(status==='found'?'qr-status-success':status==='error'?'qr-status-error':'qr-status-scanning')},
+          React.createElement('div',{className:'qr-status-dot '+(status==='found'?'':'green'+(status==='error'?'':'')),
+            style:{background:status==='found'?'#4ade80':status==='error'?'#e53935':'#4ade80',animation:status!=='found'&&status!=='error'?'blink 1s infinite':'none'}}),
+          status==='scanning'?'Scanning for QR code...':
+          status==='found'?'Tree identified successfully!':
+          status==='error'?'QR code not recognized. Try manual entry.':''
+        ),
+        // Manual input
+        React.createElement('div',{style:{marginBottom:'4px',fontSize:'11px',color:'var(--text-light)',fontWeight:'500'}},'Or enter Tree ID manually:'),
+        React.createElement('div',{className:'qr-manual-input'},
+          React.createElement('input',{
+            placeholder:'e.g. TBJ-001',value:manualInput,
+            onChange:e=>setManualInput(e.target.value),
+            onKeyDown:e=>e.key==='Enter'&&handleManualScan()
+          }),
+          React.createElement('button',{onClick:handleManualScan},'Search')
+        ),
+        // Found result
+        status==='found'&&foundTree&&React.createElement('div',{className:'qr-found-result'},
+          React.createElement('div',{className:'qr-found-header'},
+            React.createElement('div',{className:'qr-found-icon'},foundTree.icon),
+            React.createElement('div',null,
+              React.createElement('div',{className:'qr-found-name'},foundTree.name),
+              React.createElement('em',{className:'qr-found-sci'},foundTree.sci)
+            )
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'6px',flexWrap:'wrap',marginBottom:'8px'}},
+            React.createElement('span',{className:'tag tag-blue'},foundTree.id),
+            React.createElement('span',{className:'tag tag-green'},'Zon '+foundTree.zone),
+            role==='visitor'&&React.createElement(StatusPill,{status:foundTree.status})
+          ),
+          role==='visitor' ? React.createElement(React.Fragment, null,
+            React.createElement('div',{className:'qr-found-stats'},
+              React.createElement('div',{className:'qr-found-stat'},
+                React.createElement('div',{className:'qr-found-stat-val'},foundTree.health+'%'),
+                React.createElement('div',{className:'qr-found-stat-lbl'},'Health Score')
+              ),
+              React.createElement('div',{className:'qr-found-stat'},
+                React.createElement('div',{className:'qr-found-stat-val'},foundTree.age+' yrs'),
+                React.createElement('div',{className:'qr-found-stat-lbl'},'Tree Age')
+              ),
+              React.createElement('div',{className:'qr-found-stat'},
+                React.createElement('div',{className:'qr-found-stat-val'},foundTree.height),
+                React.createElement('div',{className:'qr-found-stat-lbl'},'Height')
+              ),
+              React.createElement('div',{className:'qr-found-stat'},
+                React.createElement('div',{className:'qr-found-stat-val',style:{color:foundTree.status==='healthy'?'var(--green-700)':foundTree.status==='critical'?'#c62828':'#e65100'}},
+                  foundTree.status==='healthy'?'Good':'⚠'
+                ),
+                React.createElement('div',{className:'qr-found-stat-lbl'},'Status')
+              )
+            ),
+            React.createElement('div',{className:'qr-actions'},
+              React.createElement('button',{className:'btn-primary',style:{flex:1,padding:'10px'},onClick:handleConfirm},'🏅 Collect Tree'),
+              React.createElement('button',{className:'btn-sm-outline',style:{flex:1,padding:'10px'},onClick:()=>{setStatus('scanning');setFoundTree(null)}},'Scan Another')
+            )
+          ) : React.createElement(React.Fragment, null,
+            // Ranger Edit Form
+            React.createElement('div',{style:{background:'var(--cream-dark)', padding:'14px', borderRadius:'10px', marginTop:'12px'}},
+              React.createElement('div',{style:{fontSize:'12px',fontWeight:'600',color:'var(--text-dark)',marginBottom:'10px'}},'📋 Update Tree Condition'),
+              React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',marginBottom:'10px'}},
+                React.createElement('div',null,
+                  React.createElement('label',{style:{display:'block',fontSize:'10px',color:'var(--text-light)',marginBottom:'4px'}},'Status'),
+                  React.createElement('select',{
+                    style:{width:'100%',padding:'8px',border:'1.5px solid var(--border)',borderRadius:'8px',fontSize:'12px',fontFamily:'inherit'},
+                    value:editStatus,onChange:e=>setEditStatus(e.target.value)
+                  },
+                    React.createElement('option',{value:'healthy'},'● Healthy'),
+                    React.createElement('option',{value:'monitor'},'⚠ Monitor'),
+                    React.createElement('option',{value:'critical'},'✕ Critical')
+                  )
+                ),
+                React.createElement('div',null,
+                  React.createElement('label',{style:{display:'block',fontSize:'10px',color:'var(--text-light)',marginBottom:'4px'}},'Health Score (%)'),
+                  React.createElement('input',{
+                    type:'number',min:0,max:100,
+                    style:{width:'100%',padding:'8px',border:'1.5px solid var(--border)',borderRadius:'8px',fontSize:'12px',fontFamily:'inherit'},
+                    value:editHealth,onChange:e=>setEditHealth(e.target.value)
+                  })
+                )
+              ),
+              React.createElement('div',null,
+                React.createElement('label',{style:{display:'block',fontSize:'10px',color:'var(--text-light)',marginBottom:'4px'}},'Field Note (Optional)'),
+                React.createElement('input',{
+                  style:{width:'100%',padding:'8px',border:'1.5px solid var(--border)',borderRadius:'8px',fontSize:'12px',fontFamily:'inherit'},
+                  placeholder:'e.g. Minor leaf spotting...',value:scanNote,onChange:e=>setScanNote(e.target.value)
+                })
+              )
+            ),
+            React.createElement('div',{className:'qr-actions'},
+              React.createElement('button',{className:'btn-primary',style:{flex:1,padding:'10px'},onClick:handleConfirm},'💾 Save Update'),
+              React.createElement('button',{className:'btn-sm-outline',style:{flex:1,padding:'10px',borderColor:'var(--green-500)',color:'var(--green-700)'},onClick:()=>setStatus('ai-diagnosis')},'🔬 AI Diagnose')
+            )
+          )
+        ),
+        
+        // AI Diagnosis Result inside Scanner (Ranger Only)
+        status==='ai-diagnosis'&&foundTree&&React.createElement('div',{className:'qr-found-result'},
+          React.createElement('div',{className:'qr-found-header'},
+            React.createElement('div',{className:'qr-found-icon',style:{fontSize:'32px'}},'🤖'),
+            React.createElement('div',null,
+              React.createElement('div',{className:'qr-found-name'},'AI Diagnosis: '+foundTree.id),
+              React.createElement('em',{className:'qr-found-sci'},'Analyzing conditions...')
+            )
+          ),
+          React.createElement('div',{style:{marginTop:'12px'}},
+            ...DIAGNOSES.map((d,i)=>
+              React.createElement('div',{key:i,className:'diagnosis-card',style:{borderLeftColor:i===0?'var(--green-500)':'var(--border)',borderLeftWidth:'4px'}},
+                React.createElement('div',{className:'diagnosis-rank',style:{color:i===0?'var(--green-700)':'var(--text-light)'}},d.rank+' Most Probable'),
+                React.createElement('div',{className:'diagnosis-name'},d.name),
+                React.createElement('div',{className:'diagnosis-conf'},'Confidence: '+d.conf+'%'),
+                React.createElement('div',{className:'confidence-bar'},
+                  React.createElement('div',{className:'confidence-fill',style:{width:d.conf+'%',background:i===0?'var(--green-500)':i===1?'#fb8c00':'#e05c3a'}})
+                ),
+                React.createElement('div',{className:'diagnosis-treatment'},'💊 Treatment: '+d.treatment)
+              )
+            )
+          ),
+          React.createElement('div',{className:'qr-actions'},
+            React.createElement('button',{className:'btn-primary',style:{flex:1,padding:'10px'},onClick:handleConfirm},'✅ Confirm & Log Report'),
+            React.createElement('button',{className:'btn-sm-outline',style:{flex:1,padding:'10px'},onClick:()=>setStatus('found')},'← Back')
+          )
+        )
+      )
+    )
   );
 }
 
@@ -471,7 +854,6 @@ function App(){
   const [plantType,setPlantType]=useState('');
   const [visitDuration,setVisitDuration]=useState(60);
   const [generatedRoute,setGeneratedRoute]=useState(null);
-  const [diagTab,setDiagTab]=useState('results');
   const [filterZone,setFilterZone]=useState('all');
   const [filterStatus,setFilterStatus]=useState('all');
   const [searchQ,setSearchQ]=useState('');
@@ -479,13 +861,16 @@ function App(){
   const [mapLayer,setMapLayer]=useState('health');
   const [showAddTree,setShowAddTree]=useState(false);
   const [showAssignRanger,setShowAssignRanger]=useState(false);
-  const [newTree,setNewTree]=useState({name:'',sci:'',zone:'A',type:'',age:'',height:''});
-  const [rangerAssign,setRangerAssign]=useState({});
+  const [newTree,setNewTree]=useState({name:'',sci:'',zone:'Arboretum',type:'',age:'',height:''});
   const [spatialClick,setSpatialClick]=useState({x:55,y:42});
   const [loginId,setLoginId]=useState('');
   const [loginPass,setLoginPass]=useState('');
   const [loginErr,setLoginErr]=useState('');
   const [dashTab,setDashTab]=useState('overview');
+  const [showQRScanner,setShowQRScanner]=useState(false);
+  const [scanHistory,setScanHistory]=useState(SCAN_HISTORY_DEFAULT);
+  const [collectedTrees,setCollectedTrees]=useState([TREES[0],TREES[2],TREES[4]]);
+  const [lastScan,setLastScan]=useState(null);
   const chatEndRef=useRef(null);
 
   useEffect(()=>{chatEndRef.current&&chatEndRef.current.scrollIntoView({behavior:'smooth'})},[chatMsgs]);
@@ -506,16 +891,35 @@ function App(){
     } else {setLoginErr('Invalid credentials. Please try again.');}
   }
 
+  function handleQRScan(tree,note){
+    if(!tree)return;
+    const now=new Date();
+    const timeStr=now.toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'});
+    setLastScan(tree);
+    if(role==='ranger'){
+      setScanHistory(prev=>[{tree,time:timeStr,ranger:RANGERS[0].name,note:note||'Scanned via QR'},
+        ...prev.slice(0,9)]);
+    } else {
+      // Visitor: collect tree
+      if(!collectedTrees.find(t=>t.id===tree.id)){
+        setCollectedTrees(prev=>[...prev,tree]);
+      }
+      setScanHistory(prev=>[{tree,time:timeStr,ranger:'Visitor',note:'Collected'},
+        ...prev.slice(0,9)]);
+    }
+  }
+
   function sendChat(){
     if(!chatInput.trim())return;
     const userMsg={role:'user',text:chatInput};
     const q=chatInput.toLowerCase();
     let reply='';
-    if(q.includes('angsana'))reply='The Angsana (Pterocarpus indicus) is one of Malaysia\'s most beloved trees, known for its golden flowers in February! 🌼 Currently 45 years old in Zone A with 92% health score.';
-    else if(q.includes('meranti')||q.includes('rare'))reply='Meranti Merah can grow up to 30 metres tall and is listed as a spesies nadir (rare species) in our garden. 🌳 It is over 80 years old and is our tallest tree!';
-    else if(q.includes('zone a'))reply='Zone A hosts our oldest trees including the Angsana and Cempaka Putih. Best visited in the morning (8–10 AM) when the canopy provides lovely shade! ☀️';
-    else if(q.includes('disease')||q.includes('sick'))reply='TBJ-004 (Pokok Nangka) in Zone C is currently flagged with suspected Powdery Mildew. Our rangers are monitoring it closely. 🔍';
-    else reply='Great question! 🌿 Taman Botani Johor spans 32 hectares and hosts over 1,247 trees across 4 zones. Try asking about specific species or zones!';
+    if(q.includes('angsana'))reply='The Angsana (Pterocarpus indicus) is one of Malaysia\'s most beloved trees, known for its golden flowers in February! 🌼 Currently 45 years old in the Arboretum with 92% health score.';
+    else if(q.includes('meranti')||q.includes('rare'))reply='Meranti Merah can grow up to 30 metres tall and is listed as a spesies nadir (rare species) in our garden. 🌳 It is over 80 years old in Zon Pemuliharaan and is our tallest tree!';
+    else if(q.includes('arboretum'))reply='Zon Arboretum hosts our oldest trees including the Angsana and Cempaka Putih. Best visited in the morning (8–10 AM) when the canopy provides lovely shade! ☀️';
+    else if(q.includes('disease')||q.includes('sick'))reply='TBJ-004 (Pokok Nangka) in Zon Tanaman is currently flagged with suspected Powdery Mildew. Our rangers are monitoring it closely. 🔍';
+    else if(q.includes('lake')||q.includes('tasik'))reply='TBJ has two beautiful lakes: Tasik Bukit Besi (the main central lake) and Tasik Bukit Belah (the smaller western lake). Both are surrounded by riparian vegetation! 💧';
+    else reply='Great question! 🌿 Taman Botani Johor spans 32 hectares across 7 zones: Arboretum, Pemuliharaan, Tapak Semaian, Riparian, Tanaman, Pentadbiran, and two lakes. Try asking about specific species or zones!';
     setChatMsgs(p=>[...p,userMsg,{role:'bot',text:reply}]);
     setChatInput('');
   }
@@ -601,15 +1005,15 @@ function App(){
   const navItems={
     admin:[
       {section:'Overview',items:[{id:'dashboard',icon:'📊',label:'Dashboard'}]},
-      {section:'SS1 – Tree Health',items:[{id:'treeinventory',icon:'🌳',label:'Tree Inventory'},{id:'diagnosis',icon:'🔬',label:'AI Diagnosis'},{id:'maintenance',icon:'⚙️',label:'Predictive Maint.'}]},
+      {section:'SS1 – Tree Health',items:[{id:'treeinventory',icon:'🌳',label:'Tree Inventory'},{id:'maintenance',icon:'⚙️',label:'Predictive Maint.'}]},
       {section:'SS2 – Scheduling',items:[{id:'schedule',icon:'📅',label:'Workforce Schedule'},{id:'rangers',icon:'👥',label:'Ranger Management'},{id:'tasks',icon:'✅',label:'Task Tracker'}]},
       {section:'SS4 – Map & QR',items:[{id:'map',icon:'🗺️',label:'Garden Map'},{id:'spatial',icon:'🧭',label:'Spatial Planning'},{id:'auditlog',icon:'🔐',label:'Audit Log'}]},
     ],
     ranger:[
-      {section:'Field Operations',items:[{id:'tasks',icon:'✅',label:'My Tasks'},{id:'diagnosis',icon:'🔬',label:'AI Diagnosis'},{id:'map',icon:'🗺️',label:'Garden Map'}]},
+      {section:'Field Operations',items:[{id:'tasks',icon:'✅',label:'My Tasks'},{id:'qrscan',icon:'📷',label:'QR Tree Scan'},{id:'map',icon:'🗺️',label:'Garden Map'}]},
     ],
     visitor:[
-      {section:'Visitor Portal',items:[{id:'explore',icon:'🗺️',label:'Explore & Route'},{id:'treecards',icon:'🌿',label:'Tree Profiles'},{id:'chatbot',icon:'💬',label:'Ask AI'},{id:'collection',icon:'🏅',label:'My Collection'}]},
+      {section:'Visitor Portal',items:[{id:'explore',icon:'🗺️',label:'Explore & Route'},{id:'qrscan',icon:'📷',label:'Scan QR Trees'},{id:'treecards',icon:'🌿',label:'Tree Profiles'},{id:'chatbot',icon:'💬',label:'Ask AI'},{id:'collection',icon:'🏅',label:'My Collection'}]},
     ],
   };
 
@@ -620,10 +1024,9 @@ function App(){
   };
   const u=userInfo[role];
 
-  // ── DASHBOARD ──────────────────────────────────────
+  // ── DASHBOARD ──
   function renderDashboard(){
     return React.createElement('div',null,
-      // Dashboard tabs
       React.createElement('div',{className:'tabs',style:{marginBottom:'20px'}},
         ...[['overview','📊 Overview'],['analytics','📈 Analytics'],['aiinsights','🤖 AI Insights']].map(([k,l])=>
           React.createElement('button',{key:k,className:'tab'+(dashTab===k?' active':''),onClick:()=>setDashTab(k)},l)
@@ -653,7 +1056,7 @@ function App(){
             React.createElement('div',{className:'alert-card alert-critical'},
               React.createElement('div',{className:'alert-icon'},'🔴'),
               React.createElement('div',null,
-                React.createElement('div',{className:'alert-title'},'Zone C – Disease Outbreak'),
+                React.createElement('div',{className:'alert-title'},'Zon Tanaman – Disease Outbreak'),
                 React.createElement('div',{className:'alert-body'},'Fungal infection spreading. 14% disease rate. 23 trees affected.'),
                 React.createElement('span',{className:'alert-badge'},'Confidence: 92%')
               )
@@ -661,7 +1064,7 @@ function App(){
             React.createElement('div',{className:'alert-card alert-warning'},
               React.createElement('div',{className:'alert-icon'},'🟡'),
               React.createElement('div',null,
-                React.createElement('div',{className:'alert-title'},'Zone B – Water Stress'),
+                React.createElement('div',{className:'alert-title'},'Zon Arboretum – Water Stress'),
                 React.createElement('div',{className:'alert-body'},'Unusual leaf drop rate. Drought stress likely. 8 trees at risk.'),
                 React.createElement('span',{className:'alert-badge'},'Confidence: 78%')
               )
@@ -669,7 +1072,7 @@ function App(){
             React.createElement('div',{className:'alert-card alert-info'},
               React.createElement('div',{className:'alert-icon'},'🟢'),
               React.createElement('div',null,
-                React.createElement('div',{className:'alert-title'},'Zone A – Optimal Conditions'),
+                React.createElement('div',{className:'alert-title'},'Zon Pemuliharaan – Optimal'),
                 React.createElement('div',{className:'alert-body'},'All health indicators normal. Scheduled maintenance on track.')
               )
             )
@@ -678,22 +1081,21 @@ function App(){
             React.createElement('div',{className:'card-title',style:{marginBottom:'4px'}},'📊 Zone Health Score'),
             React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'Current week average health %'),
             React.createElement('div',{className:'bar-chart'},
-              ...[{h:85,c:'var(--green-400)',lbl:'A'},{h:62,c:'#fb8c00',lbl:'B'},{h:30,c:'#e05c3a',lbl:'C'},{h:75,c:'var(--green-300)',lbl:'D'}].map(b=>
+              ...[
+                {h:91,c:'var(--green-400)',lbl:'Arboretum'},
+                {h:88,c:'var(--green-300)',lbl:'Pemuliharaan'},
+                {h:62,c:'#fb8c00',lbl:'Tanaman'},
+                {h:78,c:'var(--green-400)',lbl:'Riparian'},
+                {h:85,c:'var(--green-300)',lbl:'Tapak S.'},
+              ].map(b=>
                 React.createElement('div',{key:b.lbl,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}},
-                  React.createElement('div',{style:{fontSize:'11px',fontWeight:'600',color:'var(--text-dark)'}},b.h+'%'),
+                  React.createElement('div',{style:{fontSize:'10px',fontWeight:'600',color:'var(--text-dark)'}},b.h+'%'),
                   React.createElement('div',{className:'bar',style:{height:b.h+'%',background:b.c,width:'100%',borderRadius:'4px 4px 0 0'}})
                 )
               )
             ),
             React.createElement('div',{className:'bar-labels'},
-              ...['Zone A','Zone B','Zone C','Zone D'].map(l=>React.createElement('div',{key:l,className:'bar-label'},l))
-            ),
-            React.createElement('div',{style:{marginTop:'16px',display:'flex',gap:'12px',flexWrap:'wrap'}},
-              ...[['🟢','Healthy','1,021'],['🟡','Monitor','156'],['🔴','Critical','70']].map(([ic,lbl,n])=>
-                React.createElement('div',{key:lbl,style:{display:'flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'var(--text-mid)'}},
-                  React.createElement('span',null,ic),' ',lbl,' – ',React.createElement('strong',null,n)
-                )
-              )
+              ...['Arboretum','Pemuliharaan','Tanaman','Riparian','Tapak S.'].map(l=>React.createElement('div',{key:l,className:'bar-label'},l))
             )
           )
         ),
@@ -714,7 +1116,7 @@ function App(){
                 React.createElement('tr',{key:t.id,style:{cursor:'pointer'},onClick:()=>setModal(t)},
                   React.createElement('td',null,React.createElement('span',{className:'tag tag-blue'},t.id)),
                   React.createElement('td',null,t.icon,' ',t.name),
-                  React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zone '+t.zone)),
+                  React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},t.zone)),
                   React.createElement('td',null,RANGERS[i%4].name),
                   React.createElement('td',null,React.createElement(StatusPill,{status:t.status})),
                   React.createElement('td',null,
@@ -734,45 +1136,25 @@ function App(){
 
       dashTab==='analytics'&&React.createElement('div',null,
         React.createElement('div',{className:'grid-2',style:{marginBottom:'16px'}},
-          // Monthly health trend line chart
+          // Monthly Health Trend
           React.createElement('div',{className:'card'},
             React.createElement('div',{className:'card-title'},'📈 Monthly Health Trend'),
             React.createElement('div',{className:'card-sub',style:{marginBottom:'12px'}},'Average garden health score (%)'),
             React.createElement('svg',{viewBox:'0 0 280 100',style:{width:'100%',height:'120px'}},
-              // Grid lines
-              ...[20,40,60,80,100].map(y=>
-                React.createElement('line',{key:y,x1:30,y1:100-y,x2:280,y2:100-y,stroke:'#e8e4db',strokeWidth:.5})
-              ),
-              ...[20,40,60,80,100].map(y=>
-                React.createElement('text',{key:'y'+y,x:25,y:100-y+3,textAnchor:'end',fontSize:7,fill:'#6b8f78'},y)
-              ),
-              // Area fill
-              React.createElement('path',{
-                d:'M'+MONTHLY_HEALTH.map((h,i)=>`${30+i*22},${100-h}`).join(' L')+' L'+`${30+11*22},100 L30,100`,
-                fill:'rgba(58,122,80,0.12)',stroke:'none'
-              }),
-              // Line
-              React.createElement('polyline',{
-                points:MONTHLY_HEALTH.map((h,i)=>`${30+i*22},${100-h}`).join(' '),
-                fill:'none',stroke:'var(--green-500)',strokeWidth:1.5,strokeLinecap:'round',strokeLinejoin:'round'
-              }),
-              // Points
-              ...MONTHLY_HEALTH.map((h,i)=>
-                React.createElement('circle',{key:i,cx:30+i*22,cy:100-h,r:2.5,fill:'var(--green-600)',stroke:'#fff',strokeWidth:1})
-              ),
-              // X labels
-              ...MONTHLY_LABELS.map((l,i)=>
-                React.createElement('text',{key:l,x:30+i*22,y:108,textAnchor:'middle',fontSize:6,fill:'#6b8f78'},l)
-              )
+              ...[20,40,60,80,100].map(y=>React.createElement('line',{key:y,x1:30,y1:100-y,x2:280,y2:100-y,stroke:'#e8e4db',strokeWidth:.5})),
+              ...[20,40,60,80,100].map(y=>React.createElement('text',{key:'y'+y,x:25,y:100-y+3,textAnchor:'end',fontSize:7,fill:'#6b8f78'},y)),
+              React.createElement('path',{d:'M'+MONTHLY_HEALTH.map((h,i)=>`${30+i*22},${100-h}`).join(' L')+' L'+`${30+11*22},100 L30,100`,fill:'rgba(58,122,80,0.12)',stroke:'none'}),
+              React.createElement('polyline',{points:MONTHLY_HEALTH.map((h,i)=>`${30+i*22},${100-h}`).join(' '),fill:'none',stroke:'var(--green-500)',strokeWidth:1.5,strokeLinecap:'round',strokeLinejoin:'round'}),
+              ...MONTHLY_HEALTH.map((h,i)=>React.createElement('circle',{key:i,cx:30+i*22,cy:100-h,r:2.5,fill:'var(--green-600)',stroke:'#fff',strokeWidth:1})),
+              ...MONTHLY_LABELS.map((l,i)=>React.createElement('text',{key:l,x:30+i*22,y:108,textAnchor:'middle',fontSize:6,fill:'#6b8f78'},l))
             )
           ),
-          // Species donut
+          // Species Donut
           React.createElement('div',{className:'card'},
             React.createElement('div',{className:'card-title'},'🌿 Species Distribution'),
             React.createElement('div',{className:'card-sub',style:{marginBottom:'12px'}},'Tree types across all zones'),
             React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'20px'}},
               React.createElement('svg',{viewBox:'0 0 100 100',style:{width:'100px',height:'100px',flexShrink:0}},
-                // Donut segments
                 ...[
                   {pct:35,color:'var(--green-500)',startAngle:-90,label:'Hardwood'},
                   {pct:25,color:'#fb8c00',startAngle:-90+35*3.6,label:'Flowering'},
@@ -808,26 +1190,27 @@ function App(){
             )
           )
         ),
-        // Ranger performance & mortality
-        React.createElement('div',{className:'grid-2'},
+        React.createElement('div',{className:'grid-2',style:{marginBottom:'16px'}},
+          // Ranger Task Completion
           React.createElement('div',{className:'card'},
             React.createElement('div',{className:'card-title'},'👥 Ranger Task Completion'),
             React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'This month'),
-            ...RANGERS.map(r=>
+            ...RANGERS.map((r,i)=>
               React.createElement('div',{key:r.id,style:{marginBottom:'12px'}},
                 React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:'4px'}},
                   React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
                     React.createElement('div',{className:'user-avatar',style:{width:'26px',height:'26px',fontSize:'10px',background:'var(--green-500)'}},r.avatar),
                     React.createElement('span',{style:{fontSize:'12px',fontWeight:'500',color:'var(--text-dark)'}},r.name)
                   ),
-                  React.createElement('span',{style:{fontSize:'12px',fontWeight:'600',color:'var(--green-700)'}},[88,92,75,96][RANGERS.indexOf(r)]+'%')
+                  React.createElement('span',{style:{fontSize:'12px',fontWeight:'600',color:'var(--green-700)'}},[88,92,75,96][i]+'%')
                 ),
                 React.createElement('div',{className:'prog-wrap'},
-                  React.createElement('div',{className:'prog-bar',style:{width:[88,92,75,96][RANGERS.indexOf(r)]+'%'}})
+                  React.createElement('div',{className:'prog-bar',style:{width:[88,92,75,96][i]+'%'}})
                 )
               )
             )
           ),
+          // Tree Mortality Trend
           React.createElement('div',{className:'card'},
             React.createElement('div',{className:'card-title'},'📉 Tree Mortality Trend'),
             React.createElement('div',{className:'card-sub',style:{marginBottom:'12px'}},'Monthly deaths / removals'),
@@ -845,7 +1228,7 @@ function App(){
             )
           )
         ),
-        // Zone comparison table
+        // Zone Comparison Table
         React.createElement('div',{className:'card'},
           React.createElement('div',{className:'card-title',style:{marginBottom:'14px'}},'📊 Zone Comparison Summary'),
           React.createElement('table',{className:'tree-table'},
@@ -854,13 +1237,14 @@ function App(){
             ),
             React.createElement('tbody',null,
               ...[
-                ['A','312','290','18','4','91%','Excellent'],
-                ['B','428','312','88','28','77%','Good'],
-                ['C','287','198','42','47','62%','Watch'],
-                ['D','220','175','24','21','80%','Good'],
+                ['Arboretum','312','290','18','4','91%','Excellent'],
+                ['Pemuliharaan','218','180','30','8','88%','Good'],
+                ['Tanaman','285','160','80','45','62%','Watch'],
+                ['Riparian','192','140','40','12','78%','Good'],
+                ['Tapak Semaian','240','200','35','5','85%','Excellent'],
               ].map(([z,total,h,m,c,avg,st])=>
                 React.createElement('tr',{key:z},
-                  React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zone '+z)),
+                  React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zon '+z)),
                   React.createElement('td',null,total),
                   React.createElement('td',{style:{color:'#1a6b3a',fontWeight:'600'}},h),
                   React.createElement('td',{style:{color:'#8a5f00',fontWeight:'600'}},m),
@@ -884,11 +1268,11 @@ function App(){
             )
           )
         ),
-        React.createElement('div',{className:'grid-3'},
+        React.createElement('div',{className:'grid-3',style:{marginBottom:'16px'}},
           ...[
-            {icon:'🌡️',title:'Predicted Disease Risk',body:'Zone C has a 91% probability of further fungal spread within 7 days. Immediate intervention recommended. Zone B shows early signs of water stress.'},
-            {icon:'📅',title:'Optimal Maintenance Window',body:'AI recommends scheduling intensive tree care for Zone C on Wednesday–Thursday (lower rainfall probability: 23%). Best time: 7–11 AM.'},
-            {icon:'💰',title:'Resource Cost Forecast',body:'Projected fungicide cost for Zone C outbreak: RM 2,340. Early intervention now vs. later saves estimated RM 8,200 in tree replacement costs.'},
+            {icon:'🌡️',title:'Predicted Disease Risk',body:'Zon Tanaman has a 91% probability of further fungal spread within 7 days. Immediate intervention recommended.'},
+            {icon:'📅',title:'Optimal Maintenance Window',body:'AI recommends scheduling intensive tree care for Zon Tanaman on Wednesday–Thursday. Best time: 7–11 AM.'},
+            {icon:'💰',title:'Resource Cost Forecast',body:'Projected fungicide cost for Zon Tanaman outbreak: RM 2,340. Early intervention saves estimated RM 8,200.'},
           ].map((c,i)=>
             React.createElement('div',{key:i,className:'card'},
               React.createElement('div',{style:{fontSize:'24px',marginBottom:'8px'}},c.icon),
@@ -897,7 +1281,6 @@ function App(){
             )
           )
         ),
-        // AI crowd flow prediction
         React.createElement('div',{className:'card'},
           React.createElement('div',{className:'card-title',style:{marginBottom:'4px'}},'👥 AI Visitor Crowd Flow Prediction — This Weekend'),
           React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'Expected congestion by zone and time based on historical scan data'),
@@ -913,12 +1296,11 @@ function App(){
             })
           ),
           React.createElement('div',{style:{background:'#fef3d0',border:'1px solid #f0d880',borderRadius:'10px',padding:'10px 14px',fontSize:'12px',color:'#8a5f00'}},
-            '⚡ AI Recommendation: Deploy extra rangers to Zone A & B at 11AM–2PM this Saturday. Pre-position drinking water stations near Zone C lake area.'
+            '⚡ AI Recommendation: Deploy extra rangers to Zon Arboretum & Pemuliharaan at 11AM–2PM this Saturday. Pre-position drinking water stations near Tanaman area.'
           )
         )
       ),
 
-      // Tree detail modal
       modal&&React.createElement('div',{className:'modal-overlay',onClick:()=>setModal(null)},
         React.createElement('div',{className:'modal',onClick:e=>e.stopPropagation()},
           React.createElement('div',{className:'modal-header'},
@@ -927,7 +1309,7 @@ function App(){
           ),
           React.createElement('div',{className:'qr-box'},'📱'),
           React.createElement('p',{style:{textAlign:'center',fontSize:'11px',color:'var(--text-light)',marginBottom:'16px'}},'QR Code: '+modal.id),
-          ...[['Scientific Name',modal.sci],['Zone','Zone '+modal.zone],['Age',modal.age+' years'],['Height',modal.height],['Health Score',modal.health+'%'],['Status',modal.status.toUpperCase()]].map(([l,v])=>
+          ...[['Scientific Name',modal.sci],['Zone','Zon '+modal.zone],['Age',modal.age+' years'],['Height',modal.height],['Health Score',modal.health+'%'],['Status',modal.status.toUpperCase()]].map(([l,v])=>
             React.createElement('div',{key:l,className:'tree-detail-row'},
               React.createElement('span',{className:'tree-detail-label'},l),
               React.createElement('span',{className:'tree-detail-val'},v)
@@ -942,14 +1324,14 @@ function App(){
     );
   }
 
-  // ── TREE INVENTORY ──────────────────────────────────
+  // ── TREE INVENTORY ──
   function renderTreeInventory(){
     return React.createElement('div',null,
       React.createElement('div',{className:'filter-bar'},
         React.createElement('input',{className:'search-input',placeholder:'🔍 Search tree name...',value:searchQ,onChange:e=>setSearchQ(e.target.value)}),
         React.createElement('select',{className:'filter-select',value:filterZone,onChange:e=>setFilterZone(e.target.value)},
           React.createElement('option',{value:'all'},'All Zones'),
-          ...['A','B','C','D'].map(z=>React.createElement('option',{key:z,value:z},'Zone '+z))
+          ...['Arboretum','Pemuliharaan','Tanaman','Riparian','Tapak Semaian'].map(z=>React.createElement('option',{key:z,value:z},'Zon '+z))
         ),
         React.createElement('select',{className:'filter-select',value:filterStatus,onChange:e=>setFilterStatus(e.target.value)},
           React.createElement('option',{value:'all'},'All Status'),
@@ -970,7 +1352,7 @@ function App(){
                 React.createElement('td',null,React.createElement('span',{className:'tag tag-blue'},t.id)),
                 React.createElement('td',null,t.icon,' ',t.name),
                 React.createElement('td',null,React.createElement('em',{style:{fontSize:'11px',color:'var(--text-light)'}},t.sci)),
-                React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zone '+t.zone)),
+                React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zon '+t.zone)),
                 React.createElement('td',null,t.age+' yrs'),
                 React.createElement('td',null,t.height),
                 React.createElement('td',null,
@@ -990,7 +1372,6 @@ function App(){
           )
         )
       ),
-      // Modal: detail
       modal&&React.createElement('div',{className:'modal-overlay',onClick:()=>setModal(null)},
         React.createElement('div',{className:'modal',onClick:e=>e.stopPropagation()},
           React.createElement('div',{className:'modal-header'},
@@ -999,7 +1380,7 @@ function App(){
           ),
           React.createElement('div',{className:'qr-box'},'📱'),
           React.createElement('p',{style:{textAlign:'center',fontSize:'11px',color:'var(--text-light)',marginBottom:'16px'}},'QR Code: '+modal.id),
-          ...[['Scientific Name',modal.sci],['Zone','Zone '+modal.zone],['Age',modal.age+' years'],['Height',modal.height],['Health Score',modal.health+'%'],['Status',modal.status.toUpperCase()]].map(([l,v])=>
+          ...[['Scientific Name',modal.sci],['Zone','Zon '+modal.zone],['Age',modal.age+' years'],['Height',modal.height],['Health Score',modal.health+'%'],['Status',modal.status.toUpperCase()]].map(([l,v])=>
             React.createElement('div',{key:l,className:'tree-detail-row'},
               React.createElement('span',{className:'tree-detail-label'},l),
               React.createElement('span',{className:'tree-detail-val'},v)
@@ -1011,7 +1392,6 @@ function App(){
           )
         )
       ),
-      // Add Tree Modal
       showAddTree&&React.createElement('div',{className:'modal-overlay',onClick:()=>setShowAddTree(false)},
         React.createElement('div',{className:'modal',style:{width:'480px'},onClick:e=>e.stopPropagation()},
           React.createElement('div',{className:'modal-header'},
@@ -1035,7 +1415,7 @@ function App(){
             React.createElement('div',{className:'form-group'},
               React.createElement('label',{className:'form-label'},'Zone'),
               React.createElement('select',{className:'form-input',value:newTree.zone,onChange:e=>setNewTree({...newTree,zone:e.target.value})},
-                ...['A','B','C','D'].map(z=>React.createElement('option',{key:z,value:z},'Zone '+z))
+                ...['Arboretum','Pemuliharaan','Tanaman','Riparian','Tapak Semaian'].map(z=>React.createElement('option',{key:z,value:z},'Zon '+z))
               )
             ),
             React.createElement('div',{className:'form-group'},
@@ -1044,23 +1424,6 @@ function App(){
                 React.createElement('option',{value:''},'Select type...'),
                 ...PLANT_TYPES.map(t=>React.createElement('option',{key:t},t))
               )
-            )
-          ),
-          React.createElement('div',{className:'grid-2',style:{gap:'12px'}},
-            React.createElement('div',{className:'form-group'},
-              React.createElement('label',{className:'form-label'},'Age (years)'),
-              React.createElement('input',{className:'form-input',type:'number',placeholder:'e.g. 15',value:newTree.age,onChange:e=>setNewTree({...newTree,age:e.target.value})})
-            ),
-            React.createElement('div',{className:'form-group'},
-              React.createElement('label',{className:'form-label'},'Height (m)'),
-              React.createElement('input',{className:'form-input',type:'number',placeholder:'e.g. 8',value:newTree.height,onChange:e=>setNewTree({...newTree,height:e.target.value})})
-            )
-          ),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Upload Photo'),
-            React.createElement('div',{style:{border:'2px dashed var(--border)',borderRadius:'10px',padding:'20px',textAlign:'center',background:'var(--cream-dark)',cursor:'pointer'}},
-              React.createElement('div',{style:{fontSize:'28px',marginBottom:'6px'}},'📷'),
-              React.createElement('p',{style:{fontSize:'12px',color:'var(--text-mid)'}},'Tap to upload tree photo')
             )
           ),
           React.createElement('div',{style:{display:'flex',gap:'10px',marginTop:'8px'}},
@@ -1072,86 +1435,7 @@ function App(){
     );
   }
 
-  // ── AI DIAGNOSIS ──────────────────────────────────
-  function renderDiagnosis(){
-    return React.createElement('div',null,
-      React.createElement('div',{className:'grid-2'},
-        React.createElement('div',{className:'card'},
-          React.createElement('div',{className:'card-title'},'📸 Upload Tree Image'),
-          React.createElement('div',{className:'card-sub',style:{marginBottom:'16px'}},'AI will analyze and return top 3 probable diseases'),
-          React.createElement('div',{style:{border:'2px dashed var(--border)',borderRadius:'12px',padding:'32px',textAlign:'center',background:'var(--cream-dark)',marginBottom:'14px',cursor:'pointer'}},
-            React.createElement('div',{style:{fontSize:'36px',marginBottom:'8px'}},'📷'),
-            React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',marginBottom:'4px'}},'Tap to capture or upload'),
-            React.createElement('p',{style:{fontSize:'11px',color:'var(--text-light)'}},'Supports JPG, PNG. Max 10MB.')
-          ),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Tree ID'),
-            React.createElement('input',{className:'form-input',defaultValue:'TBJ-004',placeholder:'Enter tree ID'})
-          ),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Zone'),
-            React.createElement('select',{className:'form-input'},
-              ...['A','B','C','D'].map(z=>React.createElement('option',{key:z},'Zone '+z))
-            )
-          ),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Symptoms Observed'),
-            React.createElement('select',{className:'form-input'},
-              React.createElement('option',null,'Yellow/brown leaves'),
-              React.createElement('option',null,'White powder on leaves'),
-              React.createElement('option',null,'Root discoloration'),
-              React.createElement('option',null,'Bark peeling'),
-              React.createElement('option',null,'Wilting branches')
-            )
-          ),
-          React.createElement('button',{className:'btn-primary',onClick:()=>setDiagTab('results')},'🔬 Run AI Diagnosis')
-        ),
-        React.createElement('div',{className:'card'},
-          React.createElement('div',{className:'tabs'},
-            React.createElement('button',{className:'tab'+(diagTab==='results'?' active':''),onClick:()=>setDiagTab('results')},'AI Results'),
-            React.createElement('button',{className:'tab'+(diagTab==='history'?' active':''),onClick:()=>setDiagTab('history')},'History')
-          ),
-          diagTab==='results'?React.createElement('div',null,
-            React.createElement('div',{style:{display:'flex',gap:'10px',alignItems:'center',marginBottom:'14px',padding:'12px',background:'var(--cream-dark)',borderRadius:'10px'}},
-              React.createElement('span',{style:{fontSize:'24px'}},'🌿'),
-              React.createElement('div',null,
-                React.createElement('div',{style:{fontSize:'12px',fontWeight:'500',color:'var(--text-dark)'}},'TBJ-004 – Pokok Nangka'),
-                React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},'Zone C · Analyzed 09:14 AM · Gemini Vision API')
-              )
-            ),
-            ...DIAGNOSES.map((d,i)=>
-              React.createElement('div',{key:i,className:'diagnosis-card',style:{borderLeftColor:i===0?'var(--green-500)':'var(--border)',borderLeftWidth:'4px'}},
-                React.createElement('div',{className:'diagnosis-rank',style:{color:i===0?'var(--green-700)':'var(--text-light)'}},d.rank+' Most Probable'),
-                React.createElement('div',{className:'diagnosis-name'},d.name),
-                React.createElement('div',{className:'diagnosis-conf'},'Confidence: '+d.conf+'%'),
-                React.createElement('div',{className:'confidence-bar'},
-                  React.createElement('div',{className:'confidence-fill',style:{width:d.conf+'%',background:i===0?'var(--green-500)':i===1?'#fb8c00':'#e05c3a'}})
-                ),
-                React.createElement('div',{className:'diagnosis-treatment'},'💊 Treatment: '+d.treatment)
-              )
-            ),
-            React.createElement('button',{className:'btn-primary',style:{marginTop:'8px'}},'✅ Confirm Diagnosis & Submit')
-          ):React.createElement('div',null,
-            ...[
-              {id:'TBJ-002',date:'2025-04-25',disease:'Powdery Mildew',conf:88},
-              {id:'TBJ-006',date:'2025-04-22',disease:'Root Rot',conf:74},
-              {id:'TBJ-001',date:'2025-04-18',disease:'Healthy – No Disease',conf:96},
-            ].map(h=>
-              React.createElement('div',{key:h.id,style:{padding:'12px 0',borderBottom:'1px solid var(--cream-dark)',display:'flex',justifyContent:'space-between',alignItems:'center'}},
-                React.createElement('div',null,
-                  React.createElement('div',{style:{fontSize:'13px',fontWeight:'500',color:'var(--text-dark)'}},h.id+' – '+h.disease),
-                  React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},h.date)
-                ),
-                React.createElement('span',{style:{fontSize:'11px',fontWeight:'600',color:'var(--green-700)'}},h.conf+'% conf.')
-              )
-            )
-          )
-        )
-      )
-    );
-  }
-
-  // ── PREDICTIVE MAINTENANCE ──────────────────────────
+  // ── PREDICTIVE MAINTENANCE ──
   function renderMaintenance(){
     return React.createElement('div',null,
       React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
@@ -1163,15 +1447,15 @@ function App(){
           React.createElement('button',{className:'btn-sm'},'⚡ Generate New Alerts')
         ),
         ...[
-          {tree:'TBJ-002',name:'Rain Tree',risk:'Drought Stress',zone:'B',conf:84,urgency:'High',action:'Increase watering frequency. Schedule irrigation for Zone B within 3 days.'},
-          {tree:'TBJ-004',name:'Pokok Nangka',risk:'Fungal Spread',zone:'C',conf:91,urgency:'Critical',action:'Immediate fungicide application. Isolate from neighboring trees. Alert specialist.'},
-          {tree:'TBJ-006',name:'Kelapa Sawit',risk:'Root Compaction',zone:'D',conf:67,urgency:'Medium',action:'Schedule soil aeration. Apply organic mulch around base.'},
+          {tree:'TBJ-002',name:'Rain Tree',risk:'Drought Stress',zone:'Arboretum',conf:84,urgency:'High',action:'Increase watering frequency. Schedule irrigation for Zon Arboretum within 3 days.'},
+          {tree:'TBJ-004',name:'Pokok Nangka',risk:'Fungal Spread',zone:'Tanaman',conf:91,urgency:'Critical',action:'Immediate fungicide application. Isolate from neighboring trees. Alert specialist.'},
+          {tree:'TBJ-006',name:'Kelapa Sawit',risk:'Root Compaction',zone:'Tanaman',conf:67,urgency:'Medium',action:'Schedule soil aeration. Apply organic mulch around base.'},
         ].map((a,i)=>
           React.createElement('div',{key:i,className:'card',style:{marginBottom:'10px',borderLeft:'4px solid '+(a.urgency==='Critical'?'#e53935':'#fb8c00')}},
             React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'8px'}},
               React.createElement('div',null,
                 React.createElement('div',{style:{fontSize:'13px',fontWeight:'600',color:'var(--text-dark)'}},a.tree+' – '+a.name),
-                React.createElement('div',{style:{fontSize:'12px',color:'var(--text-light)'}},a.risk+' · Zone '+a.zone)
+                React.createElement('div',{style:{fontSize:'12px',color:'var(--text-light)'}},a.risk+' · Zon '+a.zone)
               ),
               React.createElement('div',{style:{display:'flex',gap:'6px',alignItems:'center'}},
                 React.createElement('span',{className:'tag '+(a.urgency==='Critical'?'tag-red':'tag-amber')},a.urgency),
@@ -1190,7 +1474,7 @@ function App(){
     );
   }
 
-  // ── SCHEDULE ──────────────────────────────────────
+  // ── SCHEDULE ──
   function renderSchedule(){
     return React.createElement('div',null,
       React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
@@ -1214,32 +1498,18 @@ function App(){
             ),
             ...DAYS.map((d,di)=>{
               const zone=ZONES_SCHED[ri][di];
-              const zoneIdx=['Zone A','Zone B','Zone C','Zone D'].indexOf(zone);
+              const zoneIdx=['Arboretum','Pemuliharaan','Tanaman','Riparian'].indexOf(zone);
               const cls=!zone?'sched-empty sched-cell':ZONE_CLASSES[zoneIdx]||'sched-cell';
-              return React.createElement('div',{key:d,className:'sched-cell '+cls},zone||'—');
+              const short=zone?zone.substring(0,8):'-';
+              return React.createElement('div',{key:d,className:'sched-cell '+cls},short||'—');
             })
           ]).flat()
-        )
-      ),
-      React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'📤 Dispatch Ad-Hoc Task'),
-        React.createElement('div',{style:{display:'flex',gap:'10px',flexWrap:'wrap'}},
-          React.createElement('select',{className:'filter-select'},
-            ...RANGERS.map(r=>React.createElement('option',{key:r.id},r.name))
-          ),
-          React.createElement('select',{className:'filter-select'},
-            ...TREES.map(t=>React.createElement('option',{key:t.id},t.id+' – '+t.name))
-          ),
-          React.createElement('select',{className:'filter-select'},
-            React.createElement('option',null,'Emergency'),React.createElement('option',null,'Routine'),React.createElement('option',null,'Investigation')
-          ),
-          React.createElement('button',{className:'btn-sm'},'Send Task')
         )
       )
     );
   }
 
-  // ── RANGER MANAGEMENT (NEW) ──────────────────────
+  // ── RANGER MANAGEMENT ──
   function renderRangerManagement(){
     return React.createElement('div',null,
       React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}},
@@ -1280,83 +1550,41 @@ function App(){
                   )
                 ),
                 React.createElement('td',null,React.createElement('span',{className:'tag tag-blue'},r.id)),
-                React.createElement('td',null,
-                  React.createElement('select',{className:'filter-select',style:{fontSize:'11px',padding:'4px 8px'},defaultValue:r.zone},
-                    ['Zone A','Zone B','Zone C','Zone D','Zone A & C','Zone B & D'].map(z=>React.createElement('option',{key:z},z))
-                  )
-                ),
-                React.createElement('td',null,
-                  React.createElement('span',{className:'status-pill '+(r.status==='on-duty'?'status-healthy':'status-monitor')},r.status==='on-duty'?'● On Duty':'○ Off')
-                ),
+                React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zon '+r.zone)),
+                React.createElement('td',null,React.createElement('span',{className:'status-pill '+(r.status==='on-duty'?'status-healthy':'status-monitor')},r.status==='on-duty'?'● On Duty':'○ Off')),
                 React.createElement('td',null,r.tasks),
                 React.createElement('td',null,
                   React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'6px'}},
-                    React.createElement('div',{className:'prog-wrap',style:{width:'50px'}},
-                      React.createElement('div',{className:'prog-bar',style:{width:[88,92,75,96][i]+'%'}})
-                    ),
+                    React.createElement('div',{className:'prog-wrap',style:{width:'50px'}},React.createElement('div',{className:'prog-bar',style:{width:[88,92,75,96][i]+'%'}})),
                     React.createElement('span',{style:{fontSize:'11px',fontWeight:'600'}},[88,92,75,96][i]+'%')
                   )
                 ),
                 React.createElement('td',null,
-                  React.createElement('div',{style:{display:'flex',gap:'4px'}},
-                    React.createElement('button',{className:'btn-sm',style:{fontSize:'10px',padding:'4px 8px'}},'Assign Task'),
-                    React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'10px',padding:'4px 8px'}},'View')
-                  )
+                  React.createElement('button',{className:'btn-sm',style:{fontSize:'10px',padding:'4px 8px'}},'Assign Task')
                 )
               )
             )
           )
         )
       ),
-      // Assign Ranger Modal
       showAssignRanger&&React.createElement('div',{className:'modal-overlay',onClick:()=>setShowAssignRanger(false)},
         React.createElement('div',{className:'modal',style:{width:'460px'},onClick:e=>e.stopPropagation()},
           React.createElement('div',{className:'modal-header'},
             React.createElement('div',{className:'modal-title'},'👤 Add / Assign Ranger'),
             React.createElement('button',{className:'modal-close',onClick:()=>setShowAssignRanger(false)},'✕')
           ),
-          React.createElement('div',{className:'tabs'},
-            React.createElement('button',{className:'tab active'},'New Ranger'),
-            React.createElement('button',{className:'tab'},'Zone Assignment')
-          ),
           React.createElement('div',{className:'form-group'},
             React.createElement('label',{className:'form-label'},'Full Name'),
             React.createElement('input',{className:'form-input',placeholder:'e.g. Encik Ali bin Hamid'})
           ),
           React.createElement('div',{className:'grid-2',style:{gap:'12px'}},
-            React.createElement('div',{className:'form-group'},
-              React.createElement('label',{className:'form-label'},'Staff ID'),
-              React.createElement('input',{className:'form-input',placeholder:'e.g. R005'})
-            ),
-            React.createElement('div',{className:'form-group'},
-              React.createElement('label',{className:'form-label'},'Phone Number'),
-              React.createElement('input',{className:'form-input',placeholder:'+60 12-345 6789'})
-            )
+            React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Staff ID'),React.createElement('input',{className:'form-input',placeholder:'e.g. R005'})),
+            React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Phone'),React.createElement('input',{className:'form-input',placeholder:'+60 12-345 6789'}))
           ),
           React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Primary Zone Assignment'),
+            React.createElement('label',{className:'form-label'},'Primary Zone'),
             React.createElement('select',{className:'form-input'},
-              ...['Zone A','Zone B','Zone C','Zone D','Zone A & C','Zone B & D','All Zones'].map(z=>React.createElement('option',{key:z},z))
-            )
-          ),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Role Level'),
-            React.createElement('select',{className:'form-input'},
-              React.createElement('option',null,'Junior Ranger'),
-              React.createElement('option',null,'Senior Ranger'),
-              React.createElement('option',null,'Team Leader')
-            )
-          ),
-          React.createElement('div',{style:{background:'var(--cream-dark)',borderRadius:'10px',padding:'12px',marginBottom:'16px'}},
-            React.createElement('div',{style:{fontSize:'12px',fontWeight:'600',color:'var(--text-dark)',marginBottom:'8px'}},'Weekly Zone Rotation'),
-            ...DAYS.map(d=>
-              React.createElement('div',{key:d,style:{display:'flex',alignItems:'center',gap:'10px',marginBottom:'6px'}},
-                React.createElement('span',{style:{fontSize:'12px',color:'var(--text-mid)',width:'32px'}},d),
-                React.createElement('select',{className:'filter-select',style:{flex:1,fontSize:'11px',padding:'4px 8px'}},
-                  React.createElement('option',null,'Off'),
-                  ...['Zone A','Zone B','Zone C','Zone D'].map(z=>React.createElement('option',{key:z},z))
-                )
-              )
+              ...['Zon Arboretum','Zon Pemuliharaan','Zon Tanaman','Zon Riparian','Zon Tapak Semaian','All Zones'].map(z=>React.createElement('option',{key:z},z))
             )
           ),
           React.createElement('div',{style:{display:'flex',gap:'10px'}},
@@ -1368,7 +1596,7 @@ function App(){
     );
   }
 
-  // ── TASK TRACKER ──────────────────────────────────
+  // ── TASK TRACKER ──
   function renderTaskTracker(){
     return React.createElement('div',null,
       React.createElement('div',{className:'card'},
@@ -1399,16 +1627,29 @@ function App(){
     );
   }
 
-  // ── RANGER TASKS ──────────────────────────────────
+  // ── RANGER TASKS (with QR card) ──
   function renderRangerTasks(){
     return React.createElement('div',{style:{display:'flex',gap:'20px',alignItems:'flex-start'}},
       React.createElement('div',{style:{flex:1}},
+        // QR scan CTA card
+        React.createElement('div',{
+          className:'ranger-qr-card',
+          onClick:()=>setShowQRScanner(true),
+          style:{width:'100%',cursor:'pointer'}
+        },
+          React.createElement('div',{className:'ranger-qr-icon'},'📷'),
+          React.createElement('div',{className:'ranger-qr-text'},
+            React.createElement('h3',null,'Scan Tree QR Code'),
+            React.createElement('p',null,'Point camera at a tree\'s QR tag to instantly log your field visit, update health records, and trigger AI diagnosis.'),
+            React.createElement('button',{className:'ranger-qr-btn',onClick:e=>{e.stopPropagation();setShowQRScanner(true)}},'Open QR Scanner →')
+          )
+        ),
         React.createElement('div',{className:'card',style:{marginBottom:'14px'}},
           React.createElement('div',{style:{display:'flex',gap:'10px',alignItems:'center',marginBottom:'14px'}},
             React.createElement('div',{className:'user-avatar',style:{width:'40px',height:'40px',fontSize:'14px'}},'AR'),
             React.createElement('div',null,
               React.createElement('div',{style:{fontWeight:'600',color:'var(--text-dark)'}},RANGERS[0].name),
-              React.createElement('div',{style:{fontSize:'12px',color:'var(--text-light)'}},'Ranger ID: R01 · Zone A & C today')
+              React.createElement('div',{style:{fontSize:'12px',color:'var(--text-light)'}},'Ranger ID: R01 · Zon Arboretum today')
             )
           ),
           React.createElement('div',{style:{display:'flex',gap:'14px'}},
@@ -1421,9 +1662,9 @@ function App(){
           )
         ),
         ...[
-          {id:'TSK-087',priority:'emergency',name:'Investigate diseased tree',zone:'Zone C – TBJ-004',notes:'Suspected fungal infection. Capture leaf close-up.'},
-          {id:'TSK-088',priority:'routine',name:'Routine patrol – Zone A',zone:'Zone A – 15 trees',notes:'Check health status and update records.'},
-          {id:'TSK-089',priority:'routine',name:'Water stress monitoring',zone:'Zone B – TBJ-002',notes:'Check soil moisture. Increase watering if needed.'},
+          {id:'TSK-087',priority:'emergency',name:'Investigate diseased tree',zone:'Zon Tanaman – TBJ-004',notes:'Suspected fungal infection. Capture leaf close-up.'},
+          {id:'TSK-088',priority:'routine',name:'Routine patrol – Zon Arboretum',zone:'Zon Arboretum – 15 trees',notes:'Check health status and update records.'},
+          {id:'TSK-089',priority:'routine',name:'Water stress monitoring',zone:'Zon Arboretum – TBJ-002',notes:'Check soil moisture. Increase watering if needed.'},
         ].map(t=>
           React.createElement('div',{key:t.id,className:'card',style:{marginBottom:'10px',borderLeft:'4px solid '+(t.priority==='emergency'?'#e53935':'var(--green-500)')}},
             t.priority==='emergency'&&React.createElement('div',{className:'task-priority-badge'},'🚨 EMERGENCY'),
@@ -1432,8 +1673,22 @@ function App(){
             React.createElement('div',{style:{fontSize:'12px',color:'var(--text-mid)',marginBottom:'10px',lineHeight:'1.5'}},'📝 '+t.notes),
             React.createElement('div',{style:{display:'flex',gap:'6px'}},
               React.createElement('button',{className:'btn-sm',style:{fontSize:'11px',padding:'6px 12px'}},'Start'),
-              React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px',padding:'6px 12px'}},'AI Diagnose'),
-              React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px',padding:'6px 12px'}},'Skip')
+              React.createElement('button',{className:'btn-sm',style:{fontSize:'11px',padding:'6px 12px',background:'var(--green-600)'},onClick:()=>setShowQRScanner(true)},'📷 Scan QR'),
+              React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px',padding:'6px 12px'}},'AI Diagnose')
+            )
+          )
+        ),
+        // Scan history
+        scanHistory.filter(s=>s.ranger!=='Visitor').length>0&&React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'📋 Recent QR Scans'),
+          ...scanHistory.filter(s=>s.ranger!=='Visitor').map((s,i)=>
+            React.createElement('div',{key:i,className:'scan-history-item'},
+              React.createElement('div',{className:'scan-history-icon'},s.tree.icon),
+              React.createElement('div',{className:'scan-history-info'},
+                React.createElement('div',{className:'scan-history-name'},s.tree.name+' – '+s.tree.id),
+                React.createElement('div',{className:'scan-history-meta'},'Zon '+s.tree.zone+' · '+s.note)
+              ),
+              React.createElement('div',{className:'scan-history-time'},s.time)
             )
           )
         )
@@ -1442,36 +1697,36 @@ function App(){
         React.createElement('div',{className:'mobile-frame'},
           React.createElement('div',{className:'mobile-statusbar'},
             React.createElement('span',{className:'mobile-time'},'09:41'),
-            React.createElement('span',{className:'mobile-icons'},'▲ WiFi 🔋')
+            React.createElement('span',null,'WiFi 🔋')
           ),
           React.createElement('div',{className:'mobile-header'},
             React.createElement('div',{className:'mobile-header-title'},'📋 My Tasks'),
-            React.createElement('div',{className:'mobile-header-sub'},'Ahmad Razif · Zone A & C')
+            React.createElement('div',{className:'mobile-header-sub'},'Ahmad Razif · Zon Arboretum')
           ),
           React.createElement('div',{className:'mobile-body'},
+            React.createElement('div',{
+              style:{background:'linear-gradient(135deg,var(--green-800),var(--green-600))',borderRadius:'10px',padding:'12px',marginBottom:'8px',cursor:'pointer',color:'#fff',textAlign:'center'},
+              onClick:()=>setShowQRScanner(true)
+            },
+              React.createElement('div',{style:{fontSize:'24px',marginBottom:'4px'}},'📷'),
+              React.createElement('div',{style:{fontSize:'13px',fontWeight:'600'}},'Scan Tree QR'),
+              React.createElement('div',{style:{fontSize:'10px',opacity:.8}},scanHistory.length+' scans today')
+            ),
             React.createElement('div',{className:'task-item emergency'},
               React.createElement('div',{className:'task-priority-badge'},'🚨 EMERGENCY'),
               React.createElement('div',{className:'task-name'},'Diseased tree – TBJ-004'),
-              React.createElement('div',{className:'task-zone'},'Zone C'),
+              React.createElement('div',{className:'task-zone'},'Zon Tanaman'),
               React.createElement('div',{className:'task-actions'},
-                React.createElement('button',{className:'task-btn task-btn-primary'},'Start'),
-                React.createElement('button',{className:'task-btn task-btn-outline'},'AI Diagnose')
+                React.createElement('button',{className:'task-btn task-btn-primary',onClick:()=>setShowQRScanner(true)},'Scan QR'),
+                React.createElement('button',{className:'task-btn task-btn-outline'},'Diagnose')
               )
             ),
             React.createElement('div',{className:'task-item'},
-              React.createElement('div',{className:'task-name'},'Routine Patrol – Zone A'),
-              React.createElement('div',{className:'task-zone'},'Zone A · 15 trees'),
+              React.createElement('div',{className:'task-name'},'Routine – Zon Arboretum'),
+              React.createElement('div',{className:'task-zone'},'Arboretum · 15 trees'),
               React.createElement('div',{className:'task-actions'},
-                React.createElement('button',{className:'task-btn task-btn-primary'},'Start'),
+                React.createElement('button',{className:'task-btn task-btn-primary',onClick:()=>setShowQRScanner(true)},'Scan QR'),
                 React.createElement('button',{className:'task-btn task-btn-outline'},'Done')
-              )
-            ),
-            React.createElement('div',{className:'task-item'},
-              React.createElement('div',{className:'task-name'},'Water Stress Monitor'),
-              React.createElement('div',{className:'task-zone'},'Zone B · TBJ-002'),
-              React.createElement('div',{className:'task-actions'},
-                React.createElement('button',{className:'task-btn task-btn-primary'},'Start'),
-                React.createElement('button',{className:'task-btn task-btn-outline'},'Skip')
               )
             )
           )
@@ -1480,15 +1735,175 @@ function App(){
     );
   }
 
-  // ── MAP (ADMIN & RANGER) ──────────────────────────
+  // ── QR SCAN PAGE (for visitor & ranger nav) ──
+  function renderQRScanPage(){
+    const isRanger=role==='ranger';
+    return React.createElement('div',null,
+      // Hero banner
+      React.createElement('div',{
+        style:{background:isRanger?'linear-gradient(135deg,var(--green-900),var(--green-700))':'linear-gradient(135deg,#1a5e30,#2d8c4e)',
+          borderRadius:'16px',padding:'28px 32px',color:'#fff',marginBottom:'20px',position:'relative',overflow:'hidden'}
+      },
+        React.createElement('div',{style:{position:'absolute',right:-20,bottom:-20,fontSize:'100px',opacity:.08}},'📷'),
+        React.createElement('div',{style:{display:'flex',alignItems:'flex-start',gap:'18px'}},
+          React.createElement('div',{style:{fontSize:'48px',flexShrink:0}},'📱'),
+          React.createElement('div',null,
+            React.createElement('h2',{style:{fontFamily:'DM Serif Display,serif',fontSize:'24px',marginBottom:'6px'}},
+              isRanger?'Field QR Tree Scanner':'Scan & Collect Trees'
+            ),
+            React.createElement('p',{style:{fontSize:'13px',opacity:.85,lineHeight:'1.6',maxWidth:'480px'}},
+              isRanger?
+              'Scan the QR code attached to any tree to instantly log your field visit, update health status, and trigger AI diagnosis. All scans are recorded in the audit log.' :
+              'Find QR code tags on trees throughout the garden. Scan them to unlock tree profiles, earn collection badges, and learn fascinating facts!'
+            ),
+            React.createElement('div',{style:{display:'flex',gap:'10px',marginTop:'14px',flexWrap:'wrap'}},
+              React.createElement('button',{
+                onClick:()=>setShowQRScanner(true),
+                style:{padding:'11px 22px',background:'#fff',color:'var(--green-800)',border:'none',borderRadius:'10px',fontWeight:'700',fontSize:'14px',cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:'8px'}
+              },'📷 Open Camera Scanner'),
+              React.createElement('div',{style:{padding:'11px 16px',background:'rgba(255,255,255,0.15)',border:'1.5px solid rgba(255,255,255,0.4)',borderRadius:'10px',fontSize:'13px',display:'flex',alignItems:'center',gap:'6px'}},
+                '🔢 Or enter Tree ID manually'
+              )
+            )
+          )
+        )
+      ),
+
+      // Manual search
+      React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
+        React.createElement('div',{className:'card-title',style:{marginBottom:'4px'}},'🔍 Manual Tree Lookup'),
+        React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'Enter a Tree ID to look up its profile without scanning'),
+        React.createElement('div',{style:{display:'flex',gap:'10px'}},
+          React.createElement('input',{
+            id:'manual-tree-id',
+            className:'form-input',style:{flex:1,maxWidth:'300px'},
+            placeholder:'e.g. TBJ-001, TBJ-004, TBJ-007',
+          }),
+          React.createElement('button',{
+            className:'btn-sm',
+            onClick:()=>{
+              const inp=document.getElementById('manual-tree-id');
+              if(inp){
+                const q=inp.value.trim().toUpperCase();
+                const found=TREES.find(t=>t.id===q||t.id===('TBJ-'+q)||t.name.toUpperCase()===q);
+                if(found){setModal(found);}
+                else{alert('Tree "'+q+'" not found. Try TBJ-001 to TBJ-010.');}
+              }
+            }
+          },'Search Tree')
+        ),
+        React.createElement('div',{style:{marginTop:'10px',display:'flex',gap:'6px',flexWrap:'wrap'}},
+          React.createElement('span',{style:{fontSize:'11px',color:'var(--text-light)',marginRight:'4px'}},'Quick pick:'),
+          ...TREES.slice(0,5).map(t=>
+            React.createElement('button',{key:t.id,className:'btn-sm-outline',style:{fontSize:'11px',padding:'4px 10px'},onClick:()=>setModal(t)},t.icon+' '+t.id)
+          )
+        )
+      ),
+
+      // Grid of quick-scan items
+      React.createElement('div',{style:{marginBottom:'16px'}},
+        React.createElement('div',{style:{fontSize:'14px',fontWeight:'600',color:'var(--text-dark)',marginBottom:'12px'}},'🌳 All Trees – Tap to View Profile'),
+        React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(180px,1fr))',gap:'10px'}},
+          ...TREES.map(t=>{
+            const isCollected=collectedTrees.find(c=>c.id===t.id);
+            return React.createElement('div',{
+              key:t.id,
+              className:'tree-card',
+              onClick:()=>setModal(t)
+            },
+              React.createElement('div',{
+                className:'tree-card-img',
+                style:{height:'70px',background:t.status==='healthy'?'linear-gradient(135deg,var(--green-200),var(--green-100))':t.status==='critical'?'linear-gradient(135deg,#fee5e0,#ffd0c8)':'linear-gradient(135deg,#fef3d0,#fde5a0)'}
+              },
+                t.icon,
+                isCollected&&React.createElement('div',{style:{position:'absolute',top:6,right:6,background:'var(--green-600)',color:'#fff',borderRadius:'50%',width:'18px',height:'18px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px'}},'✓')
+              ),
+              React.createElement('div',{className:'tree-card-body'},
+                React.createElement('div',{className:'tree-card-name'},t.name),
+                React.createElement('div',{className:'tree-card-sci'},t.id+' · Zon '+t.zone),
+                React.createElement('div',{className:'tree-card-footer'},
+                  React.createElement(StatusPill,{status:t.status}),
+                  isCollected?React.createElement('span',{className:'collected-badge'},'✓ Collected'):React.createElement('span',{className:'tag tag-amber'},'Scan QR')
+                )
+              )
+            );
+          })
+        )
+      ),
+
+      // Scan History
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}},
+          React.createElement('div',{className:'card-title'},isRanger?'📋 Today\'s Scan Log':'🏅 My Scan History'),
+          React.createElement('span',{style:{fontSize:'12px',color:'var(--text-light)'}},scanHistory.length+' total scans')
+        ),
+        scanHistory.length===0?
+          React.createElement('div',{style:{textAlign:'center',padding:'24px',color:'var(--text-light)',fontSize:'13px'}},
+            React.createElement('div',{style:{fontSize:'32px',marginBottom:'8px'}},'📷'),
+            'No scans yet. Open the QR scanner to get started!'
+          ):
+          scanHistory.map((s,i)=>
+            React.createElement('div',{key:i,className:'scan-history-item'},
+              React.createElement('div',{className:'scan-history-icon'},s.tree.icon),
+              React.createElement('div',{className:'scan-history-info'},
+                React.createElement('div',{className:'scan-history-name'},s.tree.name+' ('+s.tree.id+')'),
+                React.createElement('div',{className:'scan-history-meta'},
+                  'Zon '+s.tree.zone+' · '+s.note+
+                  (isRanger?' · '+s.ranger:'')
+                )
+              ),
+              React.createElement('div',{className:'scan-history-time'},s.time)
+            )
+          )
+      ),
+
+      // Tree detail modal
+      modal&&React.createElement('div',{className:'modal-overlay',onClick:()=>setModal(null)},
+        React.createElement('div',{className:'modal',style:{width:'440px'},onClick:e=>e.stopPropagation()},
+          React.createElement('div',{className:'modal-header'},
+            React.createElement('div',{className:'modal-title'},modal.icon,' ',modal.name),
+            React.createElement('button',{className:'modal-close',onClick:()=>setModal(null)},'✕')
+          ),
+          // QR representation
+          React.createElement('div',{style:{textAlign:'center',marginBottom:'14px'}},
+            React.createElement('div',{style:{width:'90px',height:'90px',background:'var(--green-50)',border:'2px dashed var(--green-400)',borderRadius:'12px',margin:'0 auto 8px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'40px'}},modal.icon),
+            React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},'Tree QR ID: '+modal.id)
+          ),
+          React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',lineHeight:'1.7',marginBottom:'14px',padding:'12px',background:'var(--green-50)',borderRadius:'10px',border:'1px solid var(--green-100)'}},
+            modal.desc||'A beautiful specimen in Taman Botani Johor.'
+          ),
+          ...[['Scientific Name',React.createElement('em',{style:{fontSize:'12px'}},modal.sci)],['Zone','Zon '+modal.zone],['Age',modal.age+' years'],['Height',modal.height],['Health Score',modal.health+'%'],['Status',React.createElement(StatusPill,{status:modal.status})]].map(([l,v])=>
+            React.createElement('div',{key:l,className:'tree-detail-row'},
+              React.createElement('span',{className:'tree-detail-label'},l),
+              React.createElement('span',{className:'tree-detail-val'},v)
+            )
+          ),
+          isRanger?
+            React.createElement('div',{style:{display:'flex',gap:'8px',marginTop:'16px'}},
+              React.createElement('button',{className:'btn-primary',style:{flex:1},onClick:()=>{handleQRScan(modal,'Manual view');setModal(null)}},'📋 Log Field Visit'),
+              React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'🔬 AI Diagnose')
+            ):
+            React.createElement('div',{style:{marginTop:'16px'}},
+              collectedTrees.find(t=>t.id===modal.id)?
+                React.createElement('div',{style:{background:'var(--green-50)',border:'1px solid var(--green-200)',borderRadius:'10px',padding:'12px',textAlign:'center',fontSize:'13px',color:'var(--green-700)',fontWeight:'600'}},
+                  '✅ Already in your collection!'
+                ):
+                React.createElement('button',{className:'btn-primary',onClick:()=>{handleQRScan(modal,'Collected');setModal(null)}},'🏅 Collect This Tree')
+            )
+        )
+      )
+    );
+  }
+
+  // ── MAP ──
   function renderMap(){
     const isRanger=role==='ranger';
     return React.createElement('div',null,
       React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
         React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}},
           React.createElement('div',null,
-            React.createElement('div',{className:'card-title'},'🗺️ '+(isRanger?'Ranger Field Map':'Interactive Garden Map')),
-            React.createElement('div',{className:'card-sub'},'Taman Botani Johor · 32 Hectares · 1,247 Trees'+(isRanger?' · Your position shown in blue':''))
+            React.createElement('div',{className:'card-title'},'🗺️ '+(isRanger?'Ranger Field Map – TBJ':'Interactive Garden Map – TBJ')),
+            React.createElement('div',{className:'card-sub'},'Taman Botani Johor · 32 Hectares · Pelan Induk Layout'+(isRanger?' · Your position shown in blue':''))
           ),
           React.createElement('div',{style:{display:'flex',gap:'6px',flexWrap:'wrap'}},
             ...['health','visitors','tasks','heatmap'].map(l=>
@@ -1498,27 +1913,22 @@ function App(){
             )
           )
         ),
-        React.createElement('div',{className:'map-wrap',style:{height:'380px'}},
+        React.createElement('div',{className:'map-wrap',style:{height:'400px',background:'linear-gradient(160deg,#c8e6c9 0%,#a5d6a7 25%,#81c784 50%,#a5d6a7 75%,#c8e6c9 100%)'}},
           React.createElement('div',{className:'map-bg-detail'}),
-          React.createElement(MapSVG,{
+          React.createElement(TBJMapSVG,{
             pins:TREES,
             route:null,
             showRangers:isRanger,
             role,
-            onPinClick:(pin)=>setModal(pin)
+            onPinClick:(pin)=>setModal(pin),
+            highlightZone:mapLayer==='health'?null:null
           }),
-          // Heatmap overlay
-          mapLayer==='heatmap'&&React.createElement('div',{style:{position:'absolute',inset:0,background:'radial-gradient(ellipse 60% 40% at 30% 70%, rgba(255,100,0,0.35) 0%, transparent 60%), radial-gradient(ellipse 40% 30% at 65% 35%, rgba(255,200,0,0.25) 0%, transparent 55%)',pointerEvents:'none'}}),
-          // Visitor route overlay
-          mapLayer==='visitors'&&React.createElement('div',{style:{position:'absolute',bottom:'12px',left:'12px',background:'rgba(255,255,255,.9)',borderRadius:'8px',padding:'8px 12px',fontSize:'11px',color:'var(--text-dark)',fontWeight:'500'}},'👥 267 visitors today · Peak: Zone A & B'),
-          // Legend
+          mapLayer==='heatmap'&&React.createElement('div',{style:{position:'absolute',inset:0,background:'radial-gradient(ellipse 50% 35% at 30% 62%, rgba(255,100,0,0.35) 0%, transparent 60%), radial-gradient(ellipse 40% 28% at 68% 74%, rgba(255,200,0,0.25) 0%, transparent 55%)',pointerEvents:'none'}}),
+          mapLayer==='visitors'&&React.createElement('div',{style:{position:'absolute',bottom:'12px',left:'12px',background:'rgba(255,255,255,.9)',borderRadius:'8px',padding:'8px 12px',fontSize:'11px',color:'var(--text-dark)',fontWeight:'500'}},'👥 267 visitors today · Peak: Arboretum & Pemuliharaan'),
           React.createElement('div',{className:'map-overlay-card'},
-            React.createElement('div',{className:'map-overlay-title'},isRanger?'Your Patrol':'Legend'),
-            isRanger&&React.createElement('div',{style:{background:'#d0e8f5',borderRadius:'8px',padding:'8px 10px',marginBottom:'8px',fontSize:'11px',color:'#1a4a6e'}},
-              '📍 Your location: Zone A\n🎯 Next target: TBJ-004 (Zone C)'
-            ),
+            React.createElement('div',{className:'map-overlay-title'},'Legend'),
             React.createElement('div',{className:'map-legend'},
-              ...[['#43a047','Healthy (1,021)'],['#fb8c00','Monitor (156)'],['#e53935','Critical (70)'],
+              ...[['#2e7d32','Healthy (1,021)'],['#e65100','Monitor (156)'],['#c62828','Critical (70)'],
                   ...(isRanger?[['#1565c0','Rangers on duty']]:[])
               ].map(([c,l])=>
                 React.createElement('div',{key:l,className:'map-legend-item'},
@@ -1526,20 +1936,18 @@ function App(){
                 )
               )
             ),
-            isRanger&&React.createElement('div',{style:{marginTop:'10px'}},
-              React.createElement('div',{style:{fontSize:'11px',fontWeight:'600',color:'var(--text-dark)',marginBottom:'6px'}},'Rangers On Duty'),
-              ...RANGERS.filter(r=>r.status==='on-duty').map(r=>
-                React.createElement('div',{key:r.id,style:{display:'flex',alignItems:'center',gap:'6px',marginBottom:'4px'}},
-                  React.createElement('div',{style:{width:'18px',height:'18px',borderRadius:'50%',background:'#1565c0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'8px',color:'#fff',fontWeight:'700'}},r.avatar[0]),
-                  React.createElement('span',{style:{fontSize:'11px',color:'var(--text-dark)'}},r.name.split(' ')[0]),
-                  React.createElement('span',{style:{fontSize:'10px',color:'var(--text-light)'}},r.zone)
+            React.createElement('div',{style:{marginTop:'10px',borderTop:'1px solid var(--border)',paddingTop:'8px'}},
+              React.createElement('div',{style:{fontSize:'10px',fontWeight:'600',color:'var(--text-mid)',marginBottom:'6px'}},'ZONES'),
+              ...[['#2e7d32','Arboretum'],['#1b5e20','Pemuliharaan'],['#8d4e27','Tanaman'],['#1565c0','Riparian'],['#e65100','Tapak Semaian']].map(([c,z])=>
+                React.createElement('div',{key:z,style:{display:'flex',alignItems:'center',gap:'6px',marginBottom:'3px'}},
+                  React.createElement('div',{style:{width:'8px',height:'8px',background:c,borderRadius:'2px',opacity:.7}}),
+                  React.createElement('span',{style:{fontSize:'10px',color:'var(--text-mid)'}},z)
                 )
               )
             )
           )
         )
       ),
-      // Zone summary below map
       React.createElement('div',{className:'grid-2'},
         React.createElement('div',{className:'card'},
           React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'📋 Zone Quick Stats'),
@@ -1548,29 +1956,29 @@ function App(){
               React.createElement('tr',null,...['Zone','Trees','Health','Ranger'].map(h=>React.createElement('th',{key:h},h)))
             ),
             React.createElement('tbody',null,
-              ...['A','B','C','D'].map((z,i)=>
+              ...[['Arboretum',312,91,0],['Pemuliharaan',218,88,1],['Tanaman',285,62,2],['Riparian',192,78,3],['Tapak Semaian',240,85,0]].map(([z,trees,health,ri])=>
                 React.createElement('tr',{key:z},
-                  React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zone '+z)),
-                  React.createElement('td',null,[312,428,287,220][i]),
+                  React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zon '+z)),
+                  React.createElement('td',null,trees),
                   React.createElement('td',null,
-                    React.createElement('div',{className:'prog-wrap',style:{width:'60px'}},
-                      React.createElement('div',{className:'prog-bar',style:{width:[91,77,62,80][i]+'%',background:[91,77,62,80][i]>80?'var(--green-500)':'#fb8c00'}})
+                    React.createElement('div',{className:'prog-wrap',style:{width:'60px'}}),
+                      React.createElement('div',{className:'prog-bar',style:{width:health+'%',background:health>80?'var(--green-500)':'#fb8c00'}})
                     )
                   ),
-                  React.createElement('td',null,RANGERS[i].name.split(' ')[0])
+                  React.createElement('td',null,RANGERS[ri].name.split(' ')[0])
                 )
               )
             )
           )
         ),
         React.createElement('div',{className:'card'},
-          React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'🎯 '+(isRanger?'My Patrol Checklist':'Critical Trees Nearby')),
+          React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'🚨 '+(isRanger?'My Patrol Checklist':'Critical Trees')),
           ...TREES.filter(t=>t.status==='critical'||t.status==='monitor').map(t=>
             React.createElement('div',{key:t.id,style:{display:'flex',alignItems:'center',gap:'10px',padding:'8px 0',borderBottom:'1px solid var(--cream-dark)',cursor:'pointer'},onClick:()=>setModal(t)},
               React.createElement('div',{style:{fontSize:'20px'}},t.icon),
               React.createElement('div',{style:{flex:1}},
                 React.createElement('div',{style:{fontSize:'13px',fontWeight:'600',color:'var(--text-dark)'}},t.name+' – '+t.id),
-                React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},'Zone '+t.zone+' · Health: '+t.health+'%')
+                React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},'Zon '+t.zone+' · Health: '+t.health+'%')
               ),
               React.createElement(StatusPill,{status:t.status})
             )
@@ -1583,29 +1991,31 @@ function App(){
             React.createElement('div',{className:'modal-title'},modal.icon,' ',modal.name),
             React.createElement('button',{className:'modal-close',onClick:()=>setModal(null)},'✕')
           ),
-          ...[['Scientific',modal.sci],['Zone','Zone '+modal.zone],['Health',modal.health+'%'],['Status',modal.status.toUpperCase()],['Height',modal.height],['Age',modal.age+' yrs']].map(([l,v])=>
+          ...[['Scientific',modal.sci],['Zone','Zon '+modal.zone],['Health',modal.health+'%'],['Status',modal.status.toUpperCase()],['Height',modal.height],['Age',modal.age+' yrs']].map(([l,v])=>
             React.createElement('div',{key:l,className:'tree-detail-row'},
               React.createElement('span',{className:'tree-detail-label'},l),
               React.createElement('span',{className:'tree-detail-val'},v)
             )
           ),
           isRanger&&React.createElement('div',{style:{display:'flex',gap:'8px',marginTop:'14px'}},
-            React.createElement('button',{className:'btn-sm',style:{flex:1}},'📋 Report Issue'),
-            React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'🔬 AI Diagnose')
+            React.createElement('button',{className:'btn-sm',style:{flex:1},onClick:()=>setShowQRScanner(true)},'📷 Scan QR'),
+            React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'📋 Report Issue'),
+            React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'🔬 Diagnose')
           )
         )
       )
-    );
+    ;
   }
 
-  // ── SPATIAL PLANNING ──────────────────────────────
+  // ── SPATIAL PLANNING ──
   function renderSpatial(){
     return React.createElement('div',null,
       React.createElement('div',{className:'grid-2'},
         React.createElement('div',{className:'card'},
           React.createElement('div',{className:'card-title'},'🧭 AI Spatial Planning Simulation'),
           React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'Click map to simulate new tree placement. AI analyzes canopy & root spread.'),
-          React.createElement('div',{className:'spatial-map',
+          React.createElement('div',{
+            style:{position:'relative',height:'280px',borderRadius:'12px',overflow:'hidden',background:'linear-gradient(160deg,#c8e6c9,#a5d6a7)',cursor:'crosshair'},
             onClick:(e)=>{
               const rect=e.currentTarget.getBoundingClientRect();
               const x=((e.clientX-rect.left)/rect.width*100).toFixed(0);
@@ -1613,13 +2023,20 @@ function App(){
               setSpatialClick({x:parseInt(x),y:parseInt(y)});
             }
           },
-            React.createElement('div',{className:'map-bg-detail'}),
-            React.createElement(MapSVG,{pins:TREES.slice(0,5),route:null,showRangers:false,onPinClick:()=>{}}),
-            // Proposed location marker
-            React.createElement('div',{className:'spatial-proposed',style:{top:spatialClick.y+'%',left:spatialClick.x+'%',transform:'translate(-50%,-50%)'}},'+'),
-            // Canopy ring
-            React.createElement('div',{style:{position:'absolute',top:spatialClick.y+'%',left:spatialClick.x+'%',width:'80px',height:'80px',border:'2px dashed rgba(255,255,0,0.7)',borderRadius:'50%',transform:'translate(-50%,-50%)',pointerEvents:'none',background:'rgba(255,255,0,0.08)'}}),
-            React.createElement('div',{style:{position:'absolute',bottom:'10px',left:'10px',background:'rgba(255,255,255,.92)',borderRadius:'8px',padding:'6px 10px',fontSize:'11px',fontWeight:'500',color:'var(--text-dark)'}},'🟡 Proposed: Click to move placement')
+            React.createElement(TBJMapSVG,{pins:TREES.slice(0,5),route:null,showRangers:false,onPinClick:()=>{},highlightZone:null}),
+            React.createElement('div',{style:{
+              position:'absolute',top:spatialClick.y+'%',left:spatialClick.x+'%',
+              transform:'translate(-50%,-50%)',width:'28px',height:'28px',
+              borderRadius:'50%',background:'rgba(255,200,0,.85)',border:'3px dashed #fff',
+              display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:'700',
+              animation:'pulse 2s infinite',zIndex:10
+            }},'+'),
+            React.createElement('div',{style:{
+              position:'absolute',top:spatialClick.y+'%',left:spatialClick.x+'%',
+              width:'70px',height:'70px',border:'2px dashed rgba(255,235,59,0.75)',borderRadius:'50%',
+              transform:'translate(-50%,-50%)',pointerEvents:'none',background:'rgba(255,235,59,0.08)'
+            }}),
+            React.createElement('div',{style:{position:'absolute',bottom:'10px',left:'10px',background:'rgba(255,255,255,.92)',borderRadius:'8px',padding:'6px 10px',fontSize:'11px',fontWeight:'500',color:'var(--text-dark)'}},'🟡 Proposed: Click map to move placement')
           ),
           React.createElement('div',{className:'suitability-meter'},
             React.createElement('span',{className:'suit-label'},'AI Suitability:'),
@@ -1627,9 +2044,9 @@ function App(){
             React.createElement('span',{className:'suit-score'},'78% – High ✅')
           ),
           React.createElement('div',{style:{marginTop:'12px',padding:'12px',background:'var(--cream-dark)',borderRadius:'10px',fontSize:'12px',color:'var(--text-mid)',lineHeight:'1.6'}},
-            '🌳 Selected position ('+spatialClick.x+'%, '+spatialClick.y+'%): Suitable for medium-canopy species. Canopy spread: ~8m radius. Root depth estimate: 2.5m. No underground conflict detected.',
+            '🌳 Selected position ('+spatialClick.x+'%, '+spatialClick.y+'%): Suitable for medium-canopy species. No canopy conflict detected.',
             React.createElement('br',null),
-            '💰 Cost estimate: RM 450 (planting) + RM 80/month (fertilizer). Projected 5-year survival rate: 87%.'
+            '💰 Cost estimate: RM 450 (planting) + RM 80/month (fertilizer). Projected 5-year survival: 87%.'
           ),
           React.createElement('div',{style:{display:'flex',gap:'8px',marginTop:'12px'}},
             React.createElement('button',{className:'btn-sm',style:{flex:1}},'✅ Confirm Placement'),
@@ -1641,28 +2058,20 @@ function App(){
             React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'🌱 Configure New Tree'),
             React.createElement('div',{className:'form-group'},
               React.createElement('label',{className:'form-label'},'Species'),
-              React.createElement('select',{className:'form-input'},
-                ...TREES.map(t=>React.createElement('option',{key:t.id},t.name+' ('+t.sci+')'))
-              )
+              React.createElement('select',{className:'form-input'},...TREES.map(t=>React.createElement('option',{key:t.id},t.name+' ('+t.sci+')')))
             ),
             React.createElement('div',{className:'form-group'},
               React.createElement('label',{className:'form-label'},'Target Zone'),
-              React.createElement('select',{className:'form-input'},
-                ...['A','B','C','D'].map(z=>React.createElement('option',{key:z},'Zone '+z))
-              )
-            ),
-            React.createElement('div',{className:'form-group'},
-              React.createElement('label',{className:'form-label'},'Quantity'),
-              React.createElement('input',{className:'form-input',type:'number',defaultValue:1,min:1,max:20})
+              React.createElement('select',{className:'form-input'},...['Arboretum','Pemuliharaan','Tanaman','Riparian','Tapak Semaian'].map(z=>React.createElement('option',{key:z},'Zon '+z)))
             ),
             React.createElement('button',{className:'btn-primary',style:{marginTop:'4px'}},'🤖 Run AI Suitability Check')
           ),
           React.createElement('div',{className:'card'},
             React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'📊 Recent Simulations'),
             ...[
-              {name:'Angsana – Zone B-07',suit:'High',cost:'RM 1,350',status:'Approved'},
-              {name:'Meranti – Zone A-12',suit:'Medium',cost:'RM 2,100',status:'Pending'},
-              {name:'Rain Tree – Zone C-03',suit:'Low',cost:'RM 980',status:'Rejected'},
+              {name:'Angsana – Arboretum-07',suit:'High',cost:'RM 1,350',status:'Approved'},
+              {name:'Meranti – Pemuliharaan-12',suit:'Medium',cost:'RM 2,100',status:'Pending'},
+              {name:'Rain Tree – Tanaman-03',suit:'Low',cost:'RM 980',status:'Rejected'},
             ].map((s,i)=>
               React.createElement('div',{key:i,style:{padding:'10px 0',borderBottom:'1px solid var(--cream-dark)',display:'flex',justifyContent:'space-between',alignItems:'center'}},
                 React.createElement('div',null,
@@ -1678,7 +2087,7 @@ function App(){
     );
   }
 
-  // ── AUDIT LOG ──────────────────────────────────────
+  // ── AUDIT LOG ──
   function renderAuditLog(){
     return React.createElement('div',{className:'card'},
       React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}},
@@ -1686,21 +2095,12 @@ function App(){
           React.createElement('div',{className:'card-title'},'🔐 System Audit Log'),
           React.createElement('div',{className:'card-sub'},'All system events, logins, and data modifications')
         ),
-        React.createElement('div',{style:{display:'flex',gap:'8px'}},
-          React.createElement('select',{className:'filter-select'},
-            React.createElement('option',null,'All Events'),
-            React.createElement('option',null,'Login'),
-            React.createElement('option',null,'Edit'),
-            React.createElement('option',null,'Error'),
-            React.createElement('option',null,'Alert')
-          ),
-          React.createElement('button',{className:'btn-sm'},'Export Log')
-        )
+        React.createElement('button',{className:'btn-sm'},'Export Log')
       ),
       React.createElement('div',{style:{marginBottom:'12px',padding:'12px',background:'#fee5e0',borderRadius:'10px',display:'flex',gap:'10px',alignItems:'flex-start'}},
         React.createElement('span',{style:{fontSize:'16px'}},'🛡️'),
         React.createElement('div',{style:{fontSize:'12px',color:'#8a2500',lineHeight:'1.5'}},
-          React.createElement('strong',null,'Rare Species Data Protection:'),' GPS coordinates for all spesies nadir are masked from non-admin roles. Last access audit: today 09:02 by Admin Dr. Lim Hui.'
+          React.createElement('strong',null,'Rare Species Data Protection:'),' GPS coordinates for all spesies nadir are masked from non-admin roles.'
         )
       ),
       ...LOGS.map((l,i)=>
@@ -1713,7 +2113,7 @@ function App(){
     );
   }
 
-  // ── EXPLORE (VISITOR) ──────────────────────────────
+  // ── EXPLORE (VISITOR) ──
   function renderExplore(){
     return React.createElement('div',null,
       React.createElement('div',{className:'visitor-hero'},
@@ -1740,7 +2140,7 @@ function App(){
           ),
           React.createElement('div',{style:{display:'flex',gap:'12px',alignItems:'center',marginTop:'10px',flexWrap:'wrap'}},
             React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
-              React.createElement('span',{style:{fontSize:'12px',opacity:.85}},L.duration||'Visit Duration:'),
+              React.createElement('span',{style:{fontSize:'12px',opacity:.85}},L.duration+':'),
               ...[45,60,90,120].map(d=>
                 React.createElement('button',{key:d,onClick:()=>setVisitDuration(d),
                   style:{padding:'5px 10px',background:visitDuration===d?'rgba(255,255,255,.35)':'rgba(255,255,255,.12)',border:'1px solid rgba(255,255,255,.4)',borderRadius:'8px',color:'#fff',fontSize:'11px',cursor:'pointer',fontFamily:'inherit'}},d+'min')
@@ -1754,33 +2154,30 @@ function App(){
         )
       ),
 
-      // Garden map with route
+      // Garden Map - Realistic TBJ
       React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
         React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}},
-          React.createElement('div',{className:'card-title'},generatedRoute?'🗺️ Your Personalized Route':'🗺️ Garden Map'),
+          React.createElement('div',{className:'card-title'},generatedRoute?'🗺️ Your Personalized Route':'🗺️ Pelan Taman Botani Johor'),
           React.createElement('div',{style:{display:'flex',gap:'6px'}},
             generatedRoute&&React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px'},onClick:()=>setGeneratedRoute(null)},'Clear Route'),
-            React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px'}},'Full Screen')
+            React.createElement('button',{className:'btn-sm',onClick:()=>setShowQRScanner(true)},'📷 Scan QR Tree')
           )
         ),
-        React.createElement('div',{className:'map-wrap',style:{height:'280px'}},
-          React.createElement('div',{className:'map-bg-detail'}),
-          React.createElement(MapSVG,{
+        React.createElement('div',{style:{position:'relative',height:'300px',borderRadius:'12px',overflow:'hidden',background:'linear-gradient(160deg,#c8e6c9,#a5d6a7)'}},
+          React.createElement(TBJMapSVG,{
             pins:TREES,
             route:generatedRoute,
             showRangers:false,
-            onPinClick:(pin)=>setModal(pin)
+            onPinClick:(pin)=>setModal(pin),
+            highlightZone:null
           }),
-          generatedRoute&&React.createElement('div',{style:{position:'absolute',top:'12px',left:'12px',background:'rgba(255,235,59,0.9)',borderRadius:'8px',padding:'6px 10px',fontSize:'11px',fontWeight:'700',color:'#333'}},'🗺️ Your route is shown in yellow'),
-          React.createElement('div',{className:'map-overlay-card'},
-            React.createElement('div',{className:'map-overlay-title'},'Legend'),
-            React.createElement('div',{className:'map-legend'},
-              ...[['#43a047','Healthy'],['#fb8c00','Monitor'],['#e53935','Critical'],
-                  ...(generatedRoute?[['#ffeb3b','Your route']]:[])
-              ].map(([c,l])=>
-                React.createElement('div',{key:l,className:'map-legend-item'},
-                  React.createElement('div',{className:'map-legend-dot',style:{background:c}}),l
-                )
+          generatedRoute&&React.createElement('div',{style:{position:'absolute',top:'12px',left:'12px',background:'rgba(255,235,59,0.92)',borderRadius:'8px',padding:'6px 10px',fontSize:'11px',fontWeight:'700',color:'#333'}},'🗺️ Your route shown in yellow'),
+          React.createElement('div',{className:'map-overlay-card',style:{width:'160px'}},
+            React.createElement('div',{className:'map-overlay-title'},'Zones'),
+            ...[['#2e7d32','Arboretum'],['#1b5e20','Pemuliharaan'],['#8d4e27','Tanaman'],['#1565c0','Riparian'],['#e65100','Tapak Semaian'],['#4a9fd4','Lakes']].map(([c,z])=>
+              React.createElement('div',{key:z,style:{display:'flex',alignItems:'center',gap:'6px',marginBottom:'4px'}},
+                React.createElement('div',{style:{width:'10px',height:'10px',background:c,borderRadius:'3px',opacity:.8,flexShrink:0}}),
+                React.createElement('span',{style:{fontSize:'10px',color:'var(--text-mid)'}},z)
               )
             )
           )
@@ -1796,19 +2193,19 @@ function App(){
             React.createElement('div',{className:'route-step-num'},i+1),
             React.createElement('div',{className:'route-step-info'},
               React.createElement('div',{className:'route-step-name'},t.icon+' '+t.name),
-              React.createElement('div',{className:'route-step-detail'},'Zone '+t.zone+' · '+t.sci+' · '+t.age+' years old')
+              React.createElement('div',{className:'route-step-detail'},'Zon '+t.zone+' · '+t.sci+' · '+t.age+' years old')
             ),
             React.createElement('div',{className:'route-step-dist'},'~'+Math.round(visitDuration/generatedRoute.length)+' min')
           )
         ),
         React.createElement('div',{style:{marginTop:'12px',display:'flex',gap:'8px'}},
           React.createElement('button',{className:'btn-sm',style:{flex:1}},'▶ Start Navigation'),
-          React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'💾 Save Route')
+          React.createElement('button',{className:'btn-sm-outline',style:{flex:1},onClick:()=>setShowQRScanner(true)},'📷 Scan Trees Along Route')
         )
       ),
 
       React.createElement('div',{className:'metrics-grid'},
-        ...[['🌳','1,247','Trees in Garden'],['🔍','3','Collected Today'],['🏅','3/10','Badges Unlocked'],['🗺️','~2hr','Estimated Walk']].map(([ic,v,l])=>
+        ...[['🌳','1,247','Trees in Garden'],['📷',collectedTrees.length,'Collected'],['🏅',Math.min(collectedTrees.length,10)+'/10','Badges'],['🗺️','~2hr','Estimated Walk']].map(([ic,v,l])=>
           React.createElement('div',{key:l,className:'metric-card'},
             React.createElement('div',{className:'metric-icon'},ic),
             React.createElement('div',{className:'metric-val'},v),
@@ -1824,17 +2221,17 @@ function App(){
             React.createElement('button',{className:'modal-close',onClick:()=>setModal(null)},'✕')
           ),
           React.createElement('em',{style:{display:'block',textAlign:'center',fontSize:'13px',color:'var(--text-light)',marginBottom:'12px'}},modal.sci),
-          React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',lineHeight:'1.7',marginBottom:'14px'}},
-            'A beautiful specimen in Zone '+modal.zone+'. This '+modal.age+'-year-old tree stands '+modal.height+' tall. Health score: '+modal.health+'%.'
-          ),
-          React.createElement('button',{className:'btn-primary',style:{marginBottom:'8px'}},'🏅 Collect This Tree'),
+          React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',lineHeight:'1.7',marginBottom:'14px'}},modal.desc),
+          collectedTrees.find(t=>t.id===modal.id)?
+            React.createElement('div',{style:{background:'var(--green-50)',border:'1px solid var(--green-200)',borderRadius:'10px',padding:'12px',textAlign:'center',fontSize:'13px',color:'var(--green-700)',fontWeight:'600'}},'✅ Already in your collection!'):
+            React.createElement('button',{className:'btn-primary',style:{marginBottom:'8px'},onClick:()=>{handleQRScan(modal,'Collected from map');setModal(null)}},'🏅 Collect This Tree'),
           React.createElement('button',{className:'btn-sm-outline',style:{width:'100%'}},'💬 Ask AI About This Tree')
         )
       )
     );
   }
 
-  // ── TREE PROFILES ──────────────────────────────────
+  // ── TREE PROFILES ──
   function renderTreeCards(){
     return React.createElement('div',null,
       React.createElement('div',{className:'tabs'},
@@ -1842,19 +2239,22 @@ function App(){
         React.createElement('button',{className:'tab'},'Expert Mode')
       ),
       React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'12px',marginBottom:'20px'}},
-        ...TREES.map(t=>
-          React.createElement('div',{key:t.id,className:'tree-card',onClick:()=>setModal(t)},
-            React.createElement('div',{className:'tree-card-img'},t.icon),
+        ...TREES.map(t=>{
+          const isCollected=collectedTrees.find(c=>c.id===t.id);
+          return React.createElement('div',{key:t.id,className:'tree-card',onClick:()=>setModal(t)},
+            React.createElement('div',{className:'tree-card-img',style:{position:'relative'}},t.icon,
+              isCollected&&React.createElement('div',{style:{position:'absolute',top:6,right:6,background:'var(--green-600)',color:'#fff',borderRadius:'50%',width:'18px',height:'18px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px'}},'✓')
+            ),
             React.createElement('div',{className:'tree-card-body'},
               React.createElement('div',{className:'tree-card-name'},t.name),
               React.createElement('div',{className:'tree-card-sci'},t.sci),
               React.createElement('div',{className:'tree-card-footer'},
                 React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},t.age+' yrs · '+t.height),
-                t.health>80?React.createElement('span',{className:'collected-badge'},'✓ Collected'):React.createElement('span',{className:'tag tag-amber'},'Scan to Collect')
+                isCollected?React.createElement('span',{className:'collected-badge'},'✓ Collected'):React.createElement('span',{className:'tag tag-amber'},'Scan QR')
               )
             )
-          )
-        )
+          );
+        })
       ),
       modal&&React.createElement('div',{className:'modal-overlay',onClick:()=>setModal(null)},
         React.createElement('div',{className:'modal',onClick:e=>e.stopPropagation()},
@@ -1863,17 +2263,17 @@ function App(){
             React.createElement('button',{className:'modal-close',onClick:()=>setModal(null)},'✕')
           ),
           React.createElement('em',{style:{display:'block',textAlign:'center',fontSize:'13px',color:'var(--text-light)',marginBottom:'16px'}},modal.sci),
-          React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',lineHeight:'1.7',marginBottom:'16px'}},
-            'A beautiful specimen found in Zone '+modal.zone+'. This '+modal.age+'-year-old tree stands '+modal.height+' tall. Health score: '+modal.health+'%.'
-          ),
-          React.createElement('button',{className:'btn-primary',style:{marginBottom:'8px'}},'🏅 Collect This Tree'),
+          React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',lineHeight:'1.7',marginBottom:'16px'}},modal.desc),
+          collectedTrees.find(t=>t.id===modal.id)?
+            React.createElement('div',{style:{background:'var(--green-50)',border:'1px solid var(--green-200)',borderRadius:'10px',padding:'12px',textAlign:'center',fontSize:'13px',color:'var(--green-700)',fontWeight:'600',marginBottom:'8px'}},'✅ Already in your collection!'):
+            React.createElement('button',{className:'btn-primary',style:{marginBottom:'8px'},onClick:()=>{handleQRScan(modal,'Collected from profile');setModal(null)}},'🏅 Collect This Tree'),
           React.createElement('button',{className:'btn-sm-outline',style:{width:'100%'}},'💬 Ask AI About This Tree')
         )
       )
     );
   }
 
-  // ── CHATBOT ──────────────────────────────────────
+  // ── CHATBOT ──
   function renderChatbot(){
     return React.createElement('div',{className:'grid-2'},
       React.createElement('div',{className:'card'},
@@ -1885,9 +2285,7 @@ function App(){
           )
         ),
         React.createElement('div',{className:'chat-wrap'},
-          ...chatMsgs.map((m,i)=>
-            React.createElement('div',{key:i,className:'chat-msg '+(m.role==='bot'?'chat-bot':'chat-user')},m.text)
-          ),
+          ...chatMsgs.map((m,i)=>React.createElement('div',{key:i,className:'chat-msg '+(m.role==='bot'?'chat-bot':'chat-user')},m.text)),
           React.createElement('div',{ref:chatEndRef})
         ),
         React.createElement('div',{className:'chat-input-row'},
@@ -1895,8 +2293,8 @@ function App(){
           React.createElement('button',{className:'chat-send',onClick:sendChat},'Send')
         ),
         React.createElement('div',{style:{display:'flex',gap:'6px',marginTop:'10px',flexWrap:'wrap'}},
-          ...['What is Angsana?','Rare trees here?','Best time to visit Zone A?','Which trees are diseased?'].map(q=>
-            React.createElement('button',{key:q,onClick:()=>{setChatInput(q)},className:'btn-sm-outline',style:{fontSize:'11px',padding:'5px 10px'}},q)
+          ...['What is Angsana?','What are the lakes?','Arboretum info?','Diseased trees?'].map(q=>
+            React.createElement('button',{key:q,onClick:()=>setChatInput(q),className:'btn-sm-outline',style:{fontSize:'11px',padding:'5px 10px'}},q)
           )
         )
       ),
@@ -1908,23 +2306,23 @@ function App(){
           React.createElement('em',{style:{fontSize:'13px',color:'var(--text-light)'}},'Shorea parvifolia'),
           React.createElement('div',{style:{marginTop:'8px',display:'flex',gap:'8px',justifyContent:'center'}},
             React.createElement('span',{className:'tag tag-red'},'Spesies Nadir'),
-            React.createElement('span',{className:'tag tag-green'},'Zone B'),
+            React.createElement('span',{className:'tag tag-green'},'Zon Pemuliharaan'),
             React.createElement('span',{className:'tag tag-amber'},'80+ years old')
           )
         ),
         React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',lineHeight:'1.7',textAlign:'center',marginBottom:'16px'}},
-          'One of Malaysia\'s tallest native trees, reaching 30m height. A rare and protected species. Named for its reddish timber, this towering giant is over 80 years old!'
+          'One of Malaysia\'s tallest native trees, reaching 30m height. A rare and protected species (spesies nadir). Over 80 years old!'
         ),
-        React.createElement('button',{className:'btn-primary'},'🏅 Collect Meranti Merah')
+        React.createElement('button',{className:'btn-primary',onClick:()=>handleQRScan(TREES[4],'Featured tree collected')},'🏅 Collect Meranti Merah')
       )
     );
   }
 
-  // ── COLLECTION ──────────────────────────────────────
+  // ── COLLECTION ──
   function renderCollection(){
     return React.createElement('div',null,
       React.createElement('div',{className:'metrics-grid',style:{marginBottom:'20px'}},
-        ...[['🏅','3','Badges Earned'],['🌳','3','Trees Found'],['🏆','30%','Collection %'],['🌿','Rare!','Rarest Find']].map(([ic,v,l])=>
+        ...[['🏅',collectedTrees.length,'Badges Earned'],['🌳',collectedTrees.length,'Trees Found'],['🏆',Math.round(collectedTrees.length/TREES.length*100)+'%','Collection'],['🌿',collectedTrees.find(t=>t.status==='healthy'&&t.age>50)?'Rare!':'Common','Rarest Find']].map(([ic,v,l])=>
           React.createElement('div',{key:l,className:'metric-card'},
             React.createElement('div',{className:'metric-icon'},ic),
             React.createElement('div',{className:'metric-val'},v),
@@ -1933,30 +2331,39 @@ function App(){
         )
       ),
       React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
-        React.createElement('div',{className:'card-title',style:{marginBottom:'6px'}},L.collect+' – '+L.trees+': 3/10'),
-        React.createElement('div',{className:'prog-wrap',style:{marginBottom:'16px'}},React.createElement('div',{className:'prog-bar',style:{width:'30%'}})),
+        React.createElement('div',{className:'card-title',style:{marginBottom:'6px'}},L.collect+' – '+L.trees+': '+collectedTrees.length+'/'+TREES.length),
+        React.createElement('div',{className:'prog-wrap',style:{marginBottom:'16px'}},React.createElement('div',{className:'prog-bar',style:{width:(collectedTrees.length/TREES.length*100)+'%'}})),
         React.createElement('div',{className:'badge-grid'},
-          ...BADGES.map((b,i)=>
-            React.createElement('div',{key:i,className:'badge-item'},
-              React.createElement('div',{className:'badge-icon '+(b.unlocked?'badge-unlocked':'badge-locked')},b.icon),
+          ...BADGES.map((b,i)=>{
+            const unlocked=i<collectedTrees.length;
+            return React.createElement('div',{key:i,className:'badge-item'},
+              React.createElement('div',{className:'badge-icon '+(unlocked?'badge-unlocked':'badge-locked')},b.icon),
               React.createElement('div',{className:'badge-name'},b.name)
-            )
-          )
+            );
+          })
         )
       ),
       React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'📜 Collection History'),
-        ...TREES.slice(0,3).map(t=>
-          React.createElement('div',{key:t.id,style:{display:'flex',alignItems:'center',gap:'12px',padding:'10px 0',borderBottom:'1px solid var(--cream-dark)'}},
-            React.createElement('div',{style:{fontSize:'28px',lineHeight:1}},t.icon),
-            React.createElement('div',{style:{flex:1}},
-              React.createElement('div',{style:{fontSize:'13px',fontWeight:'600',color:'var(--text-dark)'}},t.name),
-              React.createElement('em',{style:{fontSize:'11px',color:'var(--text-light)'}},t.sci),
-              React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)',marginTop:'2px'}},'Scanned: 28 Apr 2025 · Zone '+t.zone)
-            ),
-            React.createElement('span',{className:'tag tag-green'},'✓ Collected')
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}},
+          React.createElement('div',{className:'card-title'},'📜 My Collection'),
+          React.createElement('button',{className:'btn-sm',onClick:()=>setShowQRScanner(true)},'📷 Scan More Trees')
+        ),
+        collectedTrees.length===0?
+          React.createElement('div',{style:{textAlign:'center',padding:'24px',color:'var(--text-light)'}},
+            React.createElement('div',{style:{fontSize:'36px',marginBottom:'8px'}},'🌱'),
+            'Scan QR codes on trees to start your collection!'
+          ):
+          collectedTrees.map(t=>
+            React.createElement('div',{key:t.id,style:{display:'flex',alignItems:'center',gap:'12px',padding:'10px 0',borderBottom:'1px solid var(--cream-dark)'}},
+              React.createElement('div',{style:{fontSize:'28px',lineHeight:1}},t.icon),
+              React.createElement('div',{style:{flex:1}},
+                React.createElement('div',{style:{fontSize:'13px',fontWeight:'600',color:'var(--text-dark)'}},t.name),
+                React.createElement('em',{style:{fontSize:'11px',color:'var(--text-light)'}},t.sci),
+                React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)',marginTop:'2px'}},'Zon '+t.zone+' · '+t.age+' years old')
+              ),
+              React.createElement('span',{className:'tag tag-green'},'✓ Collected')
+            )
           )
-        )
       )
     );
   }
@@ -1964,7 +2371,6 @@ function App(){
   function renderContent(){
     if(activeNav==='dashboard')return renderDashboard();
     if(activeNav==='treeinventory')return renderTreeInventory();
-    if(activeNav==='diagnosis')return renderDiagnosis();
     if(activeNav==='maintenance')return renderMaintenance();
     if(activeNav==='schedule')return renderSchedule();
     if(activeNav==='rangers')return renderRangerManagement();
@@ -1973,6 +2379,7 @@ function App(){
     if(activeNav==='spatial')return renderSpatial();
     if(activeNav==='auditlog')return renderAuditLog();
     if(activeNav==='explore')return renderExplore();
+    if(activeNav==='qrscan')return renderQRScanPage();
     if(activeNav==='treecards')return renderTreeCards();
     if(activeNav==='chatbot')return renderChatbot();
     if(activeNav==='collection')return renderCollection();
@@ -1981,19 +2388,21 @@ function App(){
 
   const roleNav=navItems[role]||navItems.admin;
   const pageTitles={
-    dashboard:'Dashboard',treeinventory:'Tree Inventory',diagnosis:'AI Disease Diagnosis',
+    dashboard:'Dashboard',treeinventory:'Tree Inventory',
     maintenance:'Predictive Maintenance',schedule:'Workforce Schedule',rangers:'Ranger Management',
     tasks:'Task Tracker',map:'Garden Map',spatial:'Spatial Planning',auditlog:'Audit Log',
-    explore:'Explore Garden',treecards:'Tree Profiles',chatbot:'AI Botanical Assistant',collection:'My Badge Collection'
+    explore:'Explore Garden',qrscan:role==='ranger'?'QR Tree Scanner':'Scan QR Trees',
+    treecards:'Tree Profiles',chatbot:'AI Botanical Assistant',collection:'My Badge Collection'
   };
   const pageSubs={
     dashboard:'Overview, analytics & AI insights',treeinventory:'Centralized tree database',
-    diagnosis:'Upload image for AI analysis',maintenance:'Proactive care alerts',
+    maintenance:'Proactive care alerts',
     schedule:'Weekly patrol assignments',rangers:'Manage and assign rangers',
-    tasks:'Field task management',map:'Interactive garden visualization',
+    tasks:'Field task management',map:'Taman Botani Johor – Pelan Induk layout',
     spatial:'AI tree placement simulation',auditlog:'System security & event tracking',
-    explore:'Discover & generate your route',treecards:'Learn about our trees',
-    chatbot:'Ask anything about our plants',collection:'Your botanical discoveries'
+    explore:'Discover & generate your route',qrscan:role==='ranger'?'Scan tree QR tags to log field visits':'Scan tree tags to collect & learn',
+    treecards:'Learn about our trees',chatbot:'Ask anything about our plants',
+    collection:'Your botanical discoveries'
   };
 
   return React.createElement('div',{className:'app'},
@@ -2037,11 +2446,39 @@ function App(){
           React.createElement('span',null,pageSubs[activeNav]||'')
         ),
         React.createElement('div',{className:'topbar-actions'},
+          // QR scan shortcut button (always visible for ranger/visitor)
+          (role==='ranger'||role==='visitor')&&React.createElement('button',{
+            className:'btn-sm',
+            style:{display:'flex',alignItems:'center',gap:'6px'},
+            onClick:()=>setShowQRScanner(true)
+          },'📷 Scan QR'),
           React.createElement('div',{className:'badge-notif'},'🔔',React.createElement('div',{className:'badge-dot'})),
           React.createElement('div',{style:{fontSize:'12px',color:'var(--text-light)'}},new Date().toLocaleDateString('en-MY',{day:'numeric',month:'long',year:'numeric'}))
         )
       ),
       renderContent()
+    ),
+    // QR Scanner Modal (global, available from anywhere)
+    showQRScanner&&React.createElement(QRScanner,{
+      onClose:()=>setShowQRScanner(false),
+      onScan:handleQRScan,
+      role
+    }),
+    // Last scan success toast
+    lastScan&&React.createElement('div',{
+      style:{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',
+        background:role==='visitor'?'var(--green-700)':'var(--green-800)',
+        color:'#fff',borderRadius:'12px',padding:'12px 20px',
+        display:'flex',alignItems:'center',gap:'12px',boxShadow:'0 4px 20px rgba(0,0,0,.25)',
+        zIndex:150,animation:'slideup .4s ease',minWidth:'280px'},
+      onClick:()=>setLastScan(null)
+    },
+      React.createElement('span',{style:{fontSize:'24px'}},lastScan.icon),
+      React.createElement('div',null,
+        React.createElement('div',{style:{fontWeight:'600',fontSize:'13px'}},role==='visitor'?'🏅 Collected: '+lastScan.name:'📋 Logged: '+lastScan.name),
+        React.createElement('div',{style:{fontSize:'11px',opacity:.8}},'Zon '+lastScan.zone+' · '+lastScan.id)
+      ),
+      React.createElement('span',{style:{marginLeft:'auto',opacity:.6,fontSize:'16px',cursor:'pointer'}},'✕')
     )
   );
 }
