@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TBJ Tree Mapping System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green-950:#0a1a0e;--green-900:#122318;--green-800:#1a3322;--green-700:#24472f;
+  --green-600:#2d5c3c;--green-500:#3a7a50;--green-400:#52a06e;--green-300:#7dc494;
+  --green-200:#a8d9b8;--green-100:#d4eede;--green-50:#edf7f0;
+  --earth-900:#2c1f0e;--earth-700:#5c3d1a;--earth-500:#a06830;--earth-300:#d4a96a;
+  --cream:#faf8f4;--cream-dark:#f0ece3;
+  --text-dark:#1a2e1f;--text-mid:#3a5244;--text-light:#6b8f78;
+  --border:#c8ddd0;--shadow:rgba(10,26,14,0.12);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh;overflow-x:hidden}
+
+/* AUTH */
+.auth-screen{min-height:100vh;display:flex;background:var(--green-900)}
+.auth-left{flex:1;display:flex;flex-direction:column;justify-content:center;padding:60px;background:linear-gradient(135deg,var(--green-900) 0%,var(--green-700) 100%);position:relative;overflow:hidden}
+.auth-left::before{content:'';position:absolute;top:-100px;right:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(52,160,80,.15) 0%,transparent 70%);pointer-events:none}
+.auth-leaf-deco{position:absolute;font-size:120px;opacity:.07;bottom:40px;left:20px;transform:rotate(-15deg)}
+.auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:48px}
+.auth-brand-icon{width:44px;height:44px;background:var(--green-400);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.auth-brand-name{color:#fff;font-family:'DM Serif Display',serif;font-size:22px}
+.auth-brand-name span{display:block;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--green-300);font-weight:300;letter-spacing:.1em;text-transform:uppercase}
+.auth-title{font-family:'DM Serif Display',serif;font-size:42px;color:#fff;line-height:1.15;margin-bottom:16px}
+.auth-title em{color:var(--green-300);font-style:italic}
+.auth-sub{color:var(--green-200);font-size:14px;line-height:1.7;max-width:360px}
+.auth-stats{display:flex;gap:32px;margin-top:48px}
+.auth-stat-val{font-size:28px;font-weight:600;color:var(--green-300)}
+.auth-stat-lbl{font-size:11px;color:var(--green-200);text-transform:uppercase;letter-spacing:.08em}
+.auth-right{width:440px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:var(--cream);padding:60px 48px}
+.auth-form-wrap{width:100%}
+.auth-form-title{font-family:'DM Serif Display',serif;font-size:30px;color:var(--text-dark);margin-bottom:6px}
+.auth-form-sub{font-size:13px;color:var(--text-light);margin-bottom:36px}
+.role-tabs{display:flex;gap:6px;margin-bottom:28px;background:var(--cream-dark);padding:4px;border-radius:10px}
+.role-tab{flex:1;padding:8px 10px;border:none;background:none;border-radius:8px;font-size:12px;font-weight:500;color:var(--text-light);cursor:pointer;transition:.2s;font-family:inherit}
+.role-tab.active{background:#fff;color:var(--green-700);box-shadow:0 1px 4px var(--shadow)}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:12px;font-weight:500;color:var(--text-mid);margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
+.form-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--text-dark);outline:none;transition:.2s}
+.form-input:focus{border-color:var(--green-500);box-shadow:0 0 0 3px rgba(58,122,80,.1)}
+.btn-primary{width:100%;padding:13px;background:var(--green-700);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s;letter-spacing:.02em}
+.btn-primary:hover{background:var(--green-600)}
+.auth-divider{text-align:center;font-size:12px;color:var(--text-light);margin:16px 0;position:relative}
+.auth-divider::before{content:'';position:absolute;left:0;top:50%;width:40%;height:1px;background:var(--border)}
+.auth-divider::after{content:'';position:absolute;right:0;top:50%;width:40%;height:1px;background:var(--border)}
+.btn-guest{width:100%;padding:11px;background:transparent;color:var(--text-mid);border:1.5px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;font-family:inherit;transition:.2s}
+.btn-guest:hover{border-color:var(--green-400);color:var(--green-700)}
+
+/* MAIN LAYOUT */
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--green-900);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar-brand{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-brand-row{display:flex;align-items:center;gap:10px}
+.sidebar-brand-icon{width:34px;height:34px;background:var(--green-400);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sidebar-brand-text{color:#fff;font-family:'DM Serif Display',serif;font-size:15px;line-height:1.2}
+.sidebar-brand-text span{display:block;font-family:'DM Sans',sans-serif;font-size:10px;color:var(--green-300);font-weight:300;letter-spacing:.1em;text-transform:uppercase}
+.sidebar-user{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-user-row{display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--green-500);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-info-name{font-size:13px;font-weight:500;color:#fff}
+.user-info-role{font-size:11px;color:var(--green-300)}
+.sidebar-nav{flex:1;padding:16px 0;overflow-y:auto}
+.nav-section{margin-bottom:8px}
+.nav-section-label{font-size:10px;font-weight:500;color:rgba(255,255,255,.35);letter-spacing:.12em;text-transform:uppercase;padding:8px 20px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;transition:.15s;color:rgba(255,255,255,.6);font-size:13px;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#fff}
+.nav-item.active{background:rgba(52,160,80,.15);color:var(--green-300);border-left-color:var(--green-400)}
+.nav-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-bottom{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.btn-logout{width:100%;padding:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer;font-family:inherit;transition:.2s}
+.btn-logout:hover{background:rgba(255,80,80,.12);border-color:rgba(255,80,80,.3);color:#ff8080}
+.main-content{margin-left:240px;flex:1;padding:32px;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-title{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text-dark)}
+.page-title span{display:block;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-light);font-weight:400;margin-top:2px}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.badge-notif{position:relative;padding:8px 10px;background:#fff;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:16px;transition:.2s}
+.badge-notif:hover{border-color:var(--green-400)}
+.badge-dot{position:absolute;top:-4px;right:-4px;width:10px;height:10px;background:#e05c3a;border-radius:50%;border:2px solid var(--cream)}
+.btn-sm{padding:8px 16px;background:var(--green-700);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:.2s}
+.btn-sm:hover{background:var(--green-600)}
+.btn-sm-outline{padding:8px 16px;background:transparent;color:var(--green-700);border:1.5px solid var(--green-400);border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:.2s}
+.btn-sm-outline:hover{background:var(--green-50)}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px 22px}
+.card-title{font-size:14px;font-weight:600;color:var(--text-dark);margin-bottom:4px}
+.card-sub{font-size:12px;color:var(--text-light)}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.metric-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.metric-icon{font-size:22px;margin-bottom:10px}
+.metric-val{font-size:26px;font-weight:600;color:var(--text-dark);line-height:1}
+.metric-lbl{font-size:11px;color:var(--text-light);margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
+.metric-trend{font-size:11px;margin-top:6px;font-weight:500}
+.metric-trend.up{color:#3a9e5f}
+.metric-trend.down{color:#e05c3a}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+
+/* TREE TABLE */
+.tree-table{width:100%;border-collapse:collapse}
+.tree-table th{font-size:11px;font-weight:500;color:var(--text-light);text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.05em}
+.tree-table td{padding:12px 12px;border-bottom:1px solid var(--cream-dark);font-size:13px}
+.tree-table tr:last-child td{border-bottom:none}
+.tree-table tr:hover td{background:var(--green-50)}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.status-healthy{background:#d4eede;color:#1a6b3a}
+.status-monitor{background:#fef3d0;color:#8a5f00}
+.status-critical{background:#fee5e0;color:#8a2500}
+
+/* AI ALERT */
+.alert-card{border-radius:12px;padding:16px 18px;margin-bottom:12px;display:flex;align-items:flex-start;gap:14px}
+.alert-critical{background:#fee5e0;border:1px solid #f0a090}
+.alert-warning{background:#fef3d0;border:1px solid #e8c870}
+.alert-info{background:var(--green-50);border:1px solid var(--green-200)}
+.alert-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.alert-title{font-size:13px;font-weight:600;color:var(--text-dark)}
+.alert-body{font-size:12px;color:var(--text-mid);margin-top:2px;line-height:1.5}
+.alert-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:var(--green-700);color:#fff;margin-top:6px}
+
+/* SCHEDULE */
+.schedule-grid{display:grid;grid-template-columns:80px repeat(5,1fr);gap:8px;margin-top:12px}
+.sched-header{font-size:11px;font-weight:500;color:var(--text-light);text-align:center;padding:6px;text-transform:uppercase;letter-spacing:.05em}
+.sched-ranger{font-size:12px;font-weight:500;color:var(--text-dark);padding:8px 6px;display:flex;align-items:center;gap:6px}
+.sched-cell{border-radius:8px;padding:8px 6px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;transition:.15s;min-height:48px;display:flex;flex-direction:column;justify-content:center;line-height:1.3}
+.sched-empty{background:var(--cream-dark);color:var(--text-light)}
+.sched-zone-a{background:#d4eede;color:#1a5e30}
+.sched-zone-b{background:#d0e8f5;color:#1a4a6e}
+.sched-zone-c{background:#eeddd0;color:#6e3a1a}
+.sched-zone-d{background:#edd0ee;color:#5a1a6e}
+.sched-emergency{background:#fee5e0;color:#8a2500}
+
+/* VISITOR PORTAL */
+.visitor-hero{background:linear-gradient(135deg,var(--green-800) 0%,var(--green-600) 100%);border-radius:16px;padding:32px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden}
+.visitor-hero::before{content:'🌿';position:absolute;right:-10px;bottom:-20px;font-size:120px;opacity:.1;transform:rotate(-15deg)}
+.visitor-hero h1{font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:8px}
+.visitor-hero p{font-size:13px;opacity:.8;max-width:500px;line-height:1.6}
+.route-pref-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.pref-card{background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;padding:12px;cursor:pointer;transition:.2s;text-align:center}
+.pref-card:hover,.pref-card.selected{background:rgba(255,255,255,.25);border-color:#fff}
+.pref-card-icon{font-size:22px;margin-bottom:4px}
+.pref-card-lbl{font-size:11px;font-weight:500}
+.tree-card{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:.2s}
+.tree-card:hover{border-color:var(--green-400);transform:translateY(-2px);box-shadow:0 4px 16px var(--shadow)}
+.tree-card-img{height:90px;background:linear-gradient(135deg,var(--green-200),var(--green-100));display:flex;align-items:center;justify-content:center;font-size:40px}
+.tree-card-body{padding:12px 14px}
+.tree-card-name{font-size:13px;font-weight:600;color:var(--text-dark)}
+.tree-card-sci{font-size:11px;color:var(--text-light);font-style:italic}
+.tree-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.collected-badge{font-size:10px;font-weight:500;color:var(--green-600);background:var(--green-50);padding:2px 8px;border-radius:10px}
+
+/* CHATBOT */
+.chat-wrap{display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;padding:4px}
+.chat-msg{max-width:75%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.55}
+.chat-bot{background:var(--cream-dark);color:var(--text-dark);border-bottom-left-radius:4px;align-self:flex-start}
+.chat-user{background:var(--green-700);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.chat-input-row{display:flex;gap:8px;margin-top:14px}
+.chat-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;outline:none}
+.chat-input:focus{border-color:var(--green-500)}
+.chat-send{padding:10px 16px;background:var(--green-700);color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:inherit}
+
+/* MAP */
+.map-wrap{background:linear-gradient(160deg,#b8ddb5 0%,#8ec98a 30%,#74b87a 60%,#9ecf9c 100%);border-radius:14px;position:relative;overflow:hidden}
+.map-bg-detail{position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23388E3C' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+.map-zone-label{position:absolute;background:rgba(255,255,255,.75);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:600;color:var(--text-dark)}
+.map-path-line{position:absolute;border:2px dashed rgba(255,255,255,.6);border-radius:4px}
+.map-route-overlay{position:absolute;pointer-events:none}
+.map-pin{position:absolute;display:flex;flex-direction:column;align-items:center;cursor:pointer;z-index:2}
+.map-pin-dot{width:26px;height:26px;border-radius:50%;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:.2s}
+.map-pin-dot:hover{transform:scale(1.2)}
+.map-pin-label{font-size:10px;font-weight:600;color:var(--text-dark);background:rgba(255,255,255,.92);padding:2px 7px;border-radius:6px;margin-top:4px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.pin-healthy{background:#43a047}
+.pin-monitor{background:#fb8c00}
+.pin-critical{background:#e53935}
+.pin-ranger{background:#1565c0}
+.map-overlay-card{position:absolute;right:14px;top:14px;background:rgba(255,255,255,.96);border-radius:12px;padding:14px 16px;width:200px;border:1px solid var(--border);box-shadow:0 2px 12px var(--shadow)}
+.map-overlay-title{font-size:12px;font-weight:600;color:var(--text-dark);margin-bottom:8px}
+.map-legend{display:flex;flex-direction:column;gap:6px}
+.map-legend-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-mid)}
+.map-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.map-layer-btn{padding:5px 10px;border-radius:6px;font-size:10px;font-weight:500;cursor:pointer;font-family:inherit;transition:.2s;border:1.5px solid var(--border);background:#fff;color:var(--text-mid)}
+.map-layer-btn.active{background:var(--green-700);color:#fff;border-color:var(--green-700)}
+.ranger-pos{position:absolute;z-index:5}
+.ranger-dot{width:20px;height:20px;border-radius:50%;background:#1565c0;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.ranger-dot-label{font-size:9px;background:#1565c0;color:#fff;padding:1px 5px;border-radius:4px;margin-top:2px;white-space:nowrap}
+
+/* QR Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200}
+.modal{background:#fff;border-radius:16px;padding:28px;width:400px;max-height:85vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text-dark)}
+.modal-close{font-size:20px;cursor:pointer;color:var(--text-light);background:none;border:none;padding:4px}
+.qr-box{width:120px;height:120px;background:var(--green-50);border:2px dashed var(--green-400);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:50px;margin:0 auto 16px}
+.tree-detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cream-dark);font-size:13px}
+.tree-detail-row:last-child{border-bottom:none}
+.tree-detail-label{color:var(--text-light);font-weight:500}
+.tree-detail-val{color:var(--text-dark);text-align:right}
+
+/* AI Diagnosis */
+.diagnosis-card{border-radius:10px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border)}
+.diagnosis-rank{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.diagnosis-name{font-size:14px;font-weight:600;color:var(--text-dark);margin-bottom:2px}
+.diagnosis-conf{font-size:12px;color:var(--text-light);margin-bottom:6px}
+.confidence-bar{height:6px;background:var(--cream-dark);border-radius:3px;overflow:hidden}
+.confidence-fill{height:100%;border-radius:3px;background:var(--green-500)}
+.diagnosis-treatment{font-size:12px;color:var(--text-mid);margin-top:8px;padding-top:8px;border-top:1px solid var(--cream-dark);line-height:1.5}
+
+/* Audit Log */
+.log-item{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--cream-dark);align-items:flex-start}
+.log-time{font-size:11px;color:var(--text-light);white-space:nowrap;font-weight:500;min-width:80px}
+.log-event-type{font-size:10px;font-weight:600;padding:2px 8px;border-radius:8px;flex-shrink:0}
+.log-type-login{background:#d4eede;color:#1a5e30}
+.log-type-edit{background:#d0e8f5;color:#1a4a6e}
+.log-type-error{background:#fee5e0;color:#8a2500}
+.log-type-alert{background:#fef3d0;color:#8a5f00}
+.log-desc{font-size:12px;color:var(--text-dark);line-height:1.5}
+
+/* RANGER MOBILE */
+.mobile-frame{width:300px;background:#fff;border-radius:28px;border:2px solid var(--green-800);overflow:hidden;box-shadow:0 8px 32px var(--shadow)}
+.mobile-statusbar{background:var(--green-900);display:flex;justify-content:space-between;padding:8px 16px;font-size:11px;color:#fff}
+.mobile-time{font-weight:600}
+.mobile-header{background:var(--green-800);padding:12px 16px;color:#fff}
+.mobile-header-title{font-size:15px;font-weight:600;margin-bottom:2px}
+.mobile-header-sub{font-size:11px;opacity:.7}
+.mobile-body{padding:12px;max-height:380px;overflow-y:auto}
+.task-item{background:var(--cream-dark);border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid var(--green-500)}
+.task-item.emergency{border-left-color:#e53935;background:#fff5f5}
+.task-priority-badge{font-size:10px;font-weight:700;color:#e53935;margin-bottom:4px}
+.task-name{font-size:13px;font-weight:600;color:var(--text-dark);margin-bottom:2px}
+.task-zone{font-size:11px;color:var(--text-light);margin-bottom:8px}
+.task-actions{display:flex;gap:6px}
+.task-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;border:none}
+.task-btn-primary{background:var(--green-700);color:#fff}
+.task-btn-outline{background:transparent;border:1px solid var(--green-500);color:var(--green-700)}
+
+/* CHARTS */
+.chart-container{display:flex;flex-direction:column;height:160px;justify-content:flex-end}
+.bar-chart{display:flex;gap:8px;align-items:flex-end;height:130px;margin-bottom:8px}
+.bar{flex:1;border-radius:4px 4px 0 0;min-width:20px;transition:.3s;cursor:pointer}
+.bar:hover{opacity:.8}
+.bar-labels{display:flex;gap:8px}
+.bar-label{flex:1;text-align:center;font-size:10px;color:var(--text-light);min-width:20px}
+.line-chart-svg{width:100%;height:120px}
+.donut-wrap{position:relative;width:80px;height:80px;margin:0 auto 8px}
+.donut-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.donut-num{font-size:18px;font-weight:600;color:var(--text-dark)}
+.donut-lbl{font-size:9px;color:var(--text-light)}
+
+/* Progress */
+.prog-wrap{height:6px;background:var(--cream-dark);border-radius:3px;overflow:hidden;width:100%}
+.prog-bar{height:100%;background:var(--green-500);border-radius:3px;transition:.3s}
+
+/* Filter bar */
+.filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.search-input{flex:1;min-width:200px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:inherit;outline:none;background:#fff}
+.search-input:focus{border-color:var(--green-500)}
+.filter-select{padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:12px;font-family:inherit;outline:none;background:#fff;cursor:pointer;color:var(--text-dark)}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab{padding:8px 16px;border:none;background:none;font-size:13px;font-weight:500;color:var(--text-light);cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.2s}
+.tab.active{color:var(--green-700);border-bottom-color:var(--green-500)}
+
+/* Spatial */
+.spatial-map{background:linear-gradient(160deg,#b8ddb5,#8ec98a);border-radius:12px;height:260px;position:relative;overflow:hidden;margin-bottom:14px}
+.spatial-proposed{position:absolute;width:32px;height:32px;border-radius:50%;background:rgba(255,200,0,.8);border:3px dashed #fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;cursor:pointer;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,200,0,.4)}50%{box-shadow:0 0 0 8px rgba(255,200,0,0)}}
+.suitability-meter{display:flex;align-items:center;gap:10px;margin-top:12px}
+.suit-label{font-size:12px;font-weight:500;color:var(--text-mid);white-space:nowrap}
+.suit-bar-wrap{flex:1;height:8px;background:var(--cream-dark);border-radius:4px;overflow:hidden}
+.suit-bar{height:100%;background:linear-gradient(90deg,var(--green-500),var(--green-300));border-radius:4px}
+.suit-score{font-size:12px;font-weight:600;color:var(--green-700);white-space:nowrap}
+
+/* Badge */
+.badge-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+.badge-item{text-align:center}
+.badge-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 4px}
+.badge-unlocked{background:var(--green-100);border:2px solid var(--green-400)}
+.badge-locked{background:var(--cream-dark);border:2px solid var(--border);filter:grayscale(1);opacity:.5}
+.badge-name{font-size:10px;color:var(--text-mid);font-weight:500}
+
+/* Tags */
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500}
+.tag-green{background:var(--green-50);color:var(--green-700);border:1px solid var(--green-200)}
+.tag-amber{background:#fef3d0;color:#8a5f00;border:1px solid #f0d880}
+.tag-red{background:#fee5e0;color:#8a2500;border:1px solid #f0a090}
+.tag-blue{background:#d0e8f5;color:#1a4a6e;border:1px solid #90c8e8}
+.tag-purple{background:#edd0ee;color:#5a1a6e;border:1px solid #d090e0}
+
+/* Route result overlay */
+.route-result{background:rgba(255,255,255,.95);border-radius:12px;padding:16px;margin-top:12px;border:1px solid var(--green-200)}
+.route-step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--cream-dark)}
+.route-step:last-child{border-bottom:none}
+.route-step-num{width:22px;height:22px;border-radius:50%;background:var(--green-700);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.route-step-info{flex:1}
+.route-step-name{font-size:13px;font-weight:600;color:var(--text-dark)}
+.route-step-detail{font-size:11px;color:var(--text-light);margin-top:2px}
+.route-step-dist{font-size:11px;color:var(--green-600);font-weight:500}
+
+/* Ranger assign modal */
+.ranger-assign-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--cream-dark)}
+.ranger-assign-row:last-child{border-bottom:none}
+.ranger-assign-info{display:flex;align-items:center;gap:10px}
+.ranger-zone-badge{font-size:11px;padding:2px 8px;border-radius:8px;font-weight:500}
+
+/* Stat mini */
+.stat-mini{background:var(--green-50);border:1px solid var(--green-100);border-radius:10px;padding:10px 14px;text-align:center}
+.stat-mini-val{font-size:22px;font-weight:700;color:var(--green-700)}
+.stat-mini-lbl{font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.05em}
+
+/* SVG inline chart */
+.svg-chart-label{font-size:10px;fill:#6b8f78;font-family:DM Sans,sans-serif}
+
+/* Tooltip */
+.tooltip{position:relative;display:inline-block}
+.tooltip-text{visibility:hidden;background:var(--green-900);color:#fff;font-size:11px;padding:4px 8px;border-radius:6px;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);white-space:nowrap;z-index:50}
+.tooltip:hover .tooltip-text{visibility:visible}
+
+/* Shimmer loading */
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+.shimmer{animation:shimmer 1.5s infinite;background:linear-gradient(90deg,#f0ece3 25%,#e8e4db 50%,#f0ece3 75%);background-size:400px 100%}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const {useState,useEffect,useRef,useCallback}=React;
+
+const TREES=[
+  {id:'TBJ-001',name:'Angsana',sci:'Pterocarpus indicus',zone:'A',status:'healthy',age:45,height:'18m',health:92,icon:'🌳',lat:32,lng:22},
+  {id:'TBJ-002',name:'Rain Tree',sci:'Samanea saman',zone:'B',status:'monitor',age:62,height:'22m',health:67,icon:'🌲',lat:48,lng:42},
+  {id:'TBJ-003',name:'Cempaka Putih',sci:'Magnolia alba',zone:'A',status:'healthy',age:28,height:'12m',health:88,icon:'🌸',lat:24,lng:58},
+  {id:'TBJ-004',name:'Pokok Nangka',sci:'Artocarpus heterophyllus',zone:'C',status:'critical',age:15,height:'8m',health:32,icon:'🌿',lat:62,lng:52},
+  {id:'TBJ-005',name:'Meranti Merah',sci:'Shorea parvifolia',zone:'B',status:'healthy',age:80,height:'30m',health:95,icon:'🌴',lat:28,lng:72},
+  {id:'TBJ-006',name:'Kelapa Sawit',sci:'Elaeis guineensis',zone:'D',status:'monitor',age:20,height:'10m',health:71,icon:'🌿',lat:70,lng:30},
+  {id:'TBJ-007',name:'Pokok Ara',sci:'Ficus benjamina',zone:'A',status:'healthy',age:35,height:'15m',health:85,icon:'🌱',lat:20,lng:45},
+  {id:'TBJ-008',name:'Bunga Tanjung',sci:'Mimusops elengi',zone:'C',status:'monitor',age:22,height:'10m',health:74,icon:'🌺',lat:55,lng:65},
+];
+
+const RANGERS=[
+  {id:'R01',name:'Ahmad Razif',avatar:'AR',zone:'A & C',status:'on-duty',tasks:3},
+  {id:'R02',name:'Siti Nurul',avatar:'SN',zone:'B',status:'on-duty',tasks:2},
+  {id:'R03',name:'Faizal Harun',avatar:'FH',zone:'D',status:'off-duty',tasks:0},
+  {id:'R04',name:'Mei Ling',avatar:'ML',zone:'A',status:'on-duty',tasks:4},
+];
+
+const DAYS=['Mon','Tue','Wed','Thu','Fri'];
+const ZONES_SCHED=[
+  ['Zone A','Zone B','Zone C','Zone D','Zone A'],
+  ['Zone B','Zone C','','Zone A','Zone B'],
+  ['Zone D','','Zone A','Zone C',''],
+  ['','Zone A','Zone B','','Zone D'],
+];
+const ZONE_CLASSES=['sched-zone-a','sched-zone-b','sched-zone-c','sched-zone-d'];
+
+const BADGES=[
+  {icon:'🌳',name:'Angsana',unlocked:true},{icon:'🌸',name:'Cempaka',unlocked:true},
+  {icon:'🌴',name:'Meranti',unlocked:true},{icon:'🌿',name:'Nangka',unlocked:false},
+  {icon:'🎋',name:'Bamboo',unlocked:false},{icon:'🌺',name:'Hibiscus',unlocked:false},
+  {icon:'🍃',name:'Ketapang',unlocked:false},{icon:'🌻',name:'Sunflower',unlocked:false},
+  {icon:'🌵',name:'Cactus',unlocked:false},{icon:'🌾',name:'Lalang',unlocked:false},
+];
+
+const LOGS=[
+  {time:'09:14',type:'edit',event:'Tree TBJ-004 health status updated by Ranger Ahmad Razif'},
+  {time:'09:02',type:'login',event:'Admin Dr. Lim Hui logged in from 192.168.1.12'},
+  {time:'08:47',type:'alert',event:'AI Anomaly alert triggered: Zone C disease rate 14%'},
+  {time:'08:30',type:'login',event:'Ranger Faizal Harun logged in via mobile app'},
+  {time:'07:55',type:'error',event:'QR scan API timeout — 3 retries, recovered'},
+  {time:'07:40',type:'edit',event:'Spatial planning: New Angsana proposed at Zone B-07'},
+  {time:'07:20',type:'login',event:'Ranger Mei Ling clocked in — Zone A patrol started'},
+  {time:'06:55',type:'alert',event:'Predictive: TBJ-002 drought stress score reached 84%'},
+];
+
+const DIAGNOSES=[
+  {rank:'1st',name:'Powdery Mildew (Oidium sp.)',conf:88,treatment:'Apply fungicide (Mancozeb 80 WP) weekly for 3 weeks. Remove and destroy infected leaves.'},
+  {rank:'2nd',name:'Root Rot (Phytophthora sp.)',conf:7,treatment:'Improve drainage. Reduce watering. Apply Fosetyl-Al fungicide.'},
+  {rank:'3rd',name:'Leaf Blight (Colletotrichum sp.)',conf:5,treatment:'Prune affected branches. Apply copper-based fungicide bi-weekly.'},
+];
+
+const CHATMSGS_DEFAULT=[
+  {role:'bot',text:'Hello! I am your TBJ botanical assistant 🌿 Ask me anything about the trees in Taman Botani Johor!'},
+];
+
+const PREF_OPTIONS=[
+  {icon:'🌺',lbl:'Rare Flowers',zones:['A','B'],duration:90,desc:'Focus on rare and endemic flowering specimens'},
+  {icon:'🌳',lbl:'Ancient Trees',zones:['B','C'],duration:120,desc:'Visit century-old heritage trees'},
+  {icon:'🌿',lbl:'Medicinal Plants',zones:['C','D'],duration:60,desc:'Explore plants with medicinal properties'},
+  {icon:'🦋',lbl:'Butterfly Zone',zones:['A'],duration:45,desc:'Nectar-rich flowering plants attracting butterflies'},
+  {icon:'☁️',lbl:'Shaded Paths',zones:['A','B'],duration:75,desc:'Cool canopy-covered walking trails'},
+  {icon:'📸',lbl:'Photo Spots',zones:['A','B','C'],duration:90,desc:'Most photogenic and scenic tree clusters'},
+];
+
+const PLANT_TYPES=['Tropical Hardwood','Flowering Tree','Palm Species','Fern & Ficus','Fruit Tree','Medicinal Plant','Ornamental'];
+
+const MONTHLY_HEALTH=[82,79,81,75,78,83,85,80,76,79,82,84];
+const MONTHLY_LABELS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function StatusPill({status}){
+  const map={healthy:'status-healthy',monitor:'status-monitor',critical:'status-critical'};
+  return React.createElement('span',{className:'status-pill '+map[status]},
+    status==='healthy'?'● Healthy':status==='monitor'?'⚠ Monitor':'✕ Critical'
+  );
+}
+
+function MapSVG({pins,route,showRangers,role,onPinClick}){
+  // Garden zones as painted regions
+  const zones=[
+    {label:'Zone A',x:8,y:8,w:38,h:40,color:'rgba(67,160,71,0.18)'},
+    {label:'Zone B',x:50,y:8,w:40,h:38,color:'rgba(21,101,192,0.12)'},
+    {label:'Zone C',x:8,y:52,w:45,h:38,color:'rgba(160,104,48,0.14)'},
+    {label:'Zone D',x:58,y:50,w:35,h:40,color:'rgba(90,26,110,0.12)'},
+  ];
+  const lake={cx:42,cy:48,rx:14,ry:10};
+  const routeCoords=route&&route.length>0?route.map(t=>`${t.lng},${t.lat}`).join(' L '):null;
+
+  return React.createElement('svg',{
+    viewBox:'0 0 100 95',style:{width:'100%',height:'100%',position:'absolute',top:0,left:0}
+  },
+    // Zone backgrounds
+    ...zones.map(z=>React.createElement('g',{key:z.label},
+      React.createElement('rect',{x:z.x,y:z.y,width:z.w,height:z.h,fill:z.color,rx:3}),
+      React.createElement('text',{x:z.x+2,y:z.y+8,fontSize:4,fill:'rgba(26,46,31,0.6)',fontWeight:'bold',fontFamily:'DM Sans,sans-serif'},z.label)
+    )),
+    // Lake
+    React.createElement('ellipse',{cx:lake.cx,cy:lake.cy,rx:lake.rx,ry:lake.ry,fill:'rgba(100,180,220,0.45)',stroke:'rgba(80,150,200,0.6)',strokeWidth:.5}),
+    React.createElement('text',{x:lake.cx,y:lake.cy+1,textAnchor:'middle',fontSize:3,fill:'rgba(21,101,192,0.7)',fontFamily:'DM Sans,sans-serif'},'Tasik'),
+    // Walking path
+    React.createElement('path',{d:'M 10,85 Q 25,70 42,62 Q 55,55 70,45 Q 80,35 85,20',stroke:'rgba(255,255,255,0.55)',strokeWidth:2,fill:'none',strokeDasharray:'3,2',strokeLinecap:'round'}),
+    // Route overlay
+    routeCoords&&React.createElement('polyline',{
+      points:route.map(t=>`${t.lng},${t.lat}`).join(' '),
+      stroke:'#ffeb3b',strokeWidth:2.5,fill:'none',strokeDasharray:'4,2',strokeLinecap:'round',opacity:.9
+    }),
+    // Tree pins
+    ...pins.map((pin,i)=>{
+      const color=pin.status==='healthy'?'#43a047':pin.status==='monitor'?'#fb8c00':'#e53935';
+      return React.createElement('g',{key:pin.id,style:{cursor:'pointer'},onClick:()=>onPinClick&&onPinClick(pin)},
+        React.createElement('circle',{cx:pin.lng,cy:pin.lat,r:3.5,fill:color,stroke:'#fff',strokeWidth:1}),
+        React.createElement('text',{x:pin.lng,y:pin.lat-5,textAnchor:'middle',fontSize:3,fill:'#1a2e1f',fontFamily:'DM Sans,sans-serif',fontWeight:'bold'},pin.icon)
+      );
+    }),
+    // Ranger dots (only if showRangers)
+    showRangers&&RANGERS.filter(r=>r.status==='on-duty').map((r,i)=>{
+      const poses=[{x:15,y:30},{x:62,y:22},{x:28,y:75},{x:75,y:68}];
+      const p=poses[i]||{x:20,y:20};
+      return React.createElement('g',{key:r.id},
+        React.createElement('circle',{cx:p.x,cy:p.y,r:4,fill:'#1565c0',stroke:'#fff',strokeWidth:1.5}),
+        React.createElement('text',{x:p.x,y:p.y+1.2,textAnchor:'middle',fontSize:3.5,fill:'#fff',fontFamily:'DM Sans,sans-serif',fontWeight:'bold'},r.avatar[0])
+      );
+    })
+  );
+}
+
+function App(){
+  const [screen,setScreen]=useState('auth');
+  const [role,setRole]=useState('admin');
+  const [activeNav,setActiveNav]=useState('dashboard');
+  const [modal,setModal]=useState(null);
+  const [chatMsgs,setChatMsgs]=useState(CHATMSGS_DEFAULT);
+  const [chatInput,setChatInput]=useState('');
+  const [prefSelected,setPrefSelected]=useState([]);
+  const [plantType,setPlantType]=useState('');
+  const [visitDuration,setVisitDuration]=useState(60);
+  const [generatedRoute,setGeneratedRoute]=useState(null);
+  const [diagTab,setDiagTab]=useState('results');
+  const [filterZone,setFilterZone]=useState('all');
+  const [filterStatus,setFilterStatus]=useState('all');
+  const [searchQ,setSearchQ]=useState('');
+  const [langVisitor,setLangVisitor]=useState('en');
+  const [mapLayer,setMapLayer]=useState('health');
+  const [showAddTree,setShowAddTree]=useState(false);
+  const [showAssignRanger,setShowAssignRanger]=useState(false);
+  const [newTree,setNewTree]=useState({name:'',sci:'',zone:'A',type:'',age:'',height:''});
+  const [rangerAssign,setRangerAssign]=useState({});
+  const [spatialClick,setSpatialClick]=useState({x:55,y:42});
+  const [loginId,setLoginId]=useState('');
+  const [loginPass,setLoginPass]=useState('');
+  const [loginErr,setLoginErr]=useState('');
+  const [dashTab,setDashTab]=useState('overview');
+  const chatEndRef=useRef(null);
+
+  useEffect(()=>{chatEndRef.current&&chatEndRef.current.scrollIntoView({behavior:'smooth'})},[chatMsgs]);
+
+  const loginCredentials={
+    admin:{id:'admin001',pass:'admin123'},
+    ranger:{id:'RGR001',pass:'ranger123'},
+    visitor:{email:'visitor@gmail.com',pass:'visitor123'}
+  };
+
+  function handleLogin(e){
+    e.preventDefault();
+    const cred=loginCredentials[role];
+    const idKey=role==='visitor'?'email':'id';
+    if(loginId===cred[idKey]&&loginPass===cred.pass){
+      setLoginErr('');setScreen('main');
+      setActiveNav(role==='ranger'?'tasks':role==='visitor'?'explore':'dashboard');
+    } else {setLoginErr('Invalid credentials. Please try again.');}
+  }
+
+  function sendChat(){
+    if(!chatInput.trim())return;
+    const userMsg={role:'user',text:chatInput};
+    const q=chatInput.toLowerCase();
+    let reply='';
+    if(q.includes('angsana'))reply='The Angsana (Pterocarpus indicus) is one of Malaysia\'s most beloved trees, known for its golden flowers in February! 🌼 Currently 45 years old in Zone A with 92% health score.';
+    else if(q.includes('meranti')||q.includes('rare'))reply='Meranti Merah can grow up to 30 metres tall and is listed as a spesies nadir (rare species) in our garden. 🌳 It is over 80 years old and is our tallest tree!';
+    else if(q.includes('zone a'))reply='Zone A hosts our oldest trees including the Angsana and Cempaka Putih. Best visited in the morning (8–10 AM) when the canopy provides lovely shade! ☀️';
+    else if(q.includes('disease')||q.includes('sick'))reply='TBJ-004 (Pokok Nangka) in Zone C is currently flagged with suspected Powdery Mildew. Our rangers are monitoring it closely. 🔍';
+    else reply='Great question! 🌿 Taman Botani Johor spans 32 hectares and hosts over 1,247 trees across 4 zones. Try asking about specific species or zones!';
+    setChatMsgs(p=>[...p,userMsg,{role:'bot',text:reply}]);
+    setChatInput('');
+  }
+
+  function generateRoute(){
+    if(prefSelected.length===0)return;
+    const prefs=PREF_OPTIONS.filter(p=>prefSelected.includes(p.lbl));
+    const zones=[...new Set(prefs.flatMap(p=>p.zones))];
+    const routeTrees=TREES.filter(t=>zones.includes(t.zone)).slice(0,5);
+    setGeneratedRoute(routeTrees);
+  }
+
+  function togglePref(lbl){
+    setPrefSelected(prev=>prev.includes(lbl)?prev.filter(x=>x!==lbl):[...prev,lbl]);
+  }
+
+  const filteredTrees=TREES.filter(t=>{
+    if(filterZone!=='all'&&t.zone!==filterZone)return false;
+    if(filterStatus!=='all'&&t.status!==filterStatus)return false;
+    if(searchQ&&!t.name.toLowerCase().includes(searchQ.toLowerCase()))return false;
+    return true;
+  });
+
+  const LANG={
+    en:{discover:'Discover Taman Botani Johor',sub:'Scan QR codes on trees to learn their stories. Collect badges and plan your personalized route!',pref:'What are you interested in?',collect:'Your Collection',trees:'Trees Found',duration:'Visit Duration'},
+    ms:{discover:'Terokai Taman Botani Johor',sub:'Imbas kod QR pada pokok untuk mengetahui cerita mereka. Kumpul lencana dan rancang laluan anda!',pref:'Apakah minat anda?',collect:'Koleksi Anda',trees:'Pokok Dijumpai',duration:'Tempoh Lawatan'},
+    zh:{discover:'探索柔佛植物园',sub:'扫描树木上的二维码以了解它们的故事。收集徽章并规划您的个性化路线！',pref:'您对什么感兴趣？',collect:'您的收藏',trees:'发现的树木',duration:'游览时长'},
+  };
+  const L=LANG[langVisitor]||LANG.en;
+
+  if(screen==='auth'){
+    return React.createElement('div',{className:'auth-screen'},
+      React.createElement('div',{className:'auth-left'},
+        React.createElement('div',{className:'auth-leaf-deco'},'🌿'),
+        React.createElement('div',{className:'auth-brand'},
+          React.createElement('div',{className:'auth-brand-icon'},'🌳'),
+          React.createElement('div',{className:'auth-brand-name'},'TBJ System',React.createElement('span',null,'Taman Botani Johor'))
+        ),
+        React.createElement('div',{className:'auth-title'},'Smart Tree ',React.createElement('em',null,'Mapping'),React.createElement('br',null),'& Management'),
+        React.createElement('p',{className:'auth-sub'},'An AI-driven botanical garden management platform for field rangers, administrators, and visitors of Taman Botani Johor.'),
+        React.createElement('div',{className:'auth-stats'},
+          ...[['1,247','Trees Monitored'],['32ha','Garden Area'],['4','Active Rangers']].map(([v,l])=>
+            React.createElement('div',{key:l},
+              React.createElement('div',{className:'auth-stat-val'},v),
+              React.createElement('div',{className:'auth-stat-lbl'},l)
+            )
+          )
+        )
+      ),
+      React.createElement('div',{className:'auth-right'},
+        React.createElement('div',{className:'auth-form-wrap'},
+          React.createElement('h2',{className:'auth-form-title'},'Sign In'),
+          React.createElement('p',{className:'auth-form-sub'},'Select your role to continue'),
+          React.createElement('div',{className:'role-tabs'},
+            ...[['admin','👨‍💼 Admin'],['ranger','🌲 Ranger'],['visitor','👤 Visitor']].map(([r,lbl])=>
+              React.createElement('button',{key:r,className:'role-tab'+(role===r?' active':''),onClick:()=>{setRole(r);setLoginId('');setLoginPass('');setLoginErr('')}},lbl)
+            )
+          ),
+          React.createElement('form',{onSubmit:handleLogin},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},role==='visitor'?'Email':'Staff ID'),
+              React.createElement('input',{className:'form-input',type:role==='visitor'?'email':'text',
+                placeholder:role==='visitor'?'visitor@gmail.com':'e.g. admin001',
+                value:loginId,onChange:e=>setLoginId(e.target.value),required:true})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Password'),
+              React.createElement('input',{className:'form-input',type:'password',placeholder:'Enter password',value:loginPass,onChange:e=>setLoginPass(e.target.value),required:true})
+            ),
+            loginErr&&React.createElement('p',{style:{color:'#e05c3a',fontSize:'12px',marginBottom:'12px'}},loginErr),
+            React.createElement('p',{style:{fontSize:'11px',color:'var(--text-light)',marginBottom:'14px'}},
+              role==='admin'?'Demo: admin001 / admin123':role==='ranger'?'Demo: RGR001 / ranger123':'Demo: visitor@gmail.com / visitor123'
+            ),
+            React.createElement('button',{type:'submit',className:'btn-primary'},'Sign In →')
+          ),
+          React.createElement('div',{className:'auth-divider'},'or'),
+          React.createElement('button',{className:'btn-guest',onClick:()=>{setRole('visitor');setScreen('main');setActiveNav('explore')}},'Continue as Guest (Visitor)')
+        )
+      )
+    );
+  }
+
+  const navItems={
+    admin:[
+      {section:'Overview',items:[{id:'dashboard',icon:'📊',label:'Dashboard'}]},
+      {section:'SS1 – Tree Health',items:[{id:'treeinventory',icon:'🌳',label:'Tree Inventory'},{id:'diagnosis',icon:'🔬',label:'AI Diagnosis'},{id:'maintenance',icon:'⚙️',label:'Predictive Maint.'}]},
+      {section:'SS2 – Scheduling',items:[{id:'schedule',icon:'📅',label:'Workforce Schedule'},{id:'rangers',icon:'👥',label:'Ranger Management'},{id:'tasks',icon:'✅',label:'Task Tracker'}]},
+      {section:'SS4 – Map & QR',items:[{id:'map',icon:'🗺️',label:'Garden Map'},{id:'spatial',icon:'🧭',label:'Spatial Planning'},{id:'auditlog',icon:'🔐',label:'Audit Log'}]},
+    ],
+    ranger:[
+      {section:'Field Operations',items:[{id:'tasks',icon:'✅',label:'My Tasks'},{id:'diagnosis',icon:'🔬',label:'AI Diagnosis'},{id:'map',icon:'🗺️',label:'Garden Map'}]},
+    ],
+    visitor:[
+      {section:'Visitor Portal',items:[{id:'explore',icon:'🗺️',label:'Explore & Route'},{id:'treecards',icon:'🌿',label:'Tree Profiles'},{id:'chatbot',icon:'💬',label:'Ask AI'},{id:'collection',icon:'🏅',label:'My Collection'}]},
+    ],
+  };
+
+  const userInfo={
+    admin:{name:'Dr. Lim Hui Shan',role:'Admin – Office Staff',avatar:'LH'},
+    ranger:{name:'Ahmad Razif',role:'Field Ranger',avatar:'AR'},
+    visitor:{name:'Visitor',role:'Taman Botani Johor',avatar:'👤'},
+  };
+  const u=userInfo[role];
+
+  // ── DASHBOARD ──────────────────────────────────────
+  function renderDashboard(){
+    return React.createElement('div',null,
+      // Dashboard tabs
+      React.createElement('div',{className:'tabs',style:{marginBottom:'20px'}},
+        ...[['overview','📊 Overview'],['analytics','📈 Analytics'],['aiinsights','🤖 AI Insights']].map(([k,l])=>
+          React.createElement('button',{key:k,className:'tab'+(dashTab===k?' active':''),onClick:()=>setDashTab(k)},l)
+        )
+      ),
+
+      dashTab==='overview'&&React.createElement('div',null,
+        React.createElement('div',{className:'metrics-grid'},
+          ...[
+            {icon:'🌳',val:'1,247',lbl:'Total Trees',trend:'↑ 12 this month',up:true},
+            {icon:'✅',val:'1,021',lbl:'Healthy',trend:'82% of total',up:true},
+            {icon:'⚠️',val:'156',lbl:'Under Monitor',trend:'↑ 8 flagged',up:false},
+            {icon:'🚨',val:'70',lbl:'Critical',trend:'↓ 3 resolved',up:true},
+          ].map(m=>
+            React.createElement('div',{key:m.lbl,className:'metric-card'},
+              React.createElement('div',{className:'metric-icon'},m.icon),
+              React.createElement('div',{className:'metric-val'},m.val),
+              React.createElement('div',{className:'metric-lbl'},m.lbl),
+              React.createElement('div',{className:'metric-trend '+(m.up?'up':'down')},m.trend)
+            )
+          )
+        ),
+        React.createElement('div',{className:'grid-2'},
+          React.createElement('div',{className:'card'},
+            React.createElement('div',{className:'card-title'},'🚨 AI Anomaly Alerts'),
+            React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'Zones with disease rate >10%'),
+            React.createElement('div',{className:'alert-card alert-critical'},
+              React.createElement('div',{className:'alert-icon'},'🔴'),
+              React.createElement('div',null,
+                React.createElement('div',{className:'alert-title'},'Zone C – Disease Outbreak'),
+                React.createElement('div',{className:'alert-body'},'Fungal infection spreading. 14% disease rate. 23 trees affected.'),
+                React.createElement('span',{className:'alert-badge'},'Confidence: 92%')
+              )
+            ),
+            React.createElement('div',{className:'alert-card alert-warning'},
+              React.createElement('div',{className:'alert-icon'},'🟡'),
+              React.createElement('div',null,
+                React.createElement('div',{className:'alert-title'},'Zone B – Water Stress'),
+                React.createElement('div',{className:'alert-body'},'Unusual leaf drop rate. Drought stress likely. 8 trees at risk.'),
+                React.createElement('span',{className:'alert-badge'},'Confidence: 78%')
+              )
+            ),
+            React.createElement('div',{className:'alert-card alert-info'},
+              React.createElement('div',{className:'alert-icon'},'🟢'),
+              React.createElement('div',null,
+                React.createElement('div',{className:'alert-title'},'Zone A – Optimal Conditions'),
+                React.createElement('div',{className:'alert-body'},'All health indicators normal. Scheduled maintenance on track.')
+              )
+            )
+          ),
+          React.createElement('div',{className:'card'},
+            React.createElement('div',{className:'card-title',style:{marginBottom:'4px'}},'📊 Zone Health Score'),
+            React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'Current week average health %'),
+            React.createElement('div',{className:'bar-chart'},
+              ...[{h:85,c:'var(--green-400)',lbl:'A'},{h:62,c:'#fb8c00',lbl:'B'},{h:30,c:'#e05c3a',lbl:'C'},{h:75,c:'var(--green-300)',lbl:'D'}].map(b=>
+                React.createElement('div',{key:b.lbl,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}},
+                  React.createElement('div',{style:{fontSize:'11px',fontWeight:'600',color:'var(--text-dark)'}},b.h+'%'),
+                  React.createElement('div',{className:'bar',style:{height:b.h+'%',background:b.c,width:'100%',borderRadius:'4px 4px 0 0'}})
+                )
+              )
+            ),
+            React.createElement('div',{className:'bar-labels'},
+              ...['Zone A','Zone B','Zone C','Zone D'].map(l=>React.createElement('div',{key:l,className:'bar-label'},l))
+            ),
+            React.createElement('div',{style:{marginTop:'16px',display:'flex',gap:'12px',flexWrap:'wrap'}},
+              ...[['🟢','Healthy','1,021'],['🟡','Monitor','156'],['🔴','Critical','70']].map(([ic,lbl,n])=>
+                React.createElement('div',{key:lbl,style:{display:'flex',alignItems:'center',gap:'5px',fontSize:'12px',color:'var(--text-mid)'}},
+                  React.createElement('span',null,ic),' ',lbl,' – ',React.createElement('strong',null,n)
+                )
+              )
+            )
+          )
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}},
+            React.createElement('div',null,
+              React.createElement('div',{className:'card-title'},'📋 Recent Field Reports'),
+              React.createElement('div',{className:'card-sub'},'Latest ranger submissions')
+            ),
+            React.createElement('button',{className:'btn-sm',onClick:()=>setActiveNav('tasks')},'View All')
+          ),
+          React.createElement('table',{className:'tree-table'},
+            React.createElement('thead',null,
+              React.createElement('tr',null,...['Tree ID','Name','Zone','Ranger','Status','Health'].map(h=>React.createElement('th',{key:h},h)))
+            ),
+            React.createElement('tbody',null,
+              ...TREES.slice(0,4).map((t,i)=>
+                React.createElement('tr',{key:t.id,style:{cursor:'pointer'},onClick:()=>setModal(t)},
+                  React.createElement('td',null,React.createElement('span',{className:'tag tag-blue'},t.id)),
+                  React.createElement('td',null,t.icon,' ',t.name),
+                  React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zone '+t.zone)),
+                  React.createElement('td',null,RANGERS[i%4].name),
+                  React.createElement('td',null,React.createElement(StatusPill,{status:t.status})),
+                  React.createElement('td',null,
+                    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'6px'}},
+                      React.createElement('div',{className:'prog-wrap',style:{width:'60px'}},
+                        React.createElement('div',{className:'prog-bar',style:{width:t.health+'%',background:t.health>80?'var(--green-500)':t.health>50?'#fb8c00':'#e53935'}})
+                      ),
+                      React.createElement('span',{style:{fontSize:'12px',fontWeight:'600'}},t.health+'%')
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      ),
+
+      dashTab==='analytics'&&React.createElement('div',null,
+        React.createElement('div',{className:'grid-2',style:{marginBottom:'16px'}},
+          // Monthly health trend line chart
+          React.createElement('div',{className:'card'},
+            React.createElement('div',{className:'card-title'},'📈 Monthly Health Trend'),
+            React.createElement('div',{className:'card-sub',style:{marginBottom:'12px'}},'Average garden health score (%)'),
+            React.createElement('svg',{viewBox:'0 0 280 100',style:{width:'100%',height:'120px'}},
+              // Grid lines
+              ...[20,40,60,80,100].map(y=>
+                React.createElement('line',{key:y,x1:30,y1:100-y,x2:280,y2:100-y,stroke:'#e8e4db',strokeWidth:.5})
+              ),
+              ...[20,40,60,80,100].map(y=>
+                React.createElement('text',{key:'y'+y,x:25,y:100-y+3,textAnchor:'end',fontSize:7,fill:'#6b8f78'},y)
+              ),
+              // Area fill
+              React.createElement('path',{
+                d:'M'+MONTHLY_HEALTH.map((h,i)=>`${30+i*22},${100-h}`).join(' L')+' L'+`${30+11*22},100 L30,100`,
+                fill:'rgba(58,122,80,0.12)',stroke:'none'
+              }),
+              // Line
+              React.createElement('polyline',{
+                points:MONTHLY_HEALTH.map((h,i)=>`${30+i*22},${100-h}`).join(' '),
+                fill:'none',stroke:'var(--green-500)',strokeWidth:1.5,strokeLinecap:'round',strokeLinejoin:'round'
+              }),
+              // Points
+              ...MONTHLY_HEALTH.map((h,i)=>
+                React.createElement('circle',{key:i,cx:30+i*22,cy:100-h,r:2.5,fill:'var(--green-600)',stroke:'#fff',strokeWidth:1})
+              ),
+              // X labels
+              ...MONTHLY_LABELS.map((l,i)=>
+                React.createElement('text',{key:l,x:30+i*22,y:108,textAnchor:'middle',fontSize:6,fill:'#6b8f78'},l)
+              )
+            )
+          ),
+          // Species donut
+          React.createElement('div',{className:'card'},
+            React.createElement('div',{className:'card-title'},'🌿 Species Distribution'),
+            React.createElement('div',{className:'card-sub',style:{marginBottom:'12px'}},'Tree types across all zones'),
+            React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'20px'}},
+              React.createElement('svg',{viewBox:'0 0 100 100',style:{width:'100px',height:'100px',flexShrink:0}},
+                // Donut segments
+                ...[
+                  {pct:35,color:'var(--green-500)',startAngle:-90,label:'Hardwood'},
+                  {pct:25,color:'#fb8c00',startAngle:-90+35*3.6,label:'Flowering'},
+                  {pct:18,color:'#1565c0',startAngle:-90+60*3.6,label:'Palm'},
+                  {pct:22,color:'#8e24aa',startAngle:-90+78*3.6,label:'Other'},
+                ].map((seg,i,arr)=>{
+                  const r=38,cx=50,cy=50;
+                  const startRad=seg.startAngle*Math.PI/180;
+                  const endRad=(seg.startAngle+seg.pct*3.6)*Math.PI/180;
+                  const x1=cx+r*Math.cos(startRad),y1=cy+r*Math.sin(startRad);
+                  const x2=cx+r*Math.cos(endRad),y2=cy+r*Math.sin(endRad);
+                  const large=seg.pct*3.6>180?1:0;
+                  return React.createElement('path',{key:i,
+                    d:`M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z`,
+                    fill:seg.color,opacity:.85
+                  });
+                }),
+                React.createElement('circle',{cx:50,cy:50,r:24,fill:'#fff'}),
+                React.createElement('text',{x:50,y:48,textAnchor:'middle',fontSize:11,fontWeight:'bold',fill:'var(--text-dark)'},'1,247'),
+                React.createElement('text',{x:50,y:57,textAnchor:'middle',fontSize:6,fill:'#6b8f78'},'Trees')
+              ),
+              React.createElement('div',{style:{flex:1}},
+                ...[['var(--green-500)','Tropical Hardwood','35%','437'],['#fb8c00','Flowering Trees','25%','312'],['#1565c0','Palm Species','18%','224'],['#8e24aa','Other','22%','274']].map(([c,l,p,n])=>
+                  React.createElement('div',{key:l,style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}},
+                    React.createElement('div',{style:{width:'10px',height:'10px',borderRadius:'50%',background:c,flexShrink:0}}),
+                    React.createElement('div',{style:{flex:1}},
+                      React.createElement('div',{style:{fontSize:'12px',color:'var(--text-dark)',fontWeight:'500'}},l),
+                      React.createElement('div',{style:{fontSize:'10px',color:'var(--text-light)'}},p,' · ',n,' trees')
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+        // Ranger performance & mortality
+        React.createElement('div',{className:'grid-2'},
+          React.createElement('div',{className:'card'},
+            React.createElement('div',{className:'card-title'},'👥 Ranger Task Completion'),
+            React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'This month'),
+            ...RANGERS.map(r=>
+              React.createElement('div',{key:r.id,style:{marginBottom:'12px'}},
+                React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:'4px'}},
+                  React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
+                    React.createElement('div',{className:'user-avatar',style:{width:'26px',height:'26px',fontSize:'10px',background:'var(--green-500)'}},r.avatar),
+                    React.createElement('span',{style:{fontSize:'12px',fontWeight:'500',color:'var(--text-dark)'}},r.name)
+                  ),
+                  React.createElement('span',{style:{fontSize:'12px',fontWeight:'600',color:'var(--green-700)'}},[88,92,75,96][RANGERS.indexOf(r)]+'%')
+                ),
+                React.createElement('div',{className:'prog-wrap'},
+                  React.createElement('div',{className:'prog-bar',style:{width:[88,92,75,96][RANGERS.indexOf(r)]+'%'}})
+                )
+              )
+            )
+          ),
+          React.createElement('div',{className:'card'},
+            React.createElement('div',{className:'card-title'},'📉 Tree Mortality Trend'),
+            React.createElement('div',{className:'card-sub',style:{marginBottom:'12px'}},'Monthly deaths / removals'),
+            React.createElement('svg',{viewBox:'0 0 260 90',style:{width:'100%',height:'100px'}},
+              ...[3,5,2,4,6,2,1,3,4,2,1,2].map((v,i)=>{
+                const x=20+i*20,h=v*10,y=80-h;
+                return React.createElement('g',{key:i},
+                  React.createElement('rect',{x:x-6,y,width:12,height:h,fill:'rgba(224,92,58,0.7)',rx:2}),
+                  React.createElement('text',{x,y:y-3,textAnchor:'middle',fontSize:6,fill:'#8a2500'},v)
+                );
+              }),
+              ...MONTHLY_LABELS.map((l,i)=>
+                React.createElement('text',{key:l,x:20+i*20,y:88,textAnchor:'middle',fontSize:6,fill:'#6b8f78'},l)
+              )
+            )
+          )
+        ),
+        // Zone comparison table
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'card-title',style:{marginBottom:'14px'}},'📊 Zone Comparison Summary'),
+          React.createElement('table',{className:'tree-table'},
+            React.createElement('thead',null,
+              React.createElement('tr',null,...['Zone','Trees','Healthy','Monitor','Critical','Avg Health','Status'].map(h=>React.createElement('th',{key:h},h)))
+            ),
+            React.createElement('tbody',null,
+              ...[
+                ['A','312','290','18','4','91%','Excellent'],
+                ['B','428','312','88','28','77%','Good'],
+                ['C','287','198','42','47','62%','Watch'],
+                ['D','220','175','24','21','80%','Good'],
+              ].map(([z,total,h,m,c,avg,st])=>
+                React.createElement('tr',{key:z},
+                  React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zone '+z)),
+                  React.createElement('td',null,total),
+                  React.createElement('td',{style:{color:'#1a6b3a',fontWeight:'600'}},h),
+                  React.createElement('td',{style:{color:'#8a5f00',fontWeight:'600'}},m),
+                  React.createElement('td',{style:{color:'#8a2500',fontWeight:'600'}},c),
+                  React.createElement('td',null,React.createElement('strong',null,avg)),
+                  React.createElement('td',null,React.createElement('span',{className:'tag '+(st==='Excellent'?'tag-green':st==='Watch'?'tag-amber':'tag-blue')},st))
+                )
+              )
+            )
+          )
+        )
+      ),
+
+      dashTab==='aiinsights'&&React.createElement('div',null,
+        React.createElement('div',{className:'card',style:{marginBottom:'16px',background:'linear-gradient(135deg,var(--green-900),var(--green-700))',color:'#fff',border:'none'}},
+          React.createElement('div',{style:{display:'flex',gap:'14px',alignItems:'flex-start'}},
+            React.createElement('div',{style:{fontSize:'32px'}},'🤖'),
+            React.createElement('div',null,
+              React.createElement('div',{style:{fontFamily:'DM Serif Display,serif',fontSize:'18px',marginBottom:'4px'}},'AI Garden Intelligence Report'),
+              React.createElement('div',{style:{fontSize:'12px',opacity:.8}},'Generated: '+new Date().toLocaleDateString('en-MY',{day:'numeric',month:'long',year:'numeric'})+' · Based on 30-day data window')
+            )
+          )
+        ),
+        React.createElement('div',{className:'grid-3'},
+          ...[
+            {icon:'🌡️',title:'Predicted Disease Risk',body:'Zone C has a 91% probability of further fungal spread within 7 days. Immediate intervention recommended. Zone B shows early signs of water stress.'},
+            {icon:'📅',title:'Optimal Maintenance Window',body:'AI recommends scheduling intensive tree care for Zone C on Wednesday–Thursday (lower rainfall probability: 23%). Best time: 7–11 AM.'},
+            {icon:'💰',title:'Resource Cost Forecast',body:'Projected fungicide cost for Zone C outbreak: RM 2,340. Early intervention now vs. later saves estimated RM 8,200 in tree replacement costs.'},
+          ].map((c,i)=>
+            React.createElement('div',{key:i,className:'card'},
+              React.createElement('div',{style:{fontSize:'24px',marginBottom:'8px'}},c.icon),
+              React.createElement('div',{className:'card-title',style:{marginBottom:'6px'}},c.title),
+              React.createElement('div',{style:{fontSize:'12px',color:'var(--text-mid)',lineHeight:'1.6'}},c.body)
+            )
+          )
+        ),
+        // AI crowd flow prediction
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'card-title',style:{marginBottom:'4px'}},'👥 AI Visitor Crowd Flow Prediction — This Weekend'),
+          React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'Expected congestion by zone and time based on historical scan data'),
+          React.createElement('div',{style:{display:'flex',gap:'8px',alignItems:'flex-end',height:'120px',marginBottom:'8px'}},
+            ...['8AM','10AM','12PM','2PM','4PM','6PM'].map((t,i)=>{
+              const heights=[40,80,100,90,70,30];
+              const colors=['var(--green-400)','#fb8c00','#e53935','#e53935','#fb8c00','var(--green-400)'];
+              return React.createElement('div',{key:t,style:{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'4px'}},
+                React.createElement('div',{style:{fontSize:'10px',fontWeight:'600',color:'var(--text-dark)'}},heights[i]+'%'),
+                React.createElement('div',{style:{width:'100%',height:heights[i]+'%',background:colors[i],borderRadius:'4px 4px 0 0',opacity:.85}}),
+                React.createElement('div',{style:{fontSize:'10px',color:'var(--text-light)'}},t)
+              );
+            })
+          ),
+          React.createElement('div',{style:{background:'#fef3d0',border:'1px solid #f0d880',borderRadius:'10px',padding:'10px 14px',fontSize:'12px',color:'#8a5f00'}},
+            '⚡ AI Recommendation: Deploy extra rangers to Zone A & B at 11AM–2PM this Saturday. Pre-position drinking water stations near Zone C lake area.'
+          )
+        )
+      ),
+
+      // Tree detail modal
+      modal&&React.createElement('div',{className:'modal-overlay',onClick:()=>setModal(null)},
+        React.createElement('div',{className:'modal',onClick:e=>e.stopPropagation()},
+          React.createElement('div',{className:'modal-header'},
+            React.createElement('div',{className:'modal-title'},modal.icon,' ',modal.name),
+            React.createElement('button',{className:'modal-close',onClick:()=>setModal(null)},'✕')
+          ),
+          React.createElement('div',{className:'qr-box'},'📱'),
+          React.createElement('p',{style:{textAlign:'center',fontSize:'11px',color:'var(--text-light)',marginBottom:'16px'}},'QR Code: '+modal.id),
+          ...[['Scientific Name',modal.sci],['Zone','Zone '+modal.zone],['Age',modal.age+' years'],['Height',modal.height],['Health Score',modal.health+'%'],['Status',modal.status.toUpperCase()]].map(([l,v])=>
+            React.createElement('div',{key:l,className:'tree-detail-row'},
+              React.createElement('span',{className:'tree-detail-label'},l),
+              React.createElement('span',{className:'tree-detail-val'},v)
+            )
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'8px',marginTop:'16px'}},
+            React.createElement('button',{className:'btn-sm',style:{flex:1}},'Export QR PDF'),
+            React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'Edit Record')
+          )
+        )
+      )
+    );
+  }
+
+  // ── TREE INVENTORY ──────────────────────────────────
+  function renderTreeInventory(){
+    return React.createElement('div',null,
+      React.createElement('div',{className:'filter-bar'},
+        React.createElement('input',{className:'search-input',placeholder:'🔍 Search tree name...',value:searchQ,onChange:e=>setSearchQ(e.target.value)}),
+        React.createElement('select',{className:'filter-select',value:filterZone,onChange:e=>setFilterZone(e.target.value)},
+          React.createElement('option',{value:'all'},'All Zones'),
+          ...['A','B','C','D'].map(z=>React.createElement('option',{key:z,value:z},'Zone '+z))
+        ),
+        React.createElement('select',{className:'filter-select',value:filterStatus,onChange:e=>setFilterStatus(e.target.value)},
+          React.createElement('option',{value:'all'},'All Status'),
+          React.createElement('option',{value:'healthy'},'Healthy'),
+          React.createElement('option',{value:'monitor'},'Monitor'),
+          React.createElement('option',{value:'critical'},'Critical')
+        ),
+        React.createElement('button',{className:'btn-sm',onClick:()=>setShowAddTree(true)},'+ Add Tree')
+      ),
+      React.createElement('div',{className:'card'},
+        React.createElement('table',{className:'tree-table'},
+          React.createElement('thead',null,
+            React.createElement('tr',null,...['Tree ID','Species','Scientific Name','Zone','Age','Height','Health','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))
+          ),
+          React.createElement('tbody',null,
+            ...filteredTrees.map(t=>
+              React.createElement('tr',{key:t.id,onClick:()=>setModal(t),style:{cursor:'pointer'}},
+                React.createElement('td',null,React.createElement('span',{className:'tag tag-blue'},t.id)),
+                React.createElement('td',null,t.icon,' ',t.name),
+                React.createElement('td',null,React.createElement('em',{style:{fontSize:'11px',color:'var(--text-light)'}},t.sci)),
+                React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zone '+t.zone)),
+                React.createElement('td',null,t.age+' yrs'),
+                React.createElement('td',null,t.height),
+                React.createElement('td',null,
+                  React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'6px'}},
+                    React.createElement('div',{className:'prog-wrap',style:{width:'50px'}},
+                      React.createElement('div',{className:'prog-bar',style:{width:t.health+'%',background:t.health>80?'var(--green-500)':t.health>50?'#fb8c00':'#e53935'}})
+                    ),
+                    React.createElement('span',{style:{fontSize:'11px',fontWeight:'600'}},t.health+'%')
+                  )
+                ),
+                React.createElement('td',null,React.createElement(StatusPill,{status:t.status})),
+                React.createElement('td',null,
+                  React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'10px',padding:'4px 10px'},onClick:e=>{e.stopPropagation();setModal(t)}},'View QR')
+                )
+              )
+            )
+          )
+        )
+      ),
+      // Modal: detail
+      modal&&React.createElement('div',{className:'modal-overlay',onClick:()=>setModal(null)},
+        React.createElement('div',{className:'modal',onClick:e=>e.stopPropagation()},
+          React.createElement('div',{className:'modal-header'},
+            React.createElement('div',{className:'modal-title'},modal.icon,' ',modal.name),
+            React.createElement('button',{className:'modal-close',onClick:()=>setModal(null)},'✕')
+          ),
+          React.createElement('div',{className:'qr-box'},'📱'),
+          React.createElement('p',{style:{textAlign:'center',fontSize:'11px',color:'var(--text-light)',marginBottom:'16px'}},'QR Code: '+modal.id),
+          ...[['Scientific Name',modal.sci],['Zone','Zone '+modal.zone],['Age',modal.age+' years'],['Height',modal.height],['Health Score',modal.health+'%'],['Status',modal.status.toUpperCase()]].map(([l,v])=>
+            React.createElement('div',{key:l,className:'tree-detail-row'},
+              React.createElement('span',{className:'tree-detail-label'},l),
+              React.createElement('span',{className:'tree-detail-val'},v)
+            )
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'8px',marginTop:'16px'}},
+            React.createElement('button',{className:'btn-sm',style:{flex:1}},'Export QR PDF'),
+            React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'Edit Record')
+          )
+        )
+      ),
+      // Add Tree Modal
+      showAddTree&&React.createElement('div',{className:'modal-overlay',onClick:()=>setShowAddTree(false)},
+        React.createElement('div',{className:'modal',style:{width:'480px'},onClick:e=>e.stopPropagation()},
+          React.createElement('div',{className:'modal-header'},
+            React.createElement('div',{className:'modal-title'},'🌱 Add New Tree'),
+            React.createElement('button',{className:'modal-close',onClick:()=>setShowAddTree(false)},'✕')
+          ),
+          React.createElement('div',{style:{background:'var(--green-50)',border:'1px solid var(--green-200)',borderRadius:'10px',padding:'12px',marginBottom:'16px',fontSize:'12px',color:'var(--text-mid)'}},
+            '🤖 AI will auto-generate a QR code, assign a Tree ID, and run spatial suitability analysis after submission.'
+          ),
+          React.createElement('div',{className:'grid-2',style:{gap:'12px'}},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Common Name'),
+              React.createElement('input',{className:'form-input',placeholder:'e.g. Angsana',value:newTree.name,onChange:e=>setNewTree({...newTree,name:e.target.value})})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Scientific Name'),
+              React.createElement('input',{className:'form-input',placeholder:'e.g. Pterocarpus indicus',value:newTree.sci,onChange:e=>setNewTree({...newTree,sci:e.target.value})})
+            )
+          ),
+          React.createElement('div',{className:'grid-2',style:{gap:'12px'}},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Zone'),
+              React.createElement('select',{className:'form-input',value:newTree.zone,onChange:e=>setNewTree({...newTree,zone:e.target.value})},
+                ...['A','B','C','D'].map(z=>React.createElement('option',{key:z,value:z},'Zone '+z))
+              )
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Plant Type'),
+              React.createElement('select',{className:'form-input',value:newTree.type,onChange:e=>setNewTree({...newTree,type:e.target.value})},
+                React.createElement('option',{value:''},'Select type...'),
+                ...PLANT_TYPES.map(t=>React.createElement('option',{key:t},t))
+              )
+            )
+          ),
+          React.createElement('div',{className:'grid-2',style:{gap:'12px'}},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Age (years)'),
+              React.createElement('input',{className:'form-input',type:'number',placeholder:'e.g. 15',value:newTree.age,onChange:e=>setNewTree({...newTree,age:e.target.value})})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Height (m)'),
+              React.createElement('input',{className:'form-input',type:'number',placeholder:'e.g. 8',value:newTree.height,onChange:e=>setNewTree({...newTree,height:e.target.value})})
+            )
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Upload Photo'),
+            React.createElement('div',{style:{border:'2px dashed var(--border)',borderRadius:'10px',padding:'20px',textAlign:'center',background:'var(--cream-dark)',cursor:'pointer'}},
+              React.createElement('div',{style:{fontSize:'28px',marginBottom:'6px'}},'📷'),
+              React.createElement('p',{style:{fontSize:'12px',color:'var(--text-mid)'}},'Tap to upload tree photo')
+            )
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'10px',marginTop:'8px'}},
+            React.createElement('button',{className:'btn-primary',style:{flex:1},onClick:()=>setShowAddTree(false)},'🌱 Add Tree & Generate QR'),
+            React.createElement('button',{className:'btn-sm-outline',style:{flex:1},onClick:()=>setShowAddTree(false)},'Cancel')
+          )
+        )
+      )
+    );
+  }
+
+  // ── AI DIAGNOSIS ──────────────────────────────────
+  function renderDiagnosis(){
+    return React.createElement('div',null,
+      React.createElement('div',{className:'grid-2'},
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'card-title'},'📸 Upload Tree Image'),
+          React.createElement('div',{className:'card-sub',style:{marginBottom:'16px'}},'AI will analyze and return top 3 probable diseases'),
+          React.createElement('div',{style:{border:'2px dashed var(--border)',borderRadius:'12px',padding:'32px',textAlign:'center',background:'var(--cream-dark)',marginBottom:'14px',cursor:'pointer'}},
+            React.createElement('div',{style:{fontSize:'36px',marginBottom:'8px'}},'📷'),
+            React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',marginBottom:'4px'}},'Tap to capture or upload'),
+            React.createElement('p',{style:{fontSize:'11px',color:'var(--text-light)'}},'Supports JPG, PNG. Max 10MB.')
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Tree ID'),
+            React.createElement('input',{className:'form-input',defaultValue:'TBJ-004',placeholder:'Enter tree ID'})
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Zone'),
+            React.createElement('select',{className:'form-input'},
+              ...['A','B','C','D'].map(z=>React.createElement('option',{key:z},'Zone '+z))
+            )
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Symptoms Observed'),
+            React.createElement('select',{className:'form-input'},
+              React.createElement('option',null,'Yellow/brown leaves'),
+              React.createElement('option',null,'White powder on leaves'),
+              React.createElement('option',null,'Root discoloration'),
+              React.createElement('option',null,'Bark peeling'),
+              React.createElement('option',null,'Wilting branches')
+            )
+          ),
+          React.createElement('button',{className:'btn-primary',onClick:()=>setDiagTab('results')},'🔬 Run AI Diagnosis')
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'tabs'},
+            React.createElement('button',{className:'tab'+(diagTab==='results'?' active':''),onClick:()=>setDiagTab('results')},'AI Results'),
+            React.createElement('button',{className:'tab'+(diagTab==='history'?' active':''),onClick:()=>setDiagTab('history')},'History')
+          ),
+          diagTab==='results'?React.createElement('div',null,
+            React.createElement('div',{style:{display:'flex',gap:'10px',alignItems:'center',marginBottom:'14px',padding:'12px',background:'var(--cream-dark)',borderRadius:'10px'}},
+              React.createElement('span',{style:{fontSize:'24px'}},'🌿'),
+              React.createElement('div',null,
+                React.createElement('div',{style:{fontSize:'12px',fontWeight:'500',color:'var(--text-dark)'}},'TBJ-004 – Pokok Nangka'),
+                React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},'Zone C · Analyzed 09:14 AM · Gemini Vision API')
+              )
+            ),
+            ...DIAGNOSES.map((d,i)=>
+              React.createElement('div',{key:i,className:'diagnosis-card',style:{borderLeftColor:i===0?'var(--green-500)':'var(--border)',borderLeftWidth:'4px'}},
+                React.createElement('div',{className:'diagnosis-rank',style:{color:i===0?'var(--green-700)':'var(--text-light)'}},d.rank+' Most Probable'),
+                React.createElement('div',{className:'diagnosis-name'},d.name),
+                React.createElement('div',{className:'diagnosis-conf'},'Confidence: '+d.conf+'%'),
+                React.createElement('div',{className:'confidence-bar'},
+                  React.createElement('div',{className:'confidence-fill',style:{width:d.conf+'%',background:i===0?'var(--green-500)':i===1?'#fb8c00':'#e05c3a'}})
+                ),
+                React.createElement('div',{className:'diagnosis-treatment'},'💊 Treatment: '+d.treatment)
+              )
+            ),
+            React.createElement('button',{className:'btn-primary',style:{marginTop:'8px'}},'✅ Confirm Diagnosis & Submit')
+          ):React.createElement('div',null,
+            ...[
+              {id:'TBJ-002',date:'2025-04-25',disease:'Powdery Mildew',conf:88},
+              {id:'TBJ-006',date:'2025-04-22',disease:'Root Rot',conf:74},
+              {id:'TBJ-001',date:'2025-04-18',disease:'Healthy – No Disease',conf:96},
+            ].map(h=>
+              React.createElement('div',{key:h.id,style:{padding:'12px 0',borderBottom:'1px solid var(--cream-dark)',display:'flex',justifyContent:'space-between',alignItems:'center'}},
+                React.createElement('div',null,
+                  React.createElement('div',{style:{fontSize:'13px',fontWeight:'500',color:'var(--text-dark)'}},h.id+' – '+h.disease),
+                  React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},h.date)
+                ),
+                React.createElement('span',{style:{fontSize:'11px',fontWeight:'600',color:'var(--green-700)'}},h.conf+'% conf.')
+              )
+            )
+          )
+        )
+      )
+    );
+  }
+
+  // ── PREDICTIVE MAINTENANCE ──────────────────────────
+  function renderMaintenance(){
+    return React.createElement('div',null,
+      React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}},
+          React.createElement('div',null,
+            React.createElement('div',{className:'card-title'},'🔮 Predictive Maintenance Alerts'),
+            React.createElement('div',{className:'card-sub'},'AI-generated risk alerts based on historical + weather data')
+          ),
+          React.createElement('button',{className:'btn-sm'},'⚡ Generate New Alerts')
+        ),
+        ...[
+          {tree:'TBJ-002',name:'Rain Tree',risk:'Drought Stress',zone:'B',conf:84,urgency:'High',action:'Increase watering frequency. Schedule irrigation for Zone B within 3 days.'},
+          {tree:'TBJ-004',name:'Pokok Nangka',risk:'Fungal Spread',zone:'C',conf:91,urgency:'Critical',action:'Immediate fungicide application. Isolate from neighboring trees. Alert specialist.'},
+          {tree:'TBJ-006',name:'Kelapa Sawit',risk:'Root Compaction',zone:'D',conf:67,urgency:'Medium',action:'Schedule soil aeration. Apply organic mulch around base.'},
+        ].map((a,i)=>
+          React.createElement('div',{key:i,className:'card',style:{marginBottom:'10px',borderLeft:'4px solid '+(a.urgency==='Critical'?'#e53935':'#fb8c00')}},
+            React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'8px'}},
+              React.createElement('div',null,
+                React.createElement('div',{style:{fontSize:'13px',fontWeight:'600',color:'var(--text-dark)'}},a.tree+' – '+a.name),
+                React.createElement('div',{style:{fontSize:'12px',color:'var(--text-light)'}},a.risk+' · Zone '+a.zone)
+              ),
+              React.createElement('div',{style:{display:'flex',gap:'6px',alignItems:'center'}},
+                React.createElement('span',{className:'tag '+(a.urgency==='Critical'?'tag-red':'tag-amber')},a.urgency),
+                React.createElement('span',{style:{fontSize:'11px',color:'var(--text-light)'}},a.conf+'% confidence')
+              )
+            ),
+            React.createElement('p',{style:{fontSize:'12px',color:'var(--text-mid)',marginBottom:'10px',lineHeight:'1.5'}},'💡 '+a.action),
+            React.createElement('div',{style:{display:'flex',gap:'8px'}},
+              React.createElement('button',{className:'btn-sm',style:{fontSize:'11px',padding:'6px 14px'}},'✅ Approve & Dispatch'),
+              React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px',padding:'6px 14px'}},'Defer'),
+              React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px',padding:'6px 14px'}},'Reject')
+            )
+          )
+        )
+      )
+    );
+  }
+
+  // ── SCHEDULE ──────────────────────────────────────
+  function renderSchedule(){
+    return React.createElement('div',null,
+      React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}},
+          React.createElement('div',null,
+            React.createElement('div',{className:'card-title'},'📅 Weekly Workforce Schedule'),
+            React.createElement('div',{className:'card-sub'},'Week of 28 Apr – 2 May 2025 · AI-optimized, non-overlapping patrol assignments')
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'8px'}},
+            React.createElement('button',{className:'btn-sm-outline'},'⚡ AI Generate'),
+            React.createElement('button',{className:'btn-sm'},'✅ Approve & Dispatch')
+          )
+        ),
+        React.createElement('div',{className:'schedule-grid'},
+          React.createElement('div',{className:'sched-header'},'Ranger'),
+          ...DAYS.map(d=>React.createElement('div',{key:d,className:'sched-header'},d)),
+          ...RANGERS.map((r,ri)=>[
+            React.createElement('div',{key:r.id+'name',className:'sched-ranger'},
+              React.createElement('div',{className:'user-avatar',style:{width:'26px',height:'26px',fontSize:'10px'}},r.avatar),
+              r.name.split(' ')[0]
+            ),
+            ...DAYS.map((d,di)=>{
+              const zone=ZONES_SCHED[ri][di];
+              const zoneIdx=['Zone A','Zone B','Zone C','Zone D'].indexOf(zone);
+              const cls=!zone?'sched-empty sched-cell':ZONE_CLASSES[zoneIdx]||'sched-cell';
+              return React.createElement('div',{key:d,className:'sched-cell '+cls},zone||'—');
+            })
+          ]).flat()
+        )
+      ),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'📤 Dispatch Ad-Hoc Task'),
+        React.createElement('div',{style:{display:'flex',gap:'10px',flexWrap:'wrap'}},
+          React.createElement('select',{className:'filter-select'},
+            ...RANGERS.map(r=>React.createElement('option',{key:r.id},r.name))
+          ),
+          React.createElement('select',{className:'filter-select'},
+            ...TREES.map(t=>React.createElement('option',{key:t.id},t.id+' – '+t.name))
+          ),
+          React.createElement('select',{className:'filter-select'},
+            React.createElement('option',null,'Emergency'),React.createElement('option',null,'Routine'),React.createElement('option',null,'Investigation')
+          ),
+          React.createElement('button',{className:'btn-sm'},'Send Task')
+        )
+      )
+    );
+  }
+
+  // ── RANGER MANAGEMENT (NEW) ──────────────────────
+  function renderRangerManagement(){
+    return React.createElement('div',null,
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'16px'}},
+        React.createElement('div',null),
+        React.createElement('button',{className:'btn-sm',onClick:()=>setShowAssignRanger(true)},'+ Add / Assign Ranger')
+      ),
+      React.createElement('div',{className:'metrics-grid',style:{marginBottom:'16px'}},
+        ...[
+          {icon:'👥',val:'4',lbl:'Total Rangers',trend:'All verified',up:true},
+          {icon:'✅',val:'3',lbl:'On Duty Today',trend:'1 off-day',up:true},
+          {icon:'📋',val:'9',lbl:'Active Tasks',trend:'3 emergency',up:false},
+          {icon:'⭐',val:'88%',lbl:'Avg Completion',trend:'↑ 4% vs last week',up:true},
+        ].map(m=>
+          React.createElement('div',{key:m.lbl,className:'metric-card'},
+            React.createElement('div',{className:'metric-icon'},m.icon),
+            React.createElement('div',{className:'metric-val'},m.val),
+            React.createElement('div',{className:'metric-lbl'},m.lbl),
+            React.createElement('div',{className:'metric-trend '+(m.up?'up':'down')},m.trend)
+          )
+        )
+      ),
+      React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
+        React.createElement('div',{className:'card-title',style:{marginBottom:'14px'}},'👥 Ranger Roster'),
+        React.createElement('table',{className:'tree-table'},
+          React.createElement('thead',null,
+            React.createElement('tr',null,...['Ranger','ID','Zone Assignment','Status','Tasks Today','Completion','Actions'].map(h=>React.createElement('th',{key:h},h)))
+          ),
+          React.createElement('tbody',null,
+            ...RANGERS.map((r,i)=>
+              React.createElement('tr',{key:r.id},
+                React.createElement('td',null,
+                  React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
+                    React.createElement('div',{className:'user-avatar',style:{background:'var(--green-500)'}},r.avatar),
+                    React.createElement('div',null,
+                      React.createElement('div',{style:{fontWeight:'500',fontSize:'13px'}},r.name),
+                      React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},r.id)
+                    )
+                  )
+                ),
+                React.createElement('td',null,React.createElement('span',{className:'tag tag-blue'},r.id)),
+                React.createElement('td',null,
+                  React.createElement('select',{className:'filter-select',style:{fontSize:'11px',padding:'4px 8px'},defaultValue:r.zone},
+                    ['Zone A','Zone B','Zone C','Zone D','Zone A & C','Zone B & D'].map(z=>React.createElement('option',{key:z},z))
+                  )
+                ),
+                React.createElement('td',null,
+                  React.createElement('span',{className:'status-pill '+(r.status==='on-duty'?'status-healthy':'status-monitor')},r.status==='on-duty'?'● On Duty':'○ Off')
+                ),
+                React.createElement('td',null,r.tasks),
+                React.createElement('td',null,
+                  React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'6px'}},
+                    React.createElement('div',{className:'prog-wrap',style:{width:'50px'}},
+                      React.createElement('div',{className:'prog-bar',style:{width:[88,92,75,96][i]+'%'}})
+                    ),
+                    React.createElement('span',{style:{fontSize:'11px',fontWeight:'600'}},[88,92,75,96][i]+'%')
+                  )
+                ),
+                React.createElement('td',null,
+                  React.createElement('div',{style:{display:'flex',gap:'4px'}},
+                    React.createElement('button',{className:'btn-sm',style:{fontSize:'10px',padding:'4px 8px'}},'Assign Task'),
+                    React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'10px',padding:'4px 8px'}},'View')
+                  )
+                )
+              )
+            )
+          )
+        )
+      ),
+      // Assign Ranger Modal
+      showAssignRanger&&React.createElement('div',{className:'modal-overlay',onClick:()=>setShowAssignRanger(false)},
+        React.createElement('div',{className:'modal',style:{width:'460px'},onClick:e=>e.stopPropagation()},
+          React.createElement('div',{className:'modal-header'},
+            React.createElement('div',{className:'modal-title'},'👤 Add / Assign Ranger'),
+            React.createElement('button',{className:'modal-close',onClick:()=>setShowAssignRanger(false)},'✕')
+          ),
+          React.createElement('div',{className:'tabs'},
+            React.createElement('button',{className:'tab active'},'New Ranger'),
+            React.createElement('button',{className:'tab'},'Zone Assignment')
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Full Name'),
+            React.createElement('input',{className:'form-input',placeholder:'e.g. Encik Ali bin Hamid'})
+          ),
+          React.createElement('div',{className:'grid-2',style:{gap:'12px'}},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Staff ID'),
+              React.createElement('input',{className:'form-input',placeholder:'e.g. R005'})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Phone Number'),
+              React.createElement('input',{className:'form-input',placeholder:'+60 12-345 6789'})
+            )
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Primary Zone Assignment'),
+            React.createElement('select',{className:'form-input'},
+              ...['Zone A','Zone B','Zone C','Zone D','Zone A & C','Zone B & D','All Zones'].map(z=>React.createElement('option',{key:z},z))
+            )
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Role Level'),
+            React.createElement('select',{className:'form-input'},
+              React.createElement('option',null,'Junior Ranger'),
+              React.createElement('option',null,'Senior Ranger'),
+              React.createElement('option',null,'Team Leader')
+            )
+          ),
+          React.createElement('div',{style:{background:'var(--cream-dark)',borderRadius:'10px',padding:'12px',marginBottom:'16px'}},
+            React.createElement('div',{style:{fontSize:'12px',fontWeight:'600',color:'var(--text-dark)',marginBottom:'8px'}},'Weekly Zone Rotation'),
+            ...DAYS.map(d=>
+              React.createElement('div',{key:d,style:{display:'flex',alignItems:'center',gap:'10px',marginBottom:'6px'}},
+                React.createElement('span',{style:{fontSize:'12px',color:'var(--text-mid)',width:'32px'}},d),
+                React.createElement('select',{className:'filter-select',style:{flex:1,fontSize:'11px',padding:'4px 8px'}},
+                  React.createElement('option',null,'Off'),
+                  ...['Zone A','Zone B','Zone C','Zone D'].map(z=>React.createElement('option',{key:z},z))
+                )
+              )
+            )
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'10px'}},
+            React.createElement('button',{className:'btn-primary',style:{flex:1},onClick:()=>setShowAssignRanger(false)},'✅ Create Account & Assign'),
+            React.createElement('button',{className:'btn-sm-outline',style:{flex:1},onClick:()=>setShowAssignRanger(false)},'Cancel')
+          )
+        )
+      )
+    );
+  }
+
+  // ── TASK TRACKER ──────────────────────────────────
+  function renderTaskTracker(){
+    return React.createElement('div',null,
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'card-title',style:{marginBottom:'14px'}},'✅ Task Tracker – All Field Reports'),
+        React.createElement('table',{className:'tree-table'},
+          React.createElement('thead',null,
+            React.createElement('tr',null,...['Task ID','Tree','Ranger','Type','Status','Submitted'].map(h=>React.createElement('th',{key:h},h)))
+          ),
+          React.createElement('tbody',null,
+            ...[
+              {id:'TSK-087',tree:'TBJ-004',ranger:'Ahmad Razif',type:'AI Diagnosis',status:'pending',date:'28 Apr'},
+              {id:'TSK-086',tree:'TBJ-002',ranger:'Siti Nurul',type:'Health Update',status:'confirmed',date:'27 Apr'},
+              {id:'TSK-085',tree:'TBJ-006',ranger:'Faizal Harun',type:'Maintenance',status:'confirmed',date:'26 Apr'},
+              {id:'TSK-084',tree:'TBJ-001',ranger:'Mei Ling',type:'Routine Patrol',status:'resolved',date:'25 Apr'},
+            ].map(t=>
+              React.createElement('tr',{key:t.id},
+                React.createElement('td',null,React.createElement('span',{className:'tag tag-blue'},t.id)),
+                React.createElement('td',null,t.tree),
+                React.createElement('td',null,t.ranger),
+                React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},t.type)),
+                React.createElement('td',null,React.createElement('span',{className:'status-pill '+(t.status==='confirmed'||t.status==='resolved'?'status-healthy':'status-monitor')},t.status.toUpperCase())),
+                React.createElement('td',null,t.date)
+              )
+            )
+          )
+        )
+      )
+    );
+  }
+
+  // ── RANGER TASKS ──────────────────────────────────
+  function renderRangerTasks(){
+    return React.createElement('div',{style:{display:'flex',gap:'20px',alignItems:'flex-start'}},
+      React.createElement('div',{style:{flex:1}},
+        React.createElement('div',{className:'card',style:{marginBottom:'14px'}},
+          React.createElement('div',{style:{display:'flex',gap:'10px',alignItems:'center',marginBottom:'14px'}},
+            React.createElement('div',{className:'user-avatar',style:{width:'40px',height:'40px',fontSize:'14px'}},'AR'),
+            React.createElement('div',null,
+              React.createElement('div',{style:{fontWeight:'600',color:'var(--text-dark)'}},RANGERS[0].name),
+              React.createElement('div',{style:{fontSize:'12px',color:'var(--text-light)'}},'Ranger ID: R01 · Zone A & C today')
+            )
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'14px'}},
+            ...[['3','Assigned'],['1','Completed'],['1','Emergency']].map(([n,l])=>
+              React.createElement('div',{key:l,style:{textAlign:'center',flex:1,padding:'10px',background:'var(--cream-dark)',borderRadius:'10px'}},
+                React.createElement('div',{style:{fontSize:'20px',fontWeight:'700',color:'var(--text-dark)'}},n),
+                React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},l)
+              )
+            )
+          )
+        ),
+        ...[
+          {id:'TSK-087',priority:'emergency',name:'Investigate diseased tree',zone:'Zone C – TBJ-004',notes:'Suspected fungal infection. Capture leaf close-up.'},
+          {id:'TSK-088',priority:'routine',name:'Routine patrol – Zone A',zone:'Zone A – 15 trees',notes:'Check health status and update records.'},
+          {id:'TSK-089',priority:'routine',name:'Water stress monitoring',zone:'Zone B – TBJ-002',notes:'Check soil moisture. Increase watering if needed.'},
+        ].map(t=>
+          React.createElement('div',{key:t.id,className:'card',style:{marginBottom:'10px',borderLeft:'4px solid '+(t.priority==='emergency'?'#e53935':'var(--green-500)')}},
+            t.priority==='emergency'&&React.createElement('div',{className:'task-priority-badge'},'🚨 EMERGENCY'),
+            React.createElement('div',{style:{fontSize:'14px',fontWeight:'600',color:'var(--text-dark)',marginBottom:'2px'}},t.name),
+            React.createElement('div',{style:{fontSize:'12px',color:'var(--text-light)',marginBottom:'6px'}},t.zone),
+            React.createElement('div',{style:{fontSize:'12px',color:'var(--text-mid)',marginBottom:'10px',lineHeight:'1.5'}},'📝 '+t.notes),
+            React.createElement('div',{style:{display:'flex',gap:'6px'}},
+              React.createElement('button',{className:'btn-sm',style:{fontSize:'11px',padding:'6px 12px'}},'Start'),
+              React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px',padding:'6px 12px'}},'AI Diagnose'),
+              React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px',padding:'6px 12px'}},'Skip')
+            )
+          )
+        )
+      ),
+      React.createElement('div',{style:{flexShrink:0}},
+        React.createElement('div',{className:'mobile-frame'},
+          React.createElement('div',{className:'mobile-statusbar'},
+            React.createElement('span',{className:'mobile-time'},'09:41'),
+            React.createElement('span',{className:'mobile-icons'},'▲ WiFi 🔋')
+          ),
+          React.createElement('div',{className:'mobile-header'},
+            React.createElement('div',{className:'mobile-header-title'},'📋 My Tasks'),
+            React.createElement('div',{className:'mobile-header-sub'},'Ahmad Razif · Zone A & C')
+          ),
+          React.createElement('div',{className:'mobile-body'},
+            React.createElement('div',{className:'task-item emergency'},
+              React.createElement('div',{className:'task-priority-badge'},'🚨 EMERGENCY'),
+              React.createElement('div',{className:'task-name'},'Diseased tree – TBJ-004'),
+              React.createElement('div',{className:'task-zone'},'Zone C'),
+              React.createElement('div',{className:'task-actions'},
+                React.createElement('button',{className:'task-btn task-btn-primary'},'Start'),
+                React.createElement('button',{className:'task-btn task-btn-outline'},'AI Diagnose')
+              )
+            ),
+            React.createElement('div',{className:'task-item'},
+              React.createElement('div',{className:'task-name'},'Routine Patrol – Zone A'),
+              React.createElement('div',{className:'task-zone'},'Zone A · 15 trees'),
+              React.createElement('div',{className:'task-actions'},
+                React.createElement('button',{className:'task-btn task-btn-primary'},'Start'),
+                React.createElement('button',{className:'task-btn task-btn-outline'},'Done')
+              )
+            ),
+            React.createElement('div',{className:'task-item'},
+              React.createElement('div',{className:'task-name'},'Water Stress Monitor'),
+              React.createElement('div',{className:'task-zone'},'Zone B · TBJ-002'),
+              React.createElement('div',{className:'task-actions'},
+                React.createElement('button',{className:'task-btn task-btn-primary'},'Start'),
+                React.createElement('button',{className:'task-btn task-btn-outline'},'Skip')
+              )
+            )
+          )
+        )
+      )
+    );
+  }
+
+  // ── MAP (ADMIN & RANGER) ──────────────────────────
+  function renderMap(){
+    const isRanger=role==='ranger';
+    return React.createElement('div',null,
+      React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}},
+          React.createElement('div',null,
+            React.createElement('div',{className:'card-title'},'🗺️ '+(isRanger?'Ranger Field Map':'Interactive Garden Map')),
+            React.createElement('div',{className:'card-sub'},'Taman Botani Johor · 32 Hectares · 1,247 Trees'+(isRanger?' · Your position shown in blue':''))
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'6px',flexWrap:'wrap'}},
+            ...['health','visitors','tasks','heatmap'].map(l=>
+              React.createElement('button',{key:l,className:'map-layer-btn'+(mapLayer===l?' active':''),onClick:()=>setMapLayer(l)},
+                {health:'🌿 Health',visitors:'👥 Visitors',tasks:'✅ Tasks',heatmap:'🔥 Heatmap'}[l]
+              )
+            )
+          )
+        ),
+        React.createElement('div',{className:'map-wrap',style:{height:'380px'}},
+          React.createElement('div',{className:'map-bg-detail'}),
+          React.createElement(MapSVG,{
+            pins:TREES,
+            route:null,
+            showRangers:isRanger,
+            role,
+            onPinClick:(pin)=>setModal(pin)
+          }),
+          // Heatmap overlay
+          mapLayer==='heatmap'&&React.createElement('div',{style:{position:'absolute',inset:0,background:'radial-gradient(ellipse 60% 40% at 30% 70%, rgba(255,100,0,0.35) 0%, transparent 60%), radial-gradient(ellipse 40% 30% at 65% 35%, rgba(255,200,0,0.25) 0%, transparent 55%)',pointerEvents:'none'}}),
+          // Visitor route overlay
+          mapLayer==='visitors'&&React.createElement('div',{style:{position:'absolute',bottom:'12px',left:'12px',background:'rgba(255,255,255,.9)',borderRadius:'8px',padding:'8px 12px',fontSize:'11px',color:'var(--text-dark)',fontWeight:'500'}},'👥 267 visitors today · Peak: Zone A & B'),
+          // Legend
+          React.createElement('div',{className:'map-overlay-card'},
+            React.createElement('div',{className:'map-overlay-title'},isRanger?'Your Patrol':'Legend'),
+            isRanger&&React.createElement('div',{style:{background:'#d0e8f5',borderRadius:'8px',padding:'8px 10px',marginBottom:'8px',fontSize:'11px',color:'#1a4a6e'}},
+              '📍 Your location: Zone A\n🎯 Next target: TBJ-004 (Zone C)'
+            ),
+            React.createElement('div',{className:'map-legend'},
+              ...[['#43a047','Healthy (1,021)'],['#fb8c00','Monitor (156)'],['#e53935','Critical (70)'],
+                  ...(isRanger?[['#1565c0','Rangers on duty']]:[])
+              ].map(([c,l])=>
+                React.createElement('div',{key:l,className:'map-legend-item'},
+                  React.createElement('div',{className:'map-legend-dot',style:{background:c}}),l
+                )
+              )
+            ),
+            isRanger&&React.createElement('div',{style:{marginTop:'10px'}},
+              React.createElement('div',{style:{fontSize:'11px',fontWeight:'600',color:'var(--text-dark)',marginBottom:'6px'}},'Rangers On Duty'),
+              ...RANGERS.filter(r=>r.status==='on-duty').map(r=>
+                React.createElement('div',{key:r.id,style:{display:'flex',alignItems:'center',gap:'6px',marginBottom:'4px'}},
+                  React.createElement('div',{style:{width:'18px',height:'18px',borderRadius:'50%',background:'#1565c0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'8px',color:'#fff',fontWeight:'700'}},r.avatar[0]),
+                  React.createElement('span',{style:{fontSize:'11px',color:'var(--text-dark)'}},r.name.split(' ')[0]),
+                  React.createElement('span',{style:{fontSize:'10px',color:'var(--text-light)'}},r.zone)
+                )
+              )
+            )
+          )
+        )
+      ),
+      // Zone summary below map
+      React.createElement('div',{className:'grid-2'},
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'📋 Zone Quick Stats'),
+          React.createElement('table',{className:'tree-table'},
+            React.createElement('thead',null,
+              React.createElement('tr',null,...['Zone','Trees','Health','Ranger'].map(h=>React.createElement('th',{key:h},h)))
+            ),
+            React.createElement('tbody',null,
+              ...['A','B','C','D'].map((z,i)=>
+                React.createElement('tr',{key:z},
+                  React.createElement('td',null,React.createElement('span',{className:'tag tag-green'},'Zone '+z)),
+                  React.createElement('td',null,[312,428,287,220][i]),
+                  React.createElement('td',null,
+                    React.createElement('div',{className:'prog-wrap',style:{width:'60px'}},
+                      React.createElement('div',{className:'prog-bar',style:{width:[91,77,62,80][i]+'%',background:[91,77,62,80][i]>80?'var(--green-500)':'#fb8c00'}})
+                    )
+                  ),
+                  React.createElement('td',null,RANGERS[i].name.split(' ')[0])
+                )
+              )
+            )
+          )
+        ),
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'🎯 '+(isRanger?'My Patrol Checklist':'Critical Trees Nearby')),
+          ...TREES.filter(t=>t.status==='critical'||t.status==='monitor').map(t=>
+            React.createElement('div',{key:t.id,style:{display:'flex',alignItems:'center',gap:'10px',padding:'8px 0',borderBottom:'1px solid var(--cream-dark)',cursor:'pointer'},onClick:()=>setModal(t)},
+              React.createElement('div',{style:{fontSize:'20px'}},t.icon),
+              React.createElement('div',{style:{flex:1}},
+                React.createElement('div',{style:{fontSize:'13px',fontWeight:'600',color:'var(--text-dark)'}},t.name+' – '+t.id),
+                React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},'Zone '+t.zone+' · Health: '+t.health+'%')
+              ),
+              React.createElement(StatusPill,{status:t.status})
+            )
+          )
+        )
+      ),
+      modal&&React.createElement('div',{className:'modal-overlay',onClick:()=>setModal(null)},
+        React.createElement('div',{className:'modal',onClick:e=>e.stopPropagation()},
+          React.createElement('div',{className:'modal-header'},
+            React.createElement('div',{className:'modal-title'},modal.icon,' ',modal.name),
+            React.createElement('button',{className:'modal-close',onClick:()=>setModal(null)},'✕')
+          ),
+          ...[['Scientific',modal.sci],['Zone','Zone '+modal.zone],['Health',modal.health+'%'],['Status',modal.status.toUpperCase()],['Height',modal.height],['Age',modal.age+' yrs']].map(([l,v])=>
+            React.createElement('div',{key:l,className:'tree-detail-row'},
+              React.createElement('span',{className:'tree-detail-label'},l),
+              React.createElement('span',{className:'tree-detail-val'},v)
+            )
+          ),
+          isRanger&&React.createElement('div',{style:{display:'flex',gap:'8px',marginTop:'14px'}},
+            React.createElement('button',{className:'btn-sm',style:{flex:1}},'📋 Report Issue'),
+            React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'🔬 AI Diagnose')
+          )
+        )
+      )
+    );
+  }
+
+  // ── SPATIAL PLANNING ──────────────────────────────
+  function renderSpatial(){
+    return React.createElement('div',null,
+      React.createElement('div',{className:'grid-2'},
+        React.createElement('div',{className:'card'},
+          React.createElement('div',{className:'card-title'},'🧭 AI Spatial Planning Simulation'),
+          React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'Click map to simulate new tree placement. AI analyzes canopy & root spread.'),
+          React.createElement('div',{className:'spatial-map',
+            onClick:(e)=>{
+              const rect=e.currentTarget.getBoundingClientRect();
+              const x=((e.clientX-rect.left)/rect.width*100).toFixed(0);
+              const y=((e.clientY-rect.top)/rect.height*100).toFixed(0);
+              setSpatialClick({x:parseInt(x),y:parseInt(y)});
+            }
+          },
+            React.createElement('div',{className:'map-bg-detail'}),
+            React.createElement(MapSVG,{pins:TREES.slice(0,5),route:null,showRangers:false,onPinClick:()=>{}}),
+            // Proposed location marker
+            React.createElement('div',{className:'spatial-proposed',style:{top:spatialClick.y+'%',left:spatialClick.x+'%',transform:'translate(-50%,-50%)'}},'+'),
+            // Canopy ring
+            React.createElement('div',{style:{position:'absolute',top:spatialClick.y+'%',left:spatialClick.x+'%',width:'80px',height:'80px',border:'2px dashed rgba(255,255,0,0.7)',borderRadius:'50%',transform:'translate(-50%,-50%)',pointerEvents:'none',background:'rgba(255,255,0,0.08)'}}),
+            React.createElement('div',{style:{position:'absolute',bottom:'10px',left:'10px',background:'rgba(255,255,255,.92)',borderRadius:'8px',padding:'6px 10px',fontSize:'11px',fontWeight:'500',color:'var(--text-dark)'}},'🟡 Proposed: Click to move placement')
+          ),
+          React.createElement('div',{className:'suitability-meter'},
+            React.createElement('span',{className:'suit-label'},'AI Suitability:'),
+            React.createElement('div',{className:'suit-bar-wrap'},React.createElement('div',{className:'suit-bar',style:{width:'78%'}})),
+            React.createElement('span',{className:'suit-score'},'78% – High ✅')
+          ),
+          React.createElement('div',{style:{marginTop:'12px',padding:'12px',background:'var(--cream-dark)',borderRadius:'10px',fontSize:'12px',color:'var(--text-mid)',lineHeight:'1.6'}},
+            '🌳 Selected position ('+spatialClick.x+'%, '+spatialClick.y+'%): Suitable for medium-canopy species. Canopy spread: ~8m radius. Root depth estimate: 2.5m. No underground conflict detected.',
+            React.createElement('br',null),
+            '💰 Cost estimate: RM 450 (planting) + RM 80/month (fertilizer). Projected 5-year survival rate: 87%.'
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'8px',marginTop:'12px'}},
+            React.createElement('button',{className:'btn-sm',style:{flex:1}},'✅ Confirm Placement'),
+            React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'🔄 Reset')
+          )
+        ),
+        React.createElement('div',null,
+          React.createElement('div',{className:'card',style:{marginBottom:'12px'}},
+            React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'🌱 Configure New Tree'),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Species'),
+              React.createElement('select',{className:'form-input'},
+                ...TREES.map(t=>React.createElement('option',{key:t.id},t.name+' ('+t.sci+')'))
+              )
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Target Zone'),
+              React.createElement('select',{className:'form-input'},
+                ...['A','B','C','D'].map(z=>React.createElement('option',{key:z},'Zone '+z))
+              )
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Quantity'),
+              React.createElement('input',{className:'form-input',type:'number',defaultValue:1,min:1,max:20})
+            ),
+            React.createElement('button',{className:'btn-primary',style:{marginTop:'4px'}},'🤖 Run AI Suitability Check')
+          ),
+          React.createElement('div',{className:'card'},
+            React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'📊 Recent Simulations'),
+            ...[
+              {name:'Angsana – Zone B-07',suit:'High',cost:'RM 1,350',status:'Approved'},
+              {name:'Meranti – Zone A-12',suit:'Medium',cost:'RM 2,100',status:'Pending'},
+              {name:'Rain Tree – Zone C-03',suit:'Low',cost:'RM 980',status:'Rejected'},
+            ].map((s,i)=>
+              React.createElement('div',{key:i,style:{padding:'10px 0',borderBottom:'1px solid var(--cream-dark)',display:'flex',justifyContent:'space-between',alignItems:'center'}},
+                React.createElement('div',null,
+                  React.createElement('div',{style:{fontSize:'13px',fontWeight:'500',color:'var(--text-dark)'}},s.name),
+                  React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},s.cost+' · AI: '+s.suit+' suitability')
+                ),
+                React.createElement('span',{className:'tag '+(s.status==='Approved'?'tag-green':s.status==='Pending'?'tag-amber':'tag-red')},s.status)
+              )
+            )
+          )
+        )
+      )
+    );
+  }
+
+  // ── AUDIT LOG ──────────────────────────────────────
+  function renderAuditLog(){
+    return React.createElement('div',{className:'card'},
+      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}},
+        React.createElement('div',null,
+          React.createElement('div',{className:'card-title'},'🔐 System Audit Log'),
+          React.createElement('div',{className:'card-sub'},'All system events, logins, and data modifications')
+        ),
+        React.createElement('div',{style:{display:'flex',gap:'8px'}},
+          React.createElement('select',{className:'filter-select'},
+            React.createElement('option',null,'All Events'),
+            React.createElement('option',null,'Login'),
+            React.createElement('option',null,'Edit'),
+            React.createElement('option',null,'Error'),
+            React.createElement('option',null,'Alert')
+          ),
+          React.createElement('button',{className:'btn-sm'},'Export Log')
+        )
+      ),
+      React.createElement('div',{style:{marginBottom:'12px',padding:'12px',background:'#fee5e0',borderRadius:'10px',display:'flex',gap:'10px',alignItems:'flex-start'}},
+        React.createElement('span',{style:{fontSize:'16px'}},'🛡️'),
+        React.createElement('div',{style:{fontSize:'12px',color:'#8a2500',lineHeight:'1.5'}},
+          React.createElement('strong',null,'Rare Species Data Protection:'),' GPS coordinates for all spesies nadir are masked from non-admin roles. Last access audit: today 09:02 by Admin Dr. Lim Hui.'
+        )
+      ),
+      ...LOGS.map((l,i)=>
+        React.createElement('div',{key:i,className:'log-item'},
+          React.createElement('div',{className:'log-time'},'Today '+l.time),
+          React.createElement('span',{className:'log-event-type log-type-'+l.type},l.type.toUpperCase()),
+          React.createElement('div',{className:'log-desc'},l.event)
+        )
+      )
+    );
+  }
+
+  // ── EXPLORE (VISITOR) ──────────────────────────────
+  function renderExplore(){
+    return React.createElement('div',null,
+      React.createElement('div',{className:'visitor-hero'},
+        React.createElement('div',{style:{display:'flex',gap:'8px',marginBottom:'12px'}},
+          ...['🇲🇾 BM','🇬🇧 EN','🇨🇳 中文'].map((l,i)=>{
+            const lk=['ms','en','zh'][i];
+            return React.createElement('button',{key:l,onClick:()=>setLangVisitor(lk),
+              style:{padding:'4px 10px',background:langVisitor===lk?'rgba(255,255,255,.3)':'rgba(255,255,255,.1)',border:'1px solid rgba(255,255,255,.3)',borderRadius:'8px',color:'#fff',fontSize:'11px',cursor:'pointer',fontFamily:'inherit'}},l);
+          })
+        ),
+        React.createElement('h1',null,L.discover),
+        React.createElement('p',null,L.sub),
+        React.createElement('div',{style:{marginTop:'16px'}},
+          React.createElement('p',{style:{fontSize:'13px',fontWeight:'600',opacity:.9,marginBottom:'10px'}},L.pref+' (choose multiple)'),
+          React.createElement('div',{className:'route-pref-grid'},
+            ...PREF_OPTIONS.map(p=>
+              React.createElement('div',{key:p.lbl,className:'pref-card'+(prefSelected.includes(p.lbl)?' selected':''),onClick:()=>togglePref(p.lbl)},
+                prefSelected.includes(p.lbl)&&React.createElement('div',{style:{position:'absolute',top:6,right:6,fontSize:'12px'}},'✓'),
+                React.createElement('div',{className:'pref-card-icon'},p.icon),
+                React.createElement('div',{className:'pref-card-lbl'},p.lbl),
+                React.createElement('div',{style:{fontSize:'9px',opacity:.7,marginTop:'2px'}},p.desc.substring(0,28)+'…')
+              )
+            )
+          ),
+          React.createElement('div',{style:{display:'flex',gap:'12px',alignItems:'center',marginTop:'10px',flexWrap:'wrap'}},
+            React.createElement('div',{style:{display:'flex',alignItems:'center',gap:'8px'}},
+              React.createElement('span',{style:{fontSize:'12px',opacity:.85}},L.duration||'Visit Duration:'),
+              ...[45,60,90,120].map(d=>
+                React.createElement('button',{key:d,onClick:()=>setVisitDuration(d),
+                  style:{padding:'5px 10px',background:visitDuration===d?'rgba(255,255,255,.35)':'rgba(255,255,255,.12)',border:'1px solid rgba(255,255,255,.4)',borderRadius:'8px',color:'#fff',fontSize:'11px',cursor:'pointer',fontFamily:'inherit'}},d+'min')
+              )
+            ),
+            prefSelected.length>0&&React.createElement('button',{
+              onClick:generateRoute,
+              style:{padding:'10px 20px',background:'rgba(255,255,255,.2)',border:'1.5px solid rgba(255,255,255,.6)',borderRadius:'10px',color:'#fff',fontSize:'13px',fontWeight:'600',cursor:'pointer',fontFamily:'inherit'}
+            },'🗺️ Generate My Route →')
+          )
+        )
+      ),
+
+      // Garden map with route
+      React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'12px'}},
+          React.createElement('div',{className:'card-title'},generatedRoute?'🗺️ Your Personalized Route':'🗺️ Garden Map'),
+          React.createElement('div',{style:{display:'flex',gap:'6px'}},
+            generatedRoute&&React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px'},onClick:()=>setGeneratedRoute(null)},'Clear Route'),
+            React.createElement('button',{className:'btn-sm-outline',style:{fontSize:'11px'}},'Full Screen')
+          )
+        ),
+        React.createElement('div',{className:'map-wrap',style:{height:'280px'}},
+          React.createElement('div',{className:'map-bg-detail'}),
+          React.createElement(MapSVG,{
+            pins:TREES,
+            route:generatedRoute,
+            showRangers:false,
+            onPinClick:(pin)=>setModal(pin)
+          }),
+          generatedRoute&&React.createElement('div',{style:{position:'absolute',top:'12px',left:'12px',background:'rgba(255,235,59,0.9)',borderRadius:'8px',padding:'6px 10px',fontSize:'11px',fontWeight:'700',color:'#333'}},'🗺️ Your route is shown in yellow'),
+          React.createElement('div',{className:'map-overlay-card'},
+            React.createElement('div',{className:'map-overlay-title'},'Legend'),
+            React.createElement('div',{className:'map-legend'},
+              ...[['#43a047','Healthy'],['#fb8c00','Monitor'],['#e53935','Critical'],
+                  ...(generatedRoute?[['#ffeb3b','Your route']]:[])
+              ].map(([c,l])=>
+                React.createElement('div',{key:l,className:'map-legend-item'},
+                  React.createElement('div',{className:'map-legend-dot',style:{background:c}}),l
+                )
+              )
+            )
+          )
+        )
+      ),
+
+      // Generated Route Steps
+      generatedRoute&&React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
+        React.createElement('div',{className:'card-title',style:{marginBottom:'4px'}},'🗺️ Your Route Plan'),
+        React.createElement('div',{className:'card-sub',style:{marginBottom:'14px'}},'Based on: '+prefSelected.join(', ')+' · Est. '+visitDuration+' min · '+generatedRoute.length+' stops'),
+        ...generatedRoute.map((t,i)=>
+          React.createElement('div',{key:t.id,className:'route-step'},
+            React.createElement('div',{className:'route-step-num'},i+1),
+            React.createElement('div',{className:'route-step-info'},
+              React.createElement('div',{className:'route-step-name'},t.icon+' '+t.name),
+              React.createElement('div',{className:'route-step-detail'},'Zone '+t.zone+' · '+t.sci+' · '+t.age+' years old')
+            ),
+            React.createElement('div',{className:'route-step-dist'},'~'+Math.round(visitDuration/generatedRoute.length)+' min')
+          )
+        ),
+        React.createElement('div',{style:{marginTop:'12px',display:'flex',gap:'8px'}},
+          React.createElement('button',{className:'btn-sm',style:{flex:1}},'▶ Start Navigation'),
+          React.createElement('button',{className:'btn-sm-outline',style:{flex:1}},'💾 Save Route')
+        )
+      ),
+
+      React.createElement('div',{className:'metrics-grid'},
+        ...[['🌳','1,247','Trees in Garden'],['🔍','3','Collected Today'],['🏅','3/10','Badges Unlocked'],['🗺️','~2hr','Estimated Walk']].map(([ic,v,l])=>
+          React.createElement('div',{key:l,className:'metric-card'},
+            React.createElement('div',{className:'metric-icon'},ic),
+            React.createElement('div',{className:'metric-val'},v),
+            React.createElement('div',{className:'metric-lbl'},l)
+          )
+        )
+      ),
+
+      modal&&React.createElement('div',{className:'modal-overlay',onClick:()=>setModal(null)},
+        React.createElement('div',{className:'modal',onClick:e=>e.stopPropagation()},
+          React.createElement('div',{className:'modal-header'},
+            React.createElement('div',{className:'modal-title'},modal.icon,' ',modal.name),
+            React.createElement('button',{className:'modal-close',onClick:()=>setModal(null)},'✕')
+          ),
+          React.createElement('em',{style:{display:'block',textAlign:'center',fontSize:'13px',color:'var(--text-light)',marginBottom:'12px'}},modal.sci),
+          React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',lineHeight:'1.7',marginBottom:'14px'}},
+            'A beautiful specimen in Zone '+modal.zone+'. This '+modal.age+'-year-old tree stands '+modal.height+' tall. Health score: '+modal.health+'%.'
+          ),
+          React.createElement('button',{className:'btn-primary',style:{marginBottom:'8px'}},'🏅 Collect This Tree'),
+          React.createElement('button',{className:'btn-sm-outline',style:{width:'100%'}},'💬 Ask AI About This Tree')
+        )
+      )
+    );
+  }
+
+  // ── TREE PROFILES ──────────────────────────────────
+  function renderTreeCards(){
+    return React.createElement('div',null,
+      React.createElement('div',{className:'tabs'},
+        React.createElement('button',{className:'tab active'},'Explorer Mode'),
+        React.createElement('button',{className:'tab'},'Expert Mode')
+      ),
+      React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'12px',marginBottom:'20px'}},
+        ...TREES.map(t=>
+          React.createElement('div',{key:t.id,className:'tree-card',onClick:()=>setModal(t)},
+            React.createElement('div',{className:'tree-card-img'},t.icon),
+            React.createElement('div',{className:'tree-card-body'},
+              React.createElement('div',{className:'tree-card-name'},t.name),
+              React.createElement('div',{className:'tree-card-sci'},t.sci),
+              React.createElement('div',{className:'tree-card-footer'},
+                React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},t.age+' yrs · '+t.height),
+                t.health>80?React.createElement('span',{className:'collected-badge'},'✓ Collected'):React.createElement('span',{className:'tag tag-amber'},'Scan to Collect')
+              )
+            )
+          )
+        )
+      ),
+      modal&&React.createElement('div',{className:'modal-overlay',onClick:()=>setModal(null)},
+        React.createElement('div',{className:'modal',onClick:e=>e.stopPropagation()},
+          React.createElement('div',{className:'modal-header'},
+            React.createElement('div',{className:'modal-title'},modal.icon,' ',modal.name),
+            React.createElement('button',{className:'modal-close',onClick:()=>setModal(null)},'✕')
+          ),
+          React.createElement('em',{style:{display:'block',textAlign:'center',fontSize:'13px',color:'var(--text-light)',marginBottom:'16px'}},modal.sci),
+          React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',lineHeight:'1.7',marginBottom:'16px'}},
+            'A beautiful specimen found in Zone '+modal.zone+'. This '+modal.age+'-year-old tree stands '+modal.height+' tall. Health score: '+modal.health+'%.'
+          ),
+          React.createElement('button',{className:'btn-primary',style:{marginBottom:'8px'}},'🏅 Collect This Tree'),
+          React.createElement('button',{className:'btn-sm-outline',style:{width:'100%'}},'💬 Ask AI About This Tree')
+        )
+      )
+    );
+  }
+
+  // ── CHATBOT ──────────────────────────────────────
+  function renderChatbot(){
+    return React.createElement('div',{className:'grid-2'},
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{style:{display:'flex',gap:'10px',alignItems:'center',marginBottom:'14px',padding:'12px',background:'var(--green-50)',borderRadius:'10px',border:'1px solid var(--green-200)'}},
+          React.createElement('span',{style:{fontSize:'28px'}},'🌿'),
+          React.createElement('div',null,
+            React.createElement('div',{style:{fontWeight:'600',fontSize:'14px',color:'var(--text-dark)'}},'TBJ Botanical AI Assistant'),
+            React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)'}},'Powered by Gemini · Ask anything about our trees!')
+          )
+        ),
+        React.createElement('div',{className:'chat-wrap'},
+          ...chatMsgs.map((m,i)=>
+            React.createElement('div',{key:i,className:'chat-msg '+(m.role==='bot'?'chat-bot':'chat-user')},m.text)
+          ),
+          React.createElement('div',{ref:chatEndRef})
+        ),
+        React.createElement('div',{className:'chat-input-row'},
+          React.createElement('input',{className:'chat-input',placeholder:'Ask about any tree in Taman Botani Johor...',value:chatInput,onChange:e=>setChatInput(e.target.value),onKeyDown:e=>e.key==='Enter'&&sendChat()}),
+          React.createElement('button',{className:'chat-send',onClick:sendChat},'Send')
+        ),
+        React.createElement('div',{style:{display:'flex',gap:'6px',marginTop:'10px',flexWrap:'wrap'}},
+          ...['What is Angsana?','Rare trees here?','Best time to visit Zone A?','Which trees are diseased?'].map(q=>
+            React.createElement('button',{key:q,onClick:()=>{setChatInput(q)},className:'btn-sm-outline',style:{fontSize:'11px',padding:'5px 10px'}},q)
+          )
+        )
+      ),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'card-title',style:{marginBottom:'14px'}},'🌳 Featured Tree Today'),
+        React.createElement('div',{style:{textAlign:'center',fontSize:'64px',margin:'8px 0'}},'🌴'),
+        React.createElement('div',{style:{textAlign:'center',marginBottom:'16px'}},
+          React.createElement('div',{style:{fontFamily:'DM Serif Display,serif',fontSize:'22px',color:'var(--text-dark)'}},'Meranti Merah'),
+          React.createElement('em',{style:{fontSize:'13px',color:'var(--text-light)'}},'Shorea parvifolia'),
+          React.createElement('div',{style:{marginTop:'8px',display:'flex',gap:'8px',justifyContent:'center'}},
+            React.createElement('span',{className:'tag tag-red'},'Spesies Nadir'),
+            React.createElement('span',{className:'tag tag-green'},'Zone B'),
+            React.createElement('span',{className:'tag tag-amber'},'80+ years old')
+          )
+        ),
+        React.createElement('p',{style:{fontSize:'13px',color:'var(--text-mid)',lineHeight:'1.7',textAlign:'center',marginBottom:'16px'}},
+          'One of Malaysia\'s tallest native trees, reaching 30m height. A rare and protected species. Named for its reddish timber, this towering giant is over 80 years old!'
+        ),
+        React.createElement('button',{className:'btn-primary'},'🏅 Collect Meranti Merah')
+      )
+    );
+  }
+
+  // ── COLLECTION ──────────────────────────────────────
+  function renderCollection(){
+    return React.createElement('div',null,
+      React.createElement('div',{className:'metrics-grid',style:{marginBottom:'20px'}},
+        ...[['🏅','3','Badges Earned'],['🌳','3','Trees Found'],['🏆','30%','Collection %'],['🌿','Rare!','Rarest Find']].map(([ic,v,l])=>
+          React.createElement('div',{key:l,className:'metric-card'},
+            React.createElement('div',{className:'metric-icon'},ic),
+            React.createElement('div',{className:'metric-val'},v),
+            React.createElement('div',{className:'metric-lbl'},l)
+          )
+        )
+      ),
+      React.createElement('div',{className:'card',style:{marginBottom:'16px'}},
+        React.createElement('div',{className:'card-title',style:{marginBottom:'6px'}},L.collect+' – '+L.trees+': 3/10'),
+        React.createElement('div',{className:'prog-wrap',style:{marginBottom:'16px'}},React.createElement('div',{className:'prog-bar',style:{width:'30%'}})),
+        React.createElement('div',{className:'badge-grid'},
+          ...BADGES.map((b,i)=>
+            React.createElement('div',{key:i,className:'badge-item'},
+              React.createElement('div',{className:'badge-icon '+(b.unlocked?'badge-unlocked':'badge-locked')},b.icon),
+              React.createElement('div',{className:'badge-name'},b.name)
+            )
+          )
+        )
+      ),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'card-title',style:{marginBottom:'12px'}},'📜 Collection History'),
+        ...TREES.slice(0,3).map(t=>
+          React.createElement('div',{key:t.id,style:{display:'flex',alignItems:'center',gap:'12px',padding:'10px 0',borderBottom:'1px solid var(--cream-dark)'}},
+            React.createElement('div',{style:{fontSize:'28px',lineHeight:1}},t.icon),
+            React.createElement('div',{style:{flex:1}},
+              React.createElement('div',{style:{fontSize:'13px',fontWeight:'600',color:'var(--text-dark)'}},t.name),
+              React.createElement('em',{style:{fontSize:'11px',color:'var(--text-light)'}},t.sci),
+              React.createElement('div',{style:{fontSize:'11px',color:'var(--text-light)',marginTop:'2px'}},'Scanned: 28 Apr 2025 · Zone '+t.zone)
+            ),
+            React.createElement('span',{className:'tag tag-green'},'✓ Collected')
+          )
+        )
+      )
+    );
+  }
+
+  function renderContent(){
+    if(activeNav==='dashboard')return renderDashboard();
+    if(activeNav==='treeinventory')return renderTreeInventory();
+    if(activeNav==='diagnosis')return renderDiagnosis();
+    if(activeNav==='maintenance')return renderMaintenance();
+    if(activeNav==='schedule')return renderSchedule();
+    if(activeNav==='rangers')return renderRangerManagement();
+    if(activeNav==='tasks')return role==='ranger'?renderRangerTasks():renderTaskTracker();
+    if(activeNav==='map')return renderMap();
+    if(activeNav==='spatial')return renderSpatial();
+    if(activeNav==='auditlog')return renderAuditLog();
+    if(activeNav==='explore')return renderExplore();
+    if(activeNav==='treecards')return renderTreeCards();
+    if(activeNav==='chatbot')return renderChatbot();
+    if(activeNav==='collection')return renderCollection();
+    return renderDashboard();
+  }
+
+  const roleNav=navItems[role]||navItems.admin;
+  const pageTitles={
+    dashboard:'Dashboard',treeinventory:'Tree Inventory',diagnosis:'AI Disease Diagnosis',
+    maintenance:'Predictive Maintenance',schedule:'Workforce Schedule',rangers:'Ranger Management',
+    tasks:'Task Tracker',map:'Garden Map',spatial:'Spatial Planning',auditlog:'Audit Log',
+    explore:'Explore Garden',treecards:'Tree Profiles',chatbot:'AI Botanical Assistant',collection:'My Badge Collection'
+  };
+  const pageSubs={
+    dashboard:'Overview, analytics & AI insights',treeinventory:'Centralized tree database',
+    diagnosis:'Upload image for AI analysis',maintenance:'Proactive care alerts',
+    schedule:'Weekly patrol assignments',rangers:'Manage and assign rangers',
+    tasks:'Field task management',map:'Interactive garden visualization',
+    spatial:'AI tree placement simulation',auditlog:'System security & event tracking',
+    explore:'Discover & generate your route',treecards:'Learn about our trees',
+    chatbot:'Ask anything about our plants',collection:'Your botanical discoveries'
+  };
+
+  return React.createElement('div',{className:'app'},
+    React.createElement('nav',{className:'sidebar'},
+      React.createElement('div',{className:'sidebar-brand'},
+        React.createElement('div',{className:'sidebar-brand-row'},
+          React.createElement('div',{className:'sidebar-brand-icon'},'🌳'),
+          React.createElement('div',{className:'sidebar-brand-text'},'TBJ System',React.createElement('span',null,'Taman Botani Johor'))
+        )
+      ),
+      React.createElement('div',{className:'sidebar-user'},
+        React.createElement('div',{className:'sidebar-user-row'},
+          React.createElement('div',{className:'user-avatar'},u.avatar),
+          React.createElement('div',null,
+            React.createElement('div',{className:'user-info-name'},u.name),
+            React.createElement('div',{className:'user-info-role'},u.role)
+          )
+        )
+      ),
+      React.createElement('div',{className:'sidebar-nav'},
+        ...roleNav.map(section=>
+          React.createElement('div',{key:section.section,className:'nav-section'},
+            React.createElement('div',{className:'nav-section-label'},section.section),
+            ...section.items.map(item=>
+              React.createElement('div',{key:item.id,className:'nav-item'+(activeNav===item.id?' active':''),onClick:()=>{setActiveNav(item.id);setModal(null)}},
+                React.createElement('span',{className:'nav-icon'},item.icon),
+                item.label
+              )
+            )
+          )
+        )
+      ),
+      React.createElement('div',{className:'sidebar-bottom'},
+        React.createElement('button',{className:'btn-logout',onClick:()=>{setScreen('auth');setLoginId('');setLoginPass('')}},'← Sign Out')
+      )
+    ),
+    React.createElement('main',{className:'main-content'},
+      React.createElement('div',{className:'topbar'},
+        React.createElement('div',{className:'page-title'},
+          pageTitles[activeNav]||'Dashboard',
+          React.createElement('span',null,pageSubs[activeNav]||'')
+        ),
+        React.createElement('div',{className:'topbar-actions'},
+          React.createElement('div',{className:'badge-notif'},'🔔',React.createElement('div',{className:'badge-dot'})),
+          React.createElement('div',{style:{fontSize:'12px',color:'var(--text-light)'}},new Date().toLocaleDateString('en-MY',{day:'numeric',month:'long',year:'numeric'}))
+        )
+      ),
+      renderContent()
+    )
+  );
+}
+
+const root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
