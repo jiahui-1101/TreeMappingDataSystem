@@ -20,16 +20,17 @@ function makePath(points, color, radius = 0.35, closed = false) {
   );
 }
 
-function makeZone(zone) {
+function makeZone(zone, selected = false) {
   const shape = new THREE.Shape();
   zone.polygon.forEach(([x, z], index) => index ? shape.lineTo(x, z) : shape.moveTo(x, z));
   shape.closePath();
   const mesh = new THREE.Mesh(
     new THREE.ShapeGeometry(shape),
-    new THREE.MeshStandardMaterial({ color: zone.color, transparent: true, opacity: 0.76, roughness: 1 }),
+    new THREE.MeshStandardMaterial({ color: selected ? 0xd7a927 : zone.color, transparent: true, opacity: selected ? 0.94 : 0.76, roughness: 1 }),
   );
   mesh.rotation.x = -Math.PI / 2;
-  mesh.position.y = 0.18;
+  mesh.position.y = selected ? 0.24 : 0.18;
+  mesh.userData.zone = zone;
   return mesh;
 }
 
@@ -76,19 +77,24 @@ export default function ThreeGardenScene({
   compact,
   layer,
   onMapClick,
+  onZoneClick,
   onProjectedPositions,
   proposedPoint,
   role,
+  routePath = [],
+  selectedZoneId,
   trees,
   viewMode,
 }) {
   const canvasRef = useRef(null);
   const hostRef = useRef(null);
   const onMapClickRef = useRef(onMapClick);
+  const onZoneClickRef = useRef(onZoneClick);
   const onProjectedPositionsRef = useRef(onProjectedPositions);
   const [fallback, setFallback] = useState(false);
 
   useEffect(() => { onMapClickRef.current = onMapClick; }, [onMapClick]);
+  useEffect(() => { onZoneClickRef.current = onZoneClick; }, [onZoneClick]);
   useEffect(() => { onProjectedPositionsRef.current = onProjectedPositions; }, [onProjectedPositions]);
 
   useEffect(() => {
@@ -138,7 +144,8 @@ export default function ThreeGardenScene({
     ground.receiveShadow = true;
     scene.add(ground);
 
-    MAP_ZONES.forEach((zone) => scene.add(makeZone(zone)));
+    const zoneMeshes = MAP_ZONES.map((zone) => makeZone(zone, zone.id === selectedZoneId));
+    zoneMeshes.forEach((zone) => scene.add(zone));
 
     const lakeMaterial = new THREE.MeshStandardMaterial({ color: 0x4899bd, roughness: 0.2, metalness: 0.05 });
     const lakeOne = new THREE.Mesh(new THREE.CircleGeometry(1, 60), lakeMaterial);
@@ -194,6 +201,27 @@ export default function ThreeGardenScene({
       scene.add(heat);
     }
 
+    const routeWorldPoints = routePath
+      .filter((point) => point.x !== null && point.y !== null)
+      .map((point) => {
+        const { x, z } = percentToWorldPosition(point);
+        return [x, z];
+      });
+    if (routeWorldPoints.length > 1) {
+      const routeLine = makePath(routeWorldPoints, 0xf2c94c, 0.42);
+      routeLine.position.y = 0.56;
+      scene.add(routeLine);
+      routeWorldPoints.forEach(([x, z], index) => {
+        if (index === 0) return;
+        const marker = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.85, 0.85, 0.28, 24),
+          new THREE.MeshStandardMaterial({ color: 0x0e4b2a, emissive: 0x123b22, emissiveIntensity: 0.12 }),
+        );
+        marker.position.set(x, 0.92, z);
+        scene.add(marker);
+      });
+    }
+
     if (proposedPoint) {
       const { x, z } = percentToWorldPosition(proposedPoint);
       const pin = new THREE.Mesh(new THREE.ConeGeometry(0.9, 3.8, 10), new THREE.MeshStandardMaterial({ color: 0xe3ab24 }));
@@ -209,10 +237,13 @@ export default function ThreeGardenScene({
       return { left: `${((position.x + 1) * 50).toFixed(2)}%`, top: `${((1 - position.y) * 50).toFixed(2)}%` };
     };
     const projectPositions = () => {
-      const next = { trees: {}, zones: {}, landmarks: {} };
+      const next = { trees: {}, zones: {}, landmarks: {}, route: {} };
       visibleTrees.forEach((tree) => { next.trees[tree.id] = project(treeToWorldPosition(tree)); });
       MAP_ZONES.forEach((zone) => { next.zones[zone.id] = project({ x: zone.label[0], z: zone.label[1] }); });
       MAP_LANDMARKS.forEach((landmark) => { next.landmarks[landmark.id] = project(landmark); });
+      routePath.forEach((point) => {
+        if (point.x !== null && point.y !== null) next.route[point.id] = project(percentToWorldPosition(point));
+      });
       const serialized = JSON.stringify(next);
       if (serialized !== projectionCache) {
         projectionCache = serialized;
@@ -232,11 +263,16 @@ export default function ThreeGardenScene({
     resize();
 
     const click = (event) => {
-      if (!onMapClickRef.current) return;
       const bounds = canvas.getBoundingClientRect();
       pointer.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
       pointer.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
       raycaster.setFromCamera(pointer, camera);
+      const zoneHit = raycaster.intersectObjects(zoneMeshes)[0];
+      if (zoneHit?.object?.userData?.zone && onZoneClickRef.current) {
+        onZoneClickRef.current(zoneHit.object.userData.zone);
+        return;
+      }
+      if (!onMapClickRef.current) return;
       const hit = raycaster.intersectObject(ground)[0];
       if (hit) onMapClickRef.current(worldToPercentPosition(hit.point));
     };
@@ -263,7 +299,7 @@ export default function ThreeGardenScene({
       });
       renderer.dispose();
     };
-  }, [compact, layer, proposedPoint, role, trees, viewMode]);
+  }, [compact, layer, proposedPoint, role, routePath, selectedZoneId, trees, viewMode]);
 
   return (
     <div className="three-map-host" ref={hostRef}>

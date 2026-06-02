@@ -18,7 +18,9 @@
   .drawer { width: min(82vw, 270px); height: 100%; background: var(--green-950); }
   .drawer > .brand { display: none; }
   .drawer .sidebar { position: static; display: flex; width: 100%; height: 100%; }
-  .topbar { align-items: flex-start; margin-bottom: 20px; }
+  .topbar { align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+  .topbar > div:not(.mobile-topbar):not(.topbar-actions) { flex: 1; min-width: 0; }
+  .mobile-topbar { flex: 0 0 auto; }
   .topbar h1 { font-size: 26px; }
   .topbar-actions > span:not(.mobile-avatar) { display: none; }
   .mobile-avatar { display: grid; }
@@ -27,6 +29,13 @@
   .two-column { grid-template-columns: 1fr; }
   .profile-grid { grid-template-columns: repeat(2, 1fr); }
   .chat-floating { right: 16px; bottom: 74px; }
+  .visitor-map-welcome, .chat-premium { grid-template-columns: 1fr; }
+  .visitor-map-toolbelt, .zone-drawer-grid, .growth-stage-layout, .tree-id-photo-hero, .growth-model-legend { grid-template-columns: 1fr; }
+  .visitor-map-toolbelt { align-items: flex-start; flex-direction: column; }
+  .route-map-overlay-card { right: 16px; bottom: 22px; left: 16px; max-width: none; }
+  .visitor-garden-facts { flex-wrap: wrap; }
+  .passport-grid { grid-template-columns: repeat(2, 1fr); }
+  .collection-passport-page .collection-metrics { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
@@ -55,6 +64,7 @@
   .modal-header, .modal-body, .modal-footer { padding: 14px; }
   .modal-footer-grid { grid-template-columns: 1fr; }
   .garden-map { min-height: 360px; }
+  .visitor-map-card-primary .garden-map { min-height: 420px; }
   .garden-map-compact { min-height: 230px; }
   .map-zone { font-size: 7px; }
   .lake { font-size: 7px; }
@@ -72,7 +82,132 @@
   .visitor-hero { padding: 18px; }.visitor-hero h2 { font-size: 26px; }
   .profile-grid { grid-template-columns: 1fr; }.profile-card p { min-height: 0; }
   .profile-modal { grid-template-columns: 1fr; }.tree-illustration { display: none; }
+  .visitor-map-welcome, .route-builder-card, .chat-mascot-panel, .collection-passport-heading { padding: 18px; border-radius: 15px; }
+  .visitor-map-welcome h2, .visitor-section-heading h2, .chat-mascot-panel h2 { font-size: 27px; }
+  .visitor-garden-facts span { min-width: 94px; flex: 1; }
+  .route-summary-strip { align-items: flex-start; flex-direction: column; margin: 0 0 10px; }
+  .visitor-map-card { padding: 10px; }
+  .profile-story-grid, .tree-id-hero, .tree-id-meta-grid, .passport-grid, .chat-premium { grid-template-columns: 1fr; }
+  .tree-id-photo { min-height: 220px; }.tree-id-photo img { min-height: 220px; }.tree-id-hero-copy { padding: 18px; }
+  .growth-stage-layout, .simulator-output-grid, .zone-drawer-grid, .growth-model-legend { grid-template-columns: 1fr; }
+  .growth-photo { min-height: 245px; }
+  .tree-id-visual { min-height: 108px; }.tree-id-visual span { font-size: 58px; }
+  .tree-id-meta-grid, .qr-preview-meta { grid-template-columns: 1fr 1fr; }
+  .qr-hero-premium, .qr-hero-glass { align-items: flex-start; flex-direction: column; }
+  .qr-camera-cta { width: 100%; min-width: 0; }
+  .chat-mascot-panel { min-height: auto; }.leaf-mascot { width: 132px; height: 132px; margin-bottom: 12px; }.mascot-face { top: 51px; left: 45px; width: 52px; height: 52px; }
+  .commercial-bot-mascot { width: 185px; height: 190px; margin-bottom: 14px; }.chat-window-premium .chat-window { min-height: 330px; }
+  .passport-stamp { min-height: 230px; }
   .collection-metrics { grid-template-columns: 1fr 1fr; }.collection-metrics .metric-card:last-child { grid-column: 1 / -1; }
   .audit-list article { grid-template-columns: 74px 57px 1fr; }.audit-list em { display: none; }
   .toast { right: 13px; bottom: 72px; left: 13px; max-width: none; }
+}
+
+@media (max-width: 900px) {
+  .visitor-hero-card, .visitor-page-header, .visitor-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    grid-template-columns: 1fr;
+  }
+  .visitor-hero-visual {
+    width: 100%;
+  }
+  .visitor-photo-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .visitor-page-shell {
+    gap: 14px;
+  }
+  .visitor-page-header, .visitor-section-header, .visitor-hero-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+  .visitor-page-header h2, .visitor-section-header h3, .visitor-hero-card h2 {
+    font-size: 28px;
+  }
+  .visitor-language-switch {
+    width: 100%;
+  }
+  .visitor-language-switch button {
+    flex: 1;
+  }
+  .visitor-photo-card .tree-photo {
+    height: 160px;
+  }
+  .garden-mascot {
+    width: 160px;
+    height: 160px;
+  }
+  .garden-mascot-body {
+    bottom: 28px;
+    width: 96px;
+    height: 96px;
+  }
+  .garden-mascot-leaf {
+    top: -16px;
+    width: 58px;
+    height: 26px;
+  }
+  .garden-mascot-eye {
+    top: 43px;
+    width: 11px;
+    height: 12px;
+  }
+  .garden-mascot-eye-left { left: 27px; }
+  .garden-mascot-eye-right { right: 27px; }
+  .garden-mascot-blush {
+    top: 58px;
+    width: 15px;
+    height: 10px;
+  }
+  .garden-mascot-blush-left { left: 18px; }
+  .garden-mascot-blush-right { right: 18px; }
+  .garden-mascot-smile {
+    top: 56px;
+    width: 23px;
+    height: 14px;
+  }
+  .garden-mascot-foot {
+    bottom: 24px;
+    width: 54px;
+    height: 32px;
+  }
+  .garden-mascot-foot-left { left: 35px; }
+  .garden-mascot-foot-right { right: 33px; }
+  .garden-mascot-shadow {
+    right: 26px;
+    left: 26px;
+  }
+  .garden-mascot-compact {
+    width: 54px;
+    height: 54px;
+  }
+  .chat-floating-garden {
+    right: 14px;
+    bottom: 76px;
+    min-width: 104px;
+    height: 58px;
+  }
+  .qr-hero-premium .garden-mascot {
+    transform: none;
+  }
+  .garden-guide-hero.visitor-hero-card {
+    align-items: center;
+    text-align: center;
+  }
+  .garden-guide-hero.visitor-hero-card h2,
+  .garden-guide-hero.visitor-hero-card p {
+    max-width: 100%;
+  }
+  .garden-guide-hero .garden-mascot {
+    width: 140px;
+    height: 140px;
+  }
+  .visitor-empty-state {
+    min-height: 300px;
+    padding: 24px 16px;
+  }
 }

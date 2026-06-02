@@ -1,10 +1,38 @@
 import Card from "../common/Card.jsx";
+import GardenMascot from "../common/GardenMascot.jsx";
+import { VisitorActionCard, VisitorHeroCard, VisitorPageShell } from "../common/VisitorUI.jsx";
 import { ROLE } from "../../models.js";
 import { visitorText } from "../../services/visitorI18n.js";
 
 export default function QRPage({ role, language, onOpenScanner }) {
   const isRanger = role === ROLE.RANGER;
   const t = (path) => visitorText(language, path);
+  if (!isRanger) {
+    return (
+      <VisitorPageShell className="qr-page qr-page-premium">
+        <VisitorHeroCard
+          className="qr-page-hero qr-hero-premium"
+          eyebrow={t("qr.heroEyebrow")}
+          title={t("qr.pageTitle")}
+          subtitle={t("qr.pageDescription")}
+          mascot={<GardenMascot />}
+          actions={(
+            <button className="button qr-camera-cta" onClick={onOpenScanner}>
+              <span>▣</span>
+              {t("qr.openScanner")}
+            </button>
+          )}
+        />
+        <Card className="qr-flow-premium visitor-card" title={t("qr.flowTitle")} subtitle={t("qr.flowSubtitle")}>
+          <div className="flow-grid">
+            <VisitorActionCard icon="1" title={t("qr.scan")} subtitle={t("qr.scanHelp")} />
+            <VisitorActionCard icon="2" title={t("qr.unlock")} subtitle={t("qr.unlockHelp")} />
+            <VisitorActionCard icon="3" title={t("qr.simulate")} subtitle={t("qr.simulateHelp")} />
+          </div>
+        </Card>
+      </VisitorPageShell>
+    );
+  }
   return (
     <div className="qr-page">
       <section className="qr-page-hero">

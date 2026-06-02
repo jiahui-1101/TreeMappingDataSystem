@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DIAGNOSES } from "../../data/diagnoses.js";
+import { getPublicTreeCard } from "../../data/visitorTreeProfiles.js";
 import { ROLE } from "../../models.js";
 import { findTree, maskTreeForRole } from "../../services/mockTreeService.js";
-import { visitorText, visitorTreeDescription } from "../../services/visitorI18n.js";
+import { visitorText } from "../../services/visitorI18n.js";
 import Modal from "../common/Modal.jsx";
 import StatusPill from "../common/StatusPill.jsx";
+import TreePhoto from "../common/TreePhoto.jsx";
 
 export default function QRScanner({ role, trees, language, onClose, onComplete }) {
   const [treeId, setTreeId] = useState("TBJ-004");
@@ -20,6 +22,7 @@ export default function QRScanner({ role, trees, language, onClose, onComplete }
   const isVisitor = role === ROLE.VISITOR;
   const t = useCallback((path) => visitorText(language, path), [language]);
   const visibleTree = maskTreeForRole(tree, role);
+  const publicProfile = visibleTree && isVisitor ? getPublicTreeCard(visibleTree, language) : null;
 
   const scan = useCallback((rawId = treeId) => {
     const parsedId = String(rawId).toUpperCase().match(/TBJ-\d{3}/)?.[0] || String(rawId).trim();
@@ -149,7 +152,18 @@ export default function QRScanner({ role, trees, language, onClose, onComplete }
                 </>
               ) : (
                 <>
-                  <p className="scanner-description">{visitorTreeDescription(language, visibleTree)}</p>
+                  <div className="qr-tree-preview-card">
+                    <TreePhoto src={publicProfile.photoUrl} alt={publicProfile.photoAlt} className="qr-preview-photo" />
+                    <span className="premium-eyebrow">{t("qr.publicPreview")}</span>
+                    <h3>{publicProfile.name}</h3>
+                    <em>{publicProfile.scientificName}</em>
+                    <p className="scanner-description">{publicProfile.description}</p>
+                    <div className="tree-id-meta-grid qr-preview-meta">
+                      <article><span>{t("profiles.zone")}</span><strong>{publicProfile.zone}</strong></article>
+                      <article><span>{t("profiles.localName")}</span><strong>{publicProfile.localName}</strong></article>
+                    </div>
+                    <div className="profile-badge-row">{publicProfile.badges.slice(0, 3).map((badge) => <span key={badge}>{badge}</span>)}</div>
+                  </div>
                   <p className="scanner-success">{t("qr.found")}</p>
                   <button className="button button-block" onClick={finish}>{t("qr.openCard")}</button>
                 </>

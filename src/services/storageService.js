@@ -31,6 +31,14 @@ export function addCollectedTree(treeId, storage) {
   return saveCollection(updated, storage);
 }
 
+export function addCollectedTreeWithStatus(treeId, storage) {
+  const collection = loadCollection(storage);
+  const isNew = !collection.includes(treeId);
+  const updated = isNew ? [...collection, treeId] : collection;
+  saveCollection(updated, storage);
+  return { collection: updated, isNew };
+}
+
 export function loadLanguage(storage) {
   return getStorage(storage)?.getItem(STORAGE_KEYS.LANGUAGE) || "en";
 }

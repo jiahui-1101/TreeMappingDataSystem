@@ -19,20 +19,24 @@ export default function GardenMap({
   trees,
   layer = "health",
   route = [],
+  routePath = [],
+  selectedZoneId,
   onTreeClick,
+  onZoneClick,
   proposedPoint,
   onMapClick,
   compact = false,
   language,
 }) {
-  const [positions, setPositions] = useState({ trees: {}, zones: {}, landmarks: {} });
+  const [positions, setPositions] = useState({ trees: {}, zones: {}, landmarks: {}, route: {} });
   const [viewMode, setViewMode] = useState("perspective");
   const showMarkers = layer !== "visitors";
   const canSeeProtected = role === ROLE.ADMIN || role === ROLE.IT_SUPPORT;
   const visitorView = role === ROLE.VISITOR;
   const visibleTrees = useMemo(() => showMarkers ? trees
     .map((tree) => maskTreeForRole(tree, role))
-    .filter((tree) => tree.x !== null || canSeeProtected) : [], [canSeeProtected, role, showMarkers, trees]);
+    .filter((tree) => tree.x !== null || canSeeProtected)
+    .filter((tree) => !visitorView || route.some((step) => step.id === tree.id)) : [], [canSeeProtected, role, route, showMarkers, trees, visitorView]);
 
   return (
     <div className={`garden-map garden-map-3d ${compact ? "garden-map-compact" : ""} layer-${layer}`}>
@@ -41,9 +45,12 @@ export default function GardenMap({
           compact={compact}
           layer={layer}
           onMapClick={onMapClick}
+          onZoneClick={onZoneClick}
           onProjectedPositions={setPositions}
           proposedPoint={proposedPoint}
           role={role}
+          routePath={routePath}
+          selectedZoneId={selectedZoneId}
           trees={trees}
           viewMode={viewMode}
         />
@@ -61,7 +68,7 @@ export default function GardenMap({
           style={clampLabelPosition(positions.zones[zone.id])}
         >
           <b>{zone.shortName}</b>
-          <small>{countZoneRecords(trees, zone)} demo records</small>
+          <small>{visitorView ? visitorText(language, "map.tapZone") : `${countZoneRecords(trees, zone)} demo records`}</small>
         </span>
       ))}
 
@@ -85,7 +92,23 @@ export default function GardenMap({
             onClick={() => onTreeClick?.(tree)}
             title={`${tree.name} - ${tree.id}`}
           >
-            <span>{tree.id.replace("TBJ-", "T-")}</span>
+            <span>{visitorView ? route.findIndex((step) => step.id === tree.id) + 1 : tree.id.replace("TBJ-", "T-")}</span>
+          </button>
+        );
+      })}
+
+      {visitorView && routePath.filter((point) => point.type === "tree").map((point) => {
+        const tree = route.find((step) => step.id === point.id);
+        if (!tree || !positions.route[point.id]) return null;
+        return (
+          <button
+            className="route-waypoint-button"
+            key={point.id}
+            onClick={() => onTreeClick?.(tree)}
+            style={positions.route[point.id]}
+            title={point.label}
+          >
+            {point.order}
           </button>
         );
       })}

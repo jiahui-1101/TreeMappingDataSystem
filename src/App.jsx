@@ -24,7 +24,7 @@ import { INITIAL_TASKS } from "./data/tasks.js";
 import { TREES } from "./data/trees.js";
 import { ROLE } from "./models.js";
 import { canAccessPage } from "./services/mockAuthService.js";
-import { addCollectedTree, loadCollection, loadLanguage, saveLanguage } from "./services/storageService.js";
+import { addCollectedTreeWithStatus, loadCollection, loadLanguage, saveLanguage } from "./services/storageService.js";
 import { visitorText } from "./services/visitorI18n.js";
 
 export default function App() {
@@ -46,9 +46,9 @@ export default function App() {
     else showToast("Access denied for this role.");
   };
   const collect = (tree) => {
-    const updated = addCollectedTree(tree.id);
-    setCollection(updated);
-    showToast(visitorText(language, "collection.added", { name: tree.name }));
+    const result = addCollectedTreeWithStatus(tree.id);
+    setCollection(result.collection);
+    showToast(visitorText(language, result.isNew ? "collection.unlocked" : "collection.alreadyCollected", { name: tree.name }));
   };
   const completeScan = (tree, message) => {
     if (user.role === ROLE.VISITOR) {
@@ -97,7 +97,7 @@ export default function App() {
       {content}
       {scannerOpen && <QRScanner role={user.role} trees={trees} language={language} onClose={() => setScannerOpen(false)} onComplete={completeScan} />}
       {scannedTree && user.role === ROLE.VISITOR && <TreeIdCardModal tree={scannedTree} language={language} onClose={() => setScannedTree(null)} onCollect={(tree) => { collect(tree); setScannedTree(null); }} />}
-      {user.role === ROLE.VISITOR && activePage !== "chat" && <ChatFloatingButton onClick={() => navigate("chat")} />}
+      {user.role === ROLE.VISITOR && activePage !== "chat" && <ChatFloatingButton language={language} onClick={() => navigate("chat")} />}
       <Toast message={toast} onClose={() => setToast("")} />
     </AppShell>
   );

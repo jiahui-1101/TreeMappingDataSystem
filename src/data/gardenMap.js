@@ -88,6 +88,77 @@ export const ARBORETUM_PLOTS = [
   "Plot Herba dan Perubatan",
 ];
 
+export const VISITOR_ZONES = {
+  pentadbiran: {
+    routeTags: ["facilities", "photo"],
+    representativeTrees: ["TBJ-001", "TBJ-002"],
+    facilities: ["Main entrance", "Garden cafe", "Herbarium"],
+    localized: {
+      en: { name: "Administration & Arrival", summary: "Start here for facilities, orientation, and the easiest route into the garden." },
+      bm: { name: "Pentadbiran & Ketibaan", summary: "Mulakan di sini untuk kemudahan, orientasi dan laluan masuk taman yang mudah." },
+      zh: { name: "行政与入口区", summary: "从这里开始，可查看设施、导览方向，并进入主要园区路线。" },
+    },
+  },
+  arboretum: {
+    routeTags: ["ancient", "medicinal", "shaded"],
+    representativeTrees: ["TBJ-001", "TBJ-002", "TBJ-009"],
+    facilities: ["Aroma plot", "Bamboo plot", "Palm plot", "Ethnobotany plot"],
+    localized: {
+      en: { name: "Arboretum Collections", summary: "A learning zone for heritage trees, bamboo, palms, aromatic plants, and ethnobotanical stories." },
+      bm: { name: "Koleksi Arboretum", summary: "Zon pembelajaran untuk pokok warisan, buluh, palma, tumbuhan aroma dan etnobotani." },
+      zh: { name: "植物标本园收藏区", summary: "学习古树、竹类、棕榈、芳香植物与民族植物故事的区域。" },
+    },
+  },
+  pemuliharaan: {
+    routeTags: ["rare", "ancient", "shaded"],
+    representativeTrees: ["TBJ-003", "TBJ-005"],
+    facilities: ["Secondary forest trail", "Conservation interpretation"],
+    localized: {
+      en: { name: "Conservation Forest", summary: "A protected learning zone for native forest stories. Rare species are shown only at generalized public level." },
+      bm: { name: "Hutan Pemuliharaan", summary: "Zon pembelajaran hutan tempatan. Spesies nadir dipaparkan secara umum sahaja." },
+      zh: { name: "保育林区", summary: "本地森林学习区。珍稀物种只以泛化方式向公众展示。" },
+    },
+  },
+  "tapak-semaian": {
+    routeTags: ["butterfly", "photo"],
+    representativeTrees: ["TBJ-010"],
+    facilities: ["Nursery plots", "Flowering plant displays"],
+    localized: {
+      en: { name: "Nursery & Flowering Zone", summary: "A friendly stop for propagation, flowering plants, and quick learning wins for families." },
+      bm: { name: "Zon Semaian & Bunga", summary: "Hentian mesra keluarga untuk semaian, tumbuhan berbunga dan pembelajaran mudah." },
+      zh: { name: "苗圃与花卉区", summary: "适合家庭参观的繁殖与开花植物学习点。" },
+    },
+  },
+  riparian: {
+    routeTags: ["shaded", "photo"],
+    representativeTrees: ["TBJ-007"],
+    facilities: ["Lake edge", "Boardwalk", "Jetty"],
+    localized: {
+      en: { name: "Riparian Lakeside", summary: "A waterside route with lake views, shade, and biodiversity interpretation." },
+      bm: { name: "Tepi Tasik Riparian", summary: "Laluan tepi air dengan pemandangan tasik, teduhan dan interpretasi biodiversiti." },
+      zh: { name: "水岸湖区", summary: "拥有湖景、林荫和生物多样性解说的水岸路线。" },
+    },
+  },
+  "tanaman-buah": {
+    routeTags: ["medicinal", "photo"],
+    representativeTrees: ["TBJ-004", "TBJ-006"],
+    facilities: ["Fruit learning area", "Useful plant walk"],
+    localized: {
+      en: { name: "Fruit & Useful Plants", summary: "A cultivated plant route for edible plants, daily-life botany, and food stories." },
+      bm: { name: "Buah & Tumbuhan Berguna", summary: "Laluan tanaman untuk tumbuhan makanan, botani harian dan cerita makanan." },
+      zh: { name: "果树与实用植物区", summary: "认识食用植物、日常植物用途与食物故事的栽培区。" },
+    },
+  },
+};
+
+export function getVisitorZone(zoneId, language = "en") {
+  const zone = MAP_ZONES.find((item) => item.id === zoneId);
+  const visitorZone = VISITOR_ZONES[zoneId];
+  if (!zone || !visitorZone) return null;
+  const localized = visitorZone.localized[language] || visitorZone.localized.en;
+  return { ...zone, ...visitorZone, localizedName: localized.name, summary: localized.summary };
+}
+
 export function treeToWorldPosition(tree) {
   return {
     x: (tree.x - 50) * 0.84,
