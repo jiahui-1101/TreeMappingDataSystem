@@ -1,7 +1,9 @@
 import { PAGE_META } from "../../config/navigation.js";
+import { ROLE } from "../../models.js";
+import { visitorText } from "../../services/visitorI18n.js";
 
-export default function Topbar({ page, user, onOpenMenu }) {
-  const [title, subtitle] = PAGE_META[page] || PAGE_META.dashboard;
+export default function Topbar({ page, user, role, language, onOpenMenu }) {
+  const [title, subtitle] = role === ROLE.VISITOR ? visitorText(language, `page.${page}`) : PAGE_META[page] || PAGE_META.dashboard;
   const date = new Intl.DateTimeFormat("en-MY", {
     day: "numeric",
     month: "long",

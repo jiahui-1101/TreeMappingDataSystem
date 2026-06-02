@@ -1,21 +1,25 @@
 import Card from "../common/Card.jsx";
+import { ROLE } from "../../models.js";
+import { visitorText } from "../../services/visitorI18n.js";
 
-export default function QRPage({ role, onOpenScanner }) {
+export default function QRPage({ role, language, onOpenScanner }) {
+  const isRanger = role === ROLE.RANGER;
+  const t = (path) => visitorText(language, path);
   return (
     <div className="qr-page">
       <section className="qr-page-hero">
         <span className="qr-page-icon">▦</span>
         <div>
-          <h2>{role === "ranger" ? "Field QR Tree Scanner" : "Scan & Collect Trees"}</h2>
-          <p>{role === "ranger" ? "Scan a physical tree tag to update health status, attach a field photo, and review AI diagnosis results." : "Find QR tags throughout the garden to unlock botanical profiles and collection badges."}</p>
+          <h2>{isRanger ? "Field QR Tree Scanner" : t("qr.pageTitle")}</h2>
+          <p>{isRanger ? "Scan a physical tree tag to update health status, attach a field photo, and review AI diagnosis results." : t("qr.pageDescription")}</p>
         </div>
-        <button className="button" onClick={onOpenScanner}>Open QR Scanner</button>
+        <button className="button" onClick={onOpenScanner}>{isRanger ? "Open QR Scanner" : t("qr.openScanner")}</button>
       </section>
-      <Card title="Role-Based QR Flow" subtitle="UI mock for M4-B QR Interaction & Role-Based Access">
+      <Card title={isRanger ? "Role-Based QR Flow" : t("qr.flowTitle")} subtitle={isRanger ? "UI mock for M4-B QR Interaction & Role-Based Access" : t("qr.flowSubtitle")}>
         <div className="flow-grid">
-          <span><b>1</b><strong>Scan</strong><small>Resolve unique tree QR identifier</small></span>
-          <span><b>2</b><strong>Detect Role</strong><small>Use visitor-safe or authenticated ranger flow</small></span>
-          <span><b>3</b><strong>{role === "ranger" ? "Submit Report" : "Unlock Profile"}</strong><small>Record a role-appropriate result</small></span>
+          <span><b>1</b><strong>{isRanger ? "Scan" : t("qr.scan")}</strong><small>{isRanger ? "Resolve unique tree QR identifier" : t("qr.scanHelp")}</small></span>
+          <span><b>2</b><strong>{isRanger ? "Detect Role" : t("qr.unlock")}</strong><small>{isRanger ? "Use visitor-safe or authenticated ranger flow" : t("qr.unlockHelp")}</small></span>
+          <span><b>3</b><strong>{isRanger ? "Submit Report" : t("qr.simulate")}</strong><small>{isRanger ? "Record a role-appropriate result" : t("qr.simulateHelp")}</small></span>
         </div>
       </Card>
     </div>

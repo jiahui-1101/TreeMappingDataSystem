@@ -15,6 +15,7 @@ import ChatPage, { ChatFloatingButton } from "./features/ss3-visitor/ChatPage.js
 import CollectionPage from "./features/ss3-visitor/CollectionPage.jsx";
 import ExplorePage from "./features/ss3-visitor/ExplorePage.jsx";
 import ProfilesPage from "./features/ss3-visitor/ProfilesPage.jsx";
+import TreeIdCardModal from "./features/ss3-visitor/TreeIdCardModal.jsx";
 import AuditPage from "./features/ss4-map/AuditPage.jsx";
 import MapPage from "./features/ss4-map/MapPage.jsx";
 import SpatialPage from "./features/ss4-map/SpatialPage.jsx";
@@ -24,6 +25,7 @@ import { TREES } from "./data/trees.js";
 import { ROLE } from "./models.js";
 import { canAccessPage } from "./services/mockAuthService.js";
 import { addCollectedTree, loadCollection, loadLanguage, saveLanguage } from "./services/storageService.js";
+import { visitorText } from "./services/visitorI18n.js";
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -33,6 +35,7 @@ export default function App() {
   const [collection, setCollection] = useState(loadCollection);
   const [language, setLanguage] = useState(loadLanguage);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [scannedTree, setScannedTree] = useState(null);
   const [toast, setToast] = useState("");
   const showToast = useCallback((message) => setToast(message), []);
 
@@ -45,10 +48,13 @@ export default function App() {
   const collect = (tree) => {
     const updated = addCollectedTree(tree.id);
     setCollection(updated);
-    showToast(`${tree.name} added to your visitor collection.`);
+    showToast(visitorText(language, "collection.added", { name: tree.name }));
   };
   const completeScan = (tree, message) => {
-    if (user.role === ROLE.VISITOR) collect(tree);
+    if (user.role === ROLE.VISITOR) {
+      collect(tree);
+      setScannedTree(tree);
+    }
     else showToast(message);
   };
   const updateTask = (id, status) => setTasks((current) => current.map((task) => task.id === id ? { ...task, status } : task));
@@ -65,7 +71,7 @@ export default function App() {
     saveLanguage(next); setLanguage(next);
   };
 
-  const pageProps = { role: user.role, trees, tasks, showToast };
+  const pageProps = { role: user.role, trees, tasks, language, showToast };
   let content;
   switch (activePage) {
     case "dashboard": content = <DashboardPage {...pageProps} onNavigate={navigate} />; break;
@@ -75,21 +81,22 @@ export default function App() {
     case "rangers": content = <RangerManagementPage {...pageProps} />; break;
     case "tasks": content = <TaskTrackerPage {...pageProps} onUpdateTask={updateTask} />; break;
     case "ranger-tasks": content = <RangerTasksPage {...pageProps} onUpdateTask={updateTask} onOpenScanner={() => setScannerOpen(true)} />; break;
-    case "qr": content = <QRPage role={user.role} onOpenScanner={() => setScannerOpen(true)} />; break;
+    case "qr": content = <QRPage role={user.role} language={language} onOpenScanner={() => setScannerOpen(true)} />; break;
     case "map": content = <MapPage {...pageProps} onOpenScanner={() => setScannerOpen(true)} />; break;
     case "spatial": content = <SpatialPage {...pageProps} />; break;
     case "audit": content = <AuditPage {...pageProps} />; break;
-    case "explore": content = <ExplorePage {...pageProps} language={language} onLanguage={changeLanguage} onTreeClick={(tree) => showToast(`${tree.name} profile selected from map.`)} onOpenScanner={() => setScannerOpen(true)} />; break;
+    case "explore": content = <ExplorePage {...pageProps} onLanguage={changeLanguage} onTreeClick={setScannedTree} onOpenScanner={() => setScannerOpen(true)} />; break;
     case "profiles": content = <ProfilesPage {...pageProps} onCollect={collect} />; break;
-    case "chat": content = <ChatPage />; break;
+    case "chat": content = <ChatPage language={language} />; break;
     case "collection": content = <CollectionPage {...pageProps} collection={collection} onOpenScanner={() => setScannerOpen(true)} />; break;
     default: content = <DashboardPage {...pageProps} onNavigate={navigate} />;
   }
 
   return (
-    <AppShell role={user.role} user={user} activePage={activePage} onNavigate={navigate} onLogout={() => setUser(null)}>
+    <AppShell role={user.role} user={user} activePage={activePage} language={language} onNavigate={navigate} onLogout={() => setUser(null)}>
       {content}
-      {scannerOpen && <QRScanner role={user.role} onClose={() => setScannerOpen(false)} onComplete={completeScan} />}
+      {scannerOpen && <QRScanner role={user.role} trees={trees} language={language} onClose={() => setScannerOpen(false)} onComplete={completeScan} />}
+      {scannedTree && user.role === ROLE.VISITOR && <TreeIdCardModal tree={scannedTree} language={language} onClose={() => setScannedTree(null)} onCollect={(tree) => { collect(tree); setScannedTree(null); }} />}
       {user.role === ROLE.VISITOR && activePage !== "chat" && <ChatFloatingButton onClick={() => navigate("chat")} />}
       <Toast message={toast} onClose={() => setToast("")} />
     </AppShell>

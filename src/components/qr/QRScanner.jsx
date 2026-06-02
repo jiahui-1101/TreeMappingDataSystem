@@ -1,61 +1,125 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DIAGNOSES } from "../../data/diagnoses.js";
 import { ROLE } from "../../models.js";
-import { findTree } from "../../services/mockTreeService.js";
+import { findTree, maskTreeForRole } from "../../services/mockTreeService.js";
+import { visitorText, visitorTreeDescription } from "../../services/visitorI18n.js";
 import Modal from "../common/Modal.jsx";
 import StatusPill from "../common/StatusPill.jsx";
 
-export default function QRScanner({ role, onClose, onComplete }) {
+export default function QRScanner({ role, trees, language, onClose, onComplete }) {
   const [treeId, setTreeId] = useState("TBJ-004");
   const [tree, setTree] = useState(null);
   const [error, setError] = useState("");
+  const [cameraState, setCameraState] = useState("idle");
+  const [detectorAvailable, setDetectorAvailable] = useState(true);
   const [photo, setPhoto] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
   const [notes, setNotes] = useState("");
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const isVisitor = role === ROLE.VISITOR;
+  const t = useCallback((path) => visitorText(language, path), [language]);
+  const visibleTree = maskTreeForRole(tree, role);
 
-  const scan = () => {
-    const found = findTree(treeId);
+  const scan = useCallback((rawId = treeId) => {
+    const parsedId = String(rawId).toUpperCase().match(/TBJ-\d{3}/)?.[0] || String(rawId).trim();
+    const found = findTree(parsedId, trees);
+    setTreeId(parsedId);
     if (!found) {
-      setError("This QR code is invalid or no longer active.");
+      setError(isVisitor ? t("qr.invalid") : "This QR code is invalid or no longer active.");
       setTree(null);
       return;
     }
     setTree(found);
     setError("");
+  }, [isVisitor, t, treeId, trees]);
+
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+  }, []);
+
+  const startCamera = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraState("unavailable");
+      return;
+    }
+    stopCamera();
+    setCameraState("requesting");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: { ideal: "environment" } },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play().catch(() => {});
+      }
+      setDetectorAvailable("BarcodeDetector" in window);
+      setCameraState("active");
+    } catch {
+      setCameraState("denied");
+    }
   };
 
+  useEffect(() => stopCamera, [stopCamera]);
+  useEffect(() => {
+    if (cameraState !== "active" || !("BarcodeDetector" in window)) return undefined;
+    let detector;
+    try {
+      detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+    } catch {
+      setDetectorAvailable(false);
+      return undefined;
+    }
+    const interval = window.setInterval(async () => {
+      if (!videoRef.current || videoRef.current.readyState < 2) return;
+      try {
+        const codes = await detector.detect(videoRef.current);
+        if (codes[0]?.rawValue) scan(codes[0].rawValue);
+      } catch {
+        setDetectorAvailable(false);
+      }
+    }, 800);
+    return () => window.clearInterval(interval);
+  }, [cameraState, scan]);
+
   const finish = () => {
-    onComplete(tree, role === ROLE.VISITOR ? "Tree added to your collection." : "Field report submitted successfully.");
+    onComplete(tree, isVisitor ? t("qr.found") : "Field report submitted successfully.");
     onClose();
   };
 
   return (
-    <Modal title={role === ROLE.RANGER ? "QR Field Report" : "Scan & Collect Tree"} onClose={onClose} wide>
+    <Modal title={role === ROLE.RANGER ? "QR Field Report" : t("qr.scannerTitle")} onClose={onClose} wide>
       <div className="scanner-grid">
-        <div className="scanner-camera">
-          <div className="scan-frame">
-            <span />
+        <div className={`scanner-camera scanner-camera-${cameraState}`}>
+          <video ref={videoRef} className="scanner-video" playsInline muted />
+          <div className="scanner-overlay">
+            <div className="scan-frame"><span /></div>
+            <p>{isVisitor ? t(`qr.camera${cameraState[0].toUpperCase()}${cameraState.slice(1)}`) : cameraState === "active" ? "Camera is active. Point it at a tree QR tag." : "Enable your camera to scan a physical tree tag."}</p>
+            {cameraState === "active" && !detectorAvailable && <small>{isVisitor ? t("qr.detectorUnavailable") : "Live QR detection is unavailable. Use the Tree ID field to continue."}</small>}
+            <button className="button button-camera" onClick={startCamera}>{isVisitor ? t("qr.enableCamera") : "Enable Camera"}</button>
           </div>
-          <p>Camera preview mock</p>
-          <small>Enter a tree ID to simulate a physical QR scan.</small>
         </div>
         <div>
-          <label className="field-label">Tree QR ID</label>
+          <label className="field-label">{isVisitor ? t("qr.manualLabel") : "Tree QR ID"}</label>
           <div className="input-row">
-            <input value={treeId} onChange={(event) => setTreeId(event.target.value)} />
-            <button className="button" onClick={scan}>Scan</button>
+            <input aria-label={isVisitor ? t("qr.treeQrId") : "Tree QR ID"} value={treeId} onChange={(event) => setTreeId(event.target.value)} />
+            <button className="button" onClick={() => scan()}>{isVisitor ? t("qr.scanButton") : "Scan"}</button>
           </div>
+          {isVisitor && <button className="text-button scanner-demo" onClick={() => scan("TBJ-004")}>{t("qr.demoScan")}</button>}
           {error && <p className="form-error">{error}</p>}
-          {tree && (
+          {visibleTree && (
             <div className="scanner-result">
               <div className="split-heading">
                 <div>
-                  <h3>{tree.name}</h3>
-                  <em>{tree.scientificName}</em>
+                  <h3>{visibleTree.name}</h3>
+                  <em>{visibleTree.scientificName}</em>
                 </div>
-                <StatusPill status={tree.status} />
+                {!isVisitor && <StatusPill status={visibleTree.status} />}
               </div>
-              <p>{tree.id} · Zon {tree.zone} · Health {tree.health}%</p>
+              <p>{visibleTree.id} · {visibleTree.zone}{!isVisitor && ` · Health ${visibleTree.health}%`}</p>
               {role === ROLE.RANGER ? (
                 <>
                   <label className="field-label">Field photo preview</label>
@@ -85,8 +149,9 @@ export default function QRScanner({ role, onClose, onComplete }) {
                 </>
               ) : (
                 <>
-                  <p className="scanner-description">{tree.description}</p>
-                  <button className="button button-block" onClick={finish}>Collect Tree</button>
+                  <p className="scanner-description">{visitorTreeDescription(language, visibleTree)}</p>
+                  <p className="scanner-success">{t("qr.found")}</p>
+                  <button className="button button-block" onClick={finish}>{t("qr.openCard")}</button>
                 </>
               )}
             </div>

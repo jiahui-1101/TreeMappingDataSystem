@@ -1,7 +1,10 @@
 import { NAVIGATION } from "../../config/navigation.js";
+import { ROLE } from "../../models.js";
+import { visitorText } from "../../services/visitorI18n.js";
 import Icon from "../common/Icon.jsx";
 
-export default function Sidebar({ role, user, activePage, onNavigate, onLogout }) {
+export default function Sidebar({ role, user, activePage, language, onNavigate, onLogout }) {
+  const visitorLabel = (id, fallback) => role === ROLE.VISITOR ? visitorText(language, `nav.${id}`) : fallback;
   return (
     <aside className="sidebar">
       <Brand />
@@ -15,7 +18,7 @@ export default function Sidebar({ role, user, activePage, onNavigate, onLogout }
       <nav className="sidebar-nav">
         {NAVIGATION[role].map((section) => (
           <section key={section.label}>
-            <p className="nav-label">{section.label}</p>
+            <p className="nav-label">{role === ROLE.VISITOR ? visitorText(language, "nav.section") : section.label}</p>
             {section.items.map((item) => (
               <button
                 key={item.id}
@@ -23,14 +26,14 @@ export default function Sidebar({ role, user, activePage, onNavigate, onLogout }
                 onClick={() => onNavigate(item.id)}
               >
                 <Icon name={item.icon} />
-                <span>{item.label}</span>
+                <span>{visitorLabel(item.id, item.label)}</span>
               </button>
             ))}
           </section>
         ))}
       </nav>
       <button className="logout-button" onClick={onLogout}>
-        ← Sign Out
+        ← {role === ROLE.VISITOR ? visitorText(language, "nav.signOut") : "Sign Out"}
       </button>
     </aside>
   );

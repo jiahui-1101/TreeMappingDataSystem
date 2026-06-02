@@ -1,13 +1,18 @@
+import { lazy, Suspense, useMemo, useState } from "react";
+import { MAP_LANDMARKS, MAP_ZONES, countZoneRecords } from "../../data/gardenMap.js";
 import { ROLE } from "../../models.js";
 import { maskTreeForRole } from "../../services/mockTreeService.js";
+import { visitorText } from "../../services/visitorI18n.js";
 
-const ZONE_BLOCKS = [
-  ["Arboretum", 20, 18, 31, 29],
-  ["Pemuliharaan", 51, 10, 22, 20],
-  ["Tanaman", 55, 57, 23, 23],
-  ["Riparian", 69, 34, 20, 27],
-  ["Tapak Semaian", 73, 15, 17, 22],
-];
+const ThreeGardenScene = lazy(() => import("./ThreeGardenScene.jsx"));
+
+function clampLabelPosition(position) {
+  if (!position) return undefined;
+  return {
+    left: `clamp(8%, ${position.left}, 92%)`,
+    top: `clamp(10%, ${position.top}, 92%)`,
+  };
+}
 
 export default function GardenMap({
   role,
@@ -18,74 +23,81 @@ export default function GardenMap({
   proposedPoint,
   onMapClick,
   compact = false,
+  language,
 }) {
+  const [positions, setPositions] = useState({ trees: {}, zones: {}, landmarks: {} });
+  const [viewMode, setViewMode] = useState("perspective");
   const showMarkers = layer !== "visitors";
   const canSeeProtected = role === ROLE.ADMIN || role === ROLE.IT_SUPPORT;
+  const visitorView = role === ROLE.VISITOR;
+  const visibleTrees = useMemo(() => showMarkers ? trees
+    .map((tree) => maskTreeForRole(tree, role))
+    .filter((tree) => tree.x !== null || canSeeProtected) : [], [canSeeProtected, role, showMarkers, trees]);
 
   return (
-    <div
-      className={`garden-map ${compact ? "garden-map-compact" : ""} layer-${layer}`}
-      onClick={(event) => {
-        if (!onMapClick) return;
-        const box = event.currentTarget.getBoundingClientRect();
-        onMapClick({
-          x: Math.round(((event.clientX - box.left) / box.width) * 100),
-          y: Math.round(((event.clientY - box.top) / box.height) * 100),
-        });
-      }}
-    >
-      <div className="lake lake-main">Tasik<br />Bukit Besi</div>
-      <div className="lake lake-small">Tasik<br />Bukit Belah</div>
-      <div className="garden-path path-a" />
-      <div className="garden-path path-b" />
-      {ZONE_BLOCKS.map(([name, left, top, width, height]) => (
-        <div
-          key={name}
-          className="map-zone"
-          style={{ left: `${left}%`, top: `${top}%`, width: `${width}%`, height: `${height}%` }}
-        >
-          <span>{name}</span>
-        </div>
-      ))}
-      {layer === "heatmap" && <div className="heatmap-orb" />}
-      {layer === "visitors" && (
-        <>
-          <div className="visitor-orb visitor-orb-a">42</div>
-          <div className="visitor-orb visitor-orb-b">26</div>
-          <div className="visitor-orb visitor-orb-c">18</div>
-        </>
-      )}
-      {showMarkers &&
-        trees.map((tree) => {
-          const visibleTree = maskTreeForRole(tree, role);
-          if (visibleTree.x === null && !canSeeProtected) return null;
-          const inRoute = route.some((step) => step.id === tree.id);
-          return (
-            <button
-              key={tree.id}
-              className={`tree-pin tree-pin-${tree.status} ${inRoute ? "route-pin" : ""}`}
-              style={{ left: `${tree.x}%`, top: `${tree.y}%` }}
-              onClick={(event) => {
-                event.stopPropagation();
-                onTreeClick?.(visibleTree);
-              }}
-              title={`${tree.name} - ${tree.id}`}
-            >
-              <span>{tree.id.replace("TBJ-", "T-")}</span>
-            </button>
-          );
-        })}
-      {!canSeeProtected && trees.some((tree) => tree.rare) && (
-        <div className="protected-marker">Protected tree location hidden</div>
-      )}
-      {proposedPoint && (
+    <div className={`garden-map garden-map-3d ${compact ? "garden-map-compact" : ""} layer-${layer}`}>
+      <Suspense fallback={<p className="three-map-fallback">Loading 3D garden map...</p>}>
+        <ThreeGardenScene
+          compact={compact}
+          layer={layer}
+          onMapClick={onMapClick}
+          onProjectedPositions={setPositions}
+          proposedPoint={proposedPoint}
+          role={role}
+          trees={trees}
+          viewMode={viewMode}
+        />
+      </Suspense>
+
+      <div className="map-source-ribbon">
+        <b>TBJ 3D concept map</b>
+        <small>Official zones · demo inventory counts</small>
+      </div>
+
+      {!compact && MAP_ZONES.map((zone) => (
         <span
-          className="proposed-pin"
-          style={{ left: `${proposedPoint.x}%`, top: `${proposedPoint.y}%` }}
+          className="map-zone-tag"
+          key={zone.id}
+          style={clampLabelPosition(positions.zones[zone.id])}
         >
-          +
+          <b>{zone.shortName}</b>
+          <small>{countZoneRecords(trees, zone)} demo records</small>
         </span>
+      ))}
+
+      {!compact && MAP_LANDMARKS.map((landmark) => (
+        <span
+          className={`map-landmark-tag map-landmark-${landmark.type}`}
+          key={landmark.id}
+          style={positions.landmarks[landmark.id]}
+        >
+          {landmark.name}
+        </span>
+      ))}
+
+      {visibleTrees.map((tree) => {
+        const inRoute = route.some((step) => step.id === tree.id);
+        return (
+          <button
+            key={tree.id}
+            className={`tree-pin tree-pin-${visitorView ? "public" : tree.status} ${inRoute ? "route-pin" : ""}`}
+            style={positions.trees[tree.id]}
+            onClick={() => onTreeClick?.(tree)}
+            title={`${tree.name} - ${tree.id}`}
+          >
+            <span>{tree.id.replace("TBJ-", "T-")}</span>
+          </button>
+        );
+      })}
+
+      {!canSeeProtected && trees.some((tree) => tree.rare) && (
+        <div className="protected-marker">{visitorView ? visitorText(language, "map.protected") : "Protected tree location hidden"}</div>
       )}
+
+      <div className="map-view-controls">
+        <button className={viewMode === "perspective" ? "active" : ""} onClick={() => setViewMode("perspective")}>3D</button>
+        <button className={viewMode === "top" ? "active" : ""} onClick={() => setViewMode("top")}>Top</button>
+      </div>
       <div className="map-compass">N<br />▲</div>
     </div>
   );

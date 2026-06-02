@@ -15,7 +15,18 @@ export function findTree(id, trees = TREES) {
 }
 
 export function maskTreeForRole(tree, role) {
-  if (!tree || !tree.rare || role === ROLE.ADMIN || role === ROLE.IT_SUPPORT) return tree;
+  if (!tree) return tree;
+  if (role === ROLE.VISITOR) {
+    const { health, status, ...publicTree } = tree;
+    if (!tree.rare) return publicTree;
+    return {
+      ...publicTree,
+      x: null,
+      y: null,
+      coordinateLabel: "Protected location - exact coordinates hidden",
+    };
+  }
+  if (!tree.rare || role === ROLE.ADMIN || role === ROLE.IT_SUPPORT) return tree;
   return {
     ...tree,
     x: null,
@@ -30,11 +41,11 @@ export function buildVisitorRoute(preferences, trees = TREES) {
   }
   const preferredZones = new Set();
   preferences.forEach((preference) => {
-    if (preference === "Rare Flowers") preferredZones.add("Pemuliharaan");
-    if (preference === "Ancient Trees") preferredZones.add("Arboretum");
-    if (preference === "Medicinal Plants") preferredZones.add("Tanaman");
-    if (preference === "Butterfly Zone") preferredZones.add("Tapak Semaian");
-    if (preference === "Shaded Paths") preferredZones.add("Riparian");
+    if (preference === "rare" || preference === "Rare Flowers") preferredZones.add("Pemuliharaan");
+    if (preference === "ancient" || preference === "Ancient Trees") preferredZones.add("Arboretum");
+    if (preference === "medicinal" || preference === "Medicinal Plants") preferredZones.add("Tanaman");
+    if (preference === "butterfly" || preference === "Butterfly Zone") preferredZones.add("Tapak Semaian");
+    if (preference === "shaded" || preference === "Shaded Paths") preferredZones.add("Riparian");
   });
   const route = trees.filter((tree) => preferredZones.has(tree.zone)).slice(0, 5);
   return { ok: true, route: route.length ? route : trees.slice(0, 4) };

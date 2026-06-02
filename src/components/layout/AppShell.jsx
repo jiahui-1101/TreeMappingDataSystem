@@ -3,7 +3,7 @@ import Sidebar, { Brand } from "./Sidebar.jsx";
 import Topbar from "./Topbar.jsx";
 import MobileNav from "./MobileNav.jsx";
 
-export default function AppShell({ role, user, activePage, onNavigate, onLogout, children }) {
+export default function AppShell({ role, user, activePage, language, onNavigate, onLogout, children }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = (page) => {
     onNavigate(page);
@@ -12,20 +12,20 @@ export default function AppShell({ role, user, activePage, onNavigate, onLogout,
 
   return (
     <div className="app-shell">
-      <Sidebar role={role} user={user} activePage={activePage} onNavigate={navigate} onLogout={onLogout} />
+      <Sidebar role={role} user={user} activePage={activePage} language={language} onNavigate={navigate} onLogout={onLogout} />
       {drawerOpen && (
         <div className="drawer-overlay" onClick={() => setDrawerOpen(false)}>
           <div className="drawer" onClick={(event) => event.stopPropagation()}>
             <Brand />
-            <Sidebar role={role} user={user} activePage={activePage} onNavigate={navigate} onLogout={onLogout} />
+            <Sidebar role={role} user={user} activePage={activePage} language={language} onNavigate={navigate} onLogout={onLogout} />
           </div>
         </div>
       )}
       <main className="main-content">
-        <Topbar page={activePage} user={user} onOpenMenu={() => setDrawerOpen(true)} />
+        <Topbar page={activePage} user={user} role={role} language={language} onOpenMenu={() => setDrawerOpen(true)} />
         {children}
       </main>
-      <MobileNav role={role} activePage={activePage} onNavigate={navigate} />
+      <MobileNav role={role} activePage={activePage} language={language} onNavigate={navigate} />
     </div>
   );
 }
