@@ -32,6 +32,41 @@
  * @property {string} role
  * @property {string} event
  * @property {string} severity
+ *
+ * @typedef {Object} SystemServiceStatus
+ * @property {string} id
+ * @property {string} name
+ * @property {string} dependency
+ * @property {"online" | "degraded" | "offline"} status
+ * @property {string} uptime
+ * @property {string} latency
+ * @property {string} lastChecked
+ * @property {string} note
+ *
+ * @typedef {Object} SupportTicket
+ * @property {string} id
+ * @property {string} title
+ * @property {"QR" | "Security" | "Map" | "AI"} category
+ * @property {"urgent" | "high" | "normal"} priority
+ * @property {"open" | "investigating" | "resolved"} status
+ * @property {string} owner
+ * @property {string} source
+ * @property {string} detail
+ *
+ * @typedef {Object} AccessUser
+ * @property {string} id
+ * @property {string} name
+ * @property {string} role
+ * @property {"active" | "inactive" | "locked"} status
+ * @property {string} session
+ * @property {string} lastLogin
+ *
+ * @typedef {Object} ServiceLog
+ * @property {string} serviceId
+ * @property {string} time
+ * @property {"info" | "warning" | "error"} level
+ * @property {string} source
+ * @property {string} message
  */
 
 export const ROLE = Object.freeze({

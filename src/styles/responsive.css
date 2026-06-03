@@ -27,6 +27,7 @@
   .notification-button { width: 35px; height: 35px; }
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
   .two-column { grid-template-columns: 1fr; }
+  .it-service-grid, .it-monitoring-grid, .it-ticket-board { grid-template-columns: 1fr; }
   .profile-grid { grid-template-columns: repeat(2, 1fr); }
   .chat-floating { right: 16px; bottom: 74px; }
   .visitor-map-welcome, .chat-premium { grid-template-columns: 1fr; }
@@ -51,6 +52,9 @@
   .toolbar-actions select, .page-toolbar select { width: 100%; min-width: 0; }
   .toolbar-actions .button { grid-column: 1 / -1; }
   .metric-grid { gap: 8px; }
+  .it-audit-summary { grid-template-columns: 1fr; }
+  .it-user-summary { grid-template-columns: 1fr 1fr; }
+  .it-action-grid, .it-service-metrics { grid-template-columns: 1fr; }
   .metric-card { min-height: 105px; padding: 12px; }
   .metric-card strong { font-size: 25px; }
   .card { padding: 14px; border-radius: 11px; }

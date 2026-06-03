@@ -54,8 +54,12 @@ export const NAVIGATION = {
   ],
   [ROLE.IT_SUPPORT]: [
     {
-      label: "Security Operations",
+      label: "IT Operations",
       items: [
+        { id: "it-dashboard", icon: "chart", label: "IT Dashboard" },
+        { id: "it-monitoring", icon: "spark", label: "System Monitoring" },
+        { id: "it-users", icon: "people", label: "User & Access Control" },
+        { id: "it-tickets", icon: "check", label: "Incident Tickets" },
         { id: "audit", icon: "lock", label: "Audit Log" },
         { id: "map", icon: "map", label: "Protected Map View" },
       ],
@@ -67,7 +71,7 @@ export const DEFAULT_PAGE = {
   [ROLE.ADMIN]: "dashboard",
   [ROLE.RANGER]: "ranger-tasks",
   [ROLE.VISITOR]: "explore",
-  [ROLE.IT_SUPPORT]: "audit",
+  [ROLE.IT_SUPPORT]: "it-dashboard",
 };
 
 export const MOBILE_PAGES = {
@@ -89,6 +93,10 @@ export const PAGE_META = {
   map: ["Garden Map", "Taman Botani Johor spatial overview"],
   spatial: ["Spatial Planning", "AI tree placement simulation"],
   audit: ["Audit Log", "System security & event tracking"],
+  "it-dashboard": ["IT Dashboard", "System health, security and support overview"],
+  "it-monitoring": ["System Monitoring", "Service status and diagnostics"],
+  "it-users": ["User & Access Control", "Account sessions and role support"],
+  "it-tickets": ["Incident Tickets", "Support queue and operational issues"],
   explore: ["Explore Garden", "Discover & generate your route"],
   profiles: ["Tree Profiles", "Explore botanical stories"],
   chat: ["AI Botanical Assistant", "Ask about plants in the garden"],

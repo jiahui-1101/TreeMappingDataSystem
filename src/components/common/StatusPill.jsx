@@ -11,6 +11,16 @@ const LABELS = {
   rejected: "Rejected",
   active: "Active",
   inactive: "Inactive",
+  locked: "Locked",
+  online: "Online",
+  degraded: "Degraded",
+  offline: "Offline",
+  open: "Open",
+  investigating: "Investigating",
+  resolved: "Resolved",
+  info: "Info",
+  warning: "Warning",
+  error: "Error",
 };
 
 export default function StatusPill({ status }) {

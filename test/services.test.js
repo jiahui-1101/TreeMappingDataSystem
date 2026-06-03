@@ -5,8 +5,10 @@ import { fileURLToPath } from "node:url";
 import { ROLE } from "../src/models.js";
 import { canAccessPage } from "../src/services/mockAuthService.js";
 import { buildVisitorRoute, maskTreeForRole } from "../src/services/mockTreeService.js";
+import { filterAccessUsers, filterServiceLogs, getServiceLogs } from "../src/services/itSupportService.js";
 import { addCollectedTree, addCollectedTreeWithStatus, loadCollection, loadLanguage, saveLanguage } from "../src/services/storageService.js";
 import { TREES } from "../src/data/trees.js";
+import { SERVICE_LOGS, SYSTEM_SERVICES } from "../src/data/itSupport.js";
 import { visitorText, visitorTreeDescription } from "../src/services/visitorI18n.js";
 import { MAP_ZONES, TBJ_MAP_FACTS, countZoneRecords, getVisitorZone, percentToWorldPosition, worldToPercentPosition } from "../src/data/gardenMap.js";
 import { getPublicTreeCard, projectGrowth } from "../src/data/visitorTreeProfiles.js";
@@ -21,9 +23,17 @@ function createStorage() {
 
 test("RBAC exposes the correct role navigation", () => {
   assert.equal(canAccessPage(ROLE.ADMIN, "spatial"), true);
+  assert.equal(canAccessPage(ROLE.ADMIN, "it-dashboard"), false);
   assert.equal(canAccessPage(ROLE.IT_SUPPORT, "audit"), true);
+  assert.equal(canAccessPage(ROLE.IT_SUPPORT, "map"), true);
+  assert.equal(canAccessPage(ROLE.IT_SUPPORT, "it-dashboard"), true);
+  assert.equal(canAccessPage(ROLE.IT_SUPPORT, "it-monitoring"), true);
+  assert.equal(canAccessPage(ROLE.IT_SUPPORT, "it-users"), true);
+  assert.equal(canAccessPage(ROLE.IT_SUPPORT, "it-tickets"), true);
   assert.equal(canAccessPage(ROLE.VISITOR, "audit"), false);
+  assert.equal(canAccessPage(ROLE.VISITOR, "it-users"), false);
   assert.equal(canAccessPage(ROLE.RANGER, "ranger-tasks"), true);
+  assert.equal(canAccessPage(ROLE.RANGER, "it-tickets"), false);
 });
 
 test("visitor collection uses localStorage without duplicate entries", () => {
@@ -34,6 +44,22 @@ test("visitor collection uses localStorage without duplicate entries", () => {
   assert.deepEqual(loadCollection(storage), ["TBJ-001", "TBJ-002"]);
   assert.equal(addCollectedTreeWithStatus("TBJ-003", storage).isNew, true);
   assert.equal(addCollectedTreeWithStatus("TBJ-003", storage).isNew, false);
+});
+
+test("IT support user filters narrow access control data", () => {
+  assert.deepEqual(filterAccessUsers(undefined, { role: "IT Support" }).map((user) => user.id), ["it001"]);
+  assert.deepEqual(filterAccessUsers(undefined, { status: "locked" }).map((user) => user.id), ["RGR004"]);
+  assert.deepEqual(filterAccessUsers(undefined, { session: "none" }).map((user) => user.id), ["visitor@gmail.com"]);
+  assert.deepEqual(filterAccessUsers(undefined, { query: "faizal" }).map((user) => user.id), ["RGR004"]);
+});
+
+test("IT support service logs are available and filterable by level", () => {
+  for (const service of SYSTEM_SERVICES) {
+    assert.ok(getServiceLogs(service.id).length > 0);
+  }
+  const qrLogs = getServiceLogs("qr-service", SERVICE_LOGS);
+  assert.ok(filterServiceLogs(qrLogs, "error").every((log) => log.level === "error"));
+  assert.equal(filterServiceLogs(qrLogs, "all").length, qrLogs.length);
 });
 
 test("visitor language choice persists", () => {

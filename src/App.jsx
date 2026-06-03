@@ -16,6 +16,10 @@ import CollectionPage from "./features/ss3-visitor/CollectionPage.jsx";
 import ExplorePage from "./features/ss3-visitor/ExplorePage.jsx";
 import ProfilesPage from "./features/ss3-visitor/ProfilesPage.jsx";
 import TreeIdCardModal from "./features/ss3-visitor/TreeIdCardModal.jsx";
+import ITDashboardPage from "./features/it-support/ITDashboardPage.jsx";
+import IncidentTicketsPage from "./features/it-support/IncidentTicketsPage.jsx";
+import SystemMonitoringPage from "./features/it-support/SystemMonitoringPage.jsx";
+import UserAccessPage from "./features/it-support/UserAccessPage.jsx";
 import AuditPage from "./features/ss4-map/AuditPage.jsx";
 import MapPage from "./features/ss4-map/MapPage.jsx";
 import SpatialPage from "./features/ss4-map/SpatialPage.jsx";
@@ -89,6 +93,10 @@ export default function App() {
     case "profiles": content = <ProfilesPage {...pageProps} onCollect={collect} />; break;
     case "chat": content = <ChatPage language={language} />; break;
     case "collection": content = <CollectionPage {...pageProps} collection={collection} onOpenScanner={() => setScannerOpen(true)} />; break;
+    case "it-dashboard": content = <ITDashboardPage {...pageProps} onNavigate={navigate} />; break;
+    case "it-monitoring": content = <SystemMonitoringPage {...pageProps} />; break;
+    case "it-users": content = <UserAccessPage {...pageProps} />; break;
+    case "it-tickets": content = <IncidentTicketsPage {...pageProps} />; break;
     default: content = <DashboardPage {...pageProps} onNavigate={navigate} />;
   }
 
