@@ -11,6 +11,13 @@ export const TBJ_MAP_FACTS = {
   mapNote: "Conceptual 3D interpretation based on public official zone information. It is not a surveyed GIS boundary.",
 };
 
+export const TBJ_OFFICIAL_CONTEXT = {
+  sourceLabel: "Official JLN Taman Botani Johor page",
+  sourceUrl: TBJ_OFFICIAL_SOURCE_URL,
+  description: "Official JLN context confirms the 245.04 acre total area, the Jalan Utama Yong Peng - Sri Medan boundary, and the six main garden zones used by this conceptual map.",
+  zones: ["Pentadbiran", "Arboretum", "Pemuliharaan/Hutan Sekunder", "Tapak Semaian", "Riparian/Habitat", "Tanaman Buah-buahan"],
+};
+
 export const MAP_ZONES = [
   {
     id: "pentadbiran",
@@ -87,6 +94,162 @@ export const ARBORETUM_PLOTS = [
   "Plot Ethnobotani",
   "Plot Herba dan Perubatan",
 ];
+
+export const TBJ_COLLECTION_SUMMARIES = [
+  {
+    plotId: "jalan-tasik-utama",
+    total: 249,
+    speciesRows: 36,
+    groupId: "jalan-rumah-tasik",
+    label: "249 stakeholder inventory records in Jalan Tasik Utama; source group total 339.",
+    examples: ["Samanea saman", "Mesua ferrea", "Hopea odorata", "Mimusops elengi"],
+    zoneBreakdown: { "Zon A": 152, "Zon B": 66, "Zon C": 3, "Zon D": 123 },
+  },
+  {
+    plotId: "rumah-tamu",
+    total: 24,
+    speciesRows: 8,
+    groupId: "jalan-rumah-tasik",
+    label: "24 stakeholder inventory records in Rumah Tamu; part of 339-record source group.",
+    examples: ["Mangifera indica", "Nephelium mutabile", "Averrhoa carambola"],
+  },
+  {
+    plotId: "tasik-bukit-belah",
+    total: 19,
+    speciesRows: 4,
+    groupId: "jalan-rumah-tasik",
+    label: "19 stakeholder inventory records in Tasik Bukit Belah; part of 339-record source group.",
+    examples: ["Pometia pinnata", "Barringtonia racemosa", "Cocos nucifera"],
+  },
+  {
+    plotId: "plot-buah-buahan",
+    total: 154,
+    speciesRows: 25,
+    label: "154 records in Plot Buah-buahan inventory",
+    examples: ["Mangifera indica", "Nephelium lappaceum", "Artocarpus heterophyllus"],
+    zoneBreakdown: { "Blok A": 43, "Blok B": 29, "Blok C": 26, "Blok D": 56 },
+  },
+  {
+    plotId: "arid",
+    total: 168,
+    speciesRows: 9,
+    label: "168 records in Plot Arid collection inventory",
+    examples: ["Bottlebrush", "Golden penda", "Fukugi"],
+  },
+  {
+    plotId: "riparian",
+    total: 97,
+    speciesRows: 14,
+    label: "97 stakeholder inventory records in Plot Riparian",
+    examples: ["Ficus benjamina", "Barringtonia racemosa", "Pometia pinnata"],
+  },
+  {
+    plotId: "ethnobotani",
+    total: 185,
+    speciesRows: 35,
+    label: "185 records in Ethnobotani inventory group; table rows split between Ethnobotani and Plot Ethnobotani.",
+    examples: ["Eugenia polyantha", "Neobalanocarpus heimii", "Aquilaria malaccensis"],
+    zoneBreakdown: { "Ethnobotani rows": 90, "Plot Ethnobotani rows": 92, "Source total": 185 },
+  },
+  {
+    plotId: "tanaman-nadir",
+    total: 154,
+    speciesRows: 30,
+    label: "154 records in Tanaman Nadir inventory",
+    examples: ["Mangifera petandra", "Gnetum gnemon", "Garcinia atroviridis"],
+  },
+  {
+    plotId: "nama-tempat",
+    total: 181,
+    speciesRows: 25,
+    label: "181 records in Nama Tempat inventory",
+    examples: ["Place-name tree collection", "Local heritage species", "Interpretive plant records"],
+  },
+];
+
+export const TBJ_INVENTORY_SOURCE_GROUPS = [
+  { id: "jalan-rumah-tasik", name: "Jalan Tasik Utama / Rumah Tamu / Tasik Bukit Belah", total: 339, source: "Jalan Utama, Plot Buah-Buahan, Arid, Riparian.docx" },
+  { id: "ethnobotani-group", name: "Ethnobotani / Plot Ethnobotani", total: 185, source: "Plot Ethnobotani, Tanaman Nadir, Nama Tempat...docx" },
+];
+
+export const TBJ_STAKEHOLDER_PLOTS = [
+  {
+    id: "jalan-tasik-utama",
+    name: "Jalan Tasik Utama",
+    zoneId: "pentadbiran",
+    source: "Stakeholder inventory doc: Jalan Utama, Plot Buah-Buahan, Arid, Riparian",
+    x: -38,
+    z: 12,
+  },
+  {
+    id: "rumah-tamu",
+    name: "Rumah Tamu",
+    zoneId: "pentadbiran",
+    source: "Stakeholder inventory doc: Jalan Utama, Plot Buah-Buahan, Arid, Riparian",
+    x: -33,
+    z: 8,
+  },
+  {
+    id: "tasik-bukit-belah",
+    name: "Tasik Bukit Belah",
+    zoneId: "riparian",
+    source: "Stakeholder inventory doc: Jalan Utama, Plot Buah-Buahan, Arid, Riparian",
+    x: 12,
+    z: 19,
+  },
+  {
+    id: "plot-buah-buahan",
+    name: "Plot Buah-buahan",
+    zoneId: "tanaman-buah",
+    source: "Stakeholder inventory doc: Jalan Utama, Plot Buah-Buahan, Arid, Riparian",
+    x: -29,
+    z: 28,
+  },
+  {
+    id: "arid",
+    name: "Arid",
+    zoneId: "tapak-semaian",
+    source: "Stakeholder inventory doc: Jalan Utama, Plot Buah-Buahan, Arid, Riparian",
+    x: 33,
+    z: 28,
+  },
+  {
+    id: "riparian",
+    name: "Riparian",
+    zoneId: "riparian",
+    source: "Stakeholder inventory doc: Jalan Utama, Plot Buah-Buahan, Arid, Riparian",
+    x: 1,
+    z: 26,
+  },
+  {
+    id: "ethnobotani",
+    name: "Ethnobotani",
+    zoneId: "arboretum",
+    source: "Stakeholder inventory doc: Plot Ethnobotani, Tanaman Nadir, Nama Tempat",
+    x: -18,
+    z: -22,
+  },
+  {
+    id: "tanaman-nadir",
+    name: "Tanaman Nadir",
+    zoneId: "tanaman-buah",
+    source: "Stakeholder inventory doc: Plot Ethnobotani, Tanaman Nadir, Nama Tempat",
+    x: -18,
+    z: 24,
+  },
+  {
+    id: "nama-tempat",
+    name: "Nama Tempat",
+    zoneId: "arboretum",
+    source: "Stakeholder inventory doc: Plot Ethnobotani, Tanaman Nadir, Nama Tempat",
+    x: -32,
+    z: -26,
+  },
+].map((plot) => {
+  const summary = TBJ_COLLECTION_SUMMARIES.find((item) => item.plotId === plot.id);
+  const zone = MAP_ZONES.find((item) => item.id === plot.zoneId);
+  return { ...plot, officialZone: zone?.name || "", inventory: summary || null, total: summary?.total || 0, countLabel: summary?.label || "", examples: summary?.examples || [] };
+});
 
 export const VISITOR_ZONES = {
   pentadbiran: {
@@ -184,4 +347,31 @@ export function worldToPercentPosition(point) {
 export function countZoneRecords(trees, zone) {
   if (!zone.inventoryZone) return 0;
   return trees.filter((tree) => tree.zone === zone.inventoryZone).length;
+}
+
+export function getStakeholderPlotsByZone(zoneId) {
+  return TBJ_STAKEHOLDER_PLOTS.filter((plot) => plot.zoneId === zoneId);
+}
+
+export function countStakeholderRecords(plotId) {
+  return TBJ_COLLECTION_SUMMARIES.find((summary) => summary.plotId === plotId)?.total || 0;
+}
+
+export function getStakeholderPlotInventory(plotId) {
+  return TBJ_COLLECTION_SUMMARIES.find((summary) => summary.plotId === plotId) || null;
+}
+
+export function getStakeholderSourceGroup(groupId) {
+  return TBJ_INVENTORY_SOURCE_GROUPS.find((group) => group.id === groupId) || null;
+}
+
+export function formatPlotQuantity(plotId) {
+  const inventory = getStakeholderPlotInventory(plotId);
+  if (!inventory) return "Inventory records from stakeholder docs";
+  const group = inventory.groupId ? getStakeholderSourceGroup(inventory.groupId) : null;
+  return group ? `${inventory.total} records · ${inventory.speciesRows} species rows · source group ${group.total}` : `${inventory.total} records · ${inventory.speciesRows} species rows`;
+}
+
+export function getMapSourceSummary() {
+  return "Official JLN zones + stakeholder DOCX inventory quantities, conceptual demo map.";
 }

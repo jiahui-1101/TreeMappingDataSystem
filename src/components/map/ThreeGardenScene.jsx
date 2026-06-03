@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { MAP_LANDMARKS, MAP_ZONES, percentToWorldPosition, treeToWorldPosition, worldToPercentPosition } from "../../data/gardenMap.js";
+import { MAP_LANDMARKS, MAP_ZONES, TBJ_STAKEHOLDER_PLOTS, percentToWorldPosition, treeToWorldPosition, worldToPercentPosition } from "../../data/gardenMap.js";
 import { ROLE } from "../../models.js";
 import { maskTreeForRole } from "../../services/mockTreeService.js";
 
@@ -75,6 +75,7 @@ function isInsideLake(x, z) {
 
 export default function ThreeGardenScene({
   compact,
+  controlAction,
   layer,
   onMapClick,
   onZoneClick,
@@ -91,11 +92,13 @@ export default function ThreeGardenScene({
   const onMapClickRef = useRef(onMapClick);
   const onZoneClickRef = useRef(onZoneClick);
   const onProjectedPositionsRef = useRef(onProjectedPositions);
+  const controlActionRef = useRef(controlAction);
   const [fallback, setFallback] = useState(false);
 
   useEffect(() => { onMapClickRef.current = onMapClick; }, [onMapClick]);
   useEffect(() => { onZoneClickRef.current = onZoneClick; }, [onZoneClick]);
   useEffect(() => { onProjectedPositionsRef.current = onProjectedPositions; }, [onProjectedPositions]);
+  useEffect(() => { controlActionRef.current = controlAction; }, [controlAction]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -126,9 +129,22 @@ export default function ThreeGardenScene({
     controls.enablePan = !compact;
     controls.maxPolarAngle = Math.PI * 0.48;
     controls.minPolarAngle = viewMode === "top" ? 0.01 : Math.PI * 0.18;
-    controls.minDistance = 52;
-    controls.maxDistance = 130;
+    controls.minDistance = compact ? 35 : 28;
+    controls.maxDistance = 145;
     controls.target.set(0, 0, 0);
+    const setCameraHome = () => {
+      camera.position.set(viewMode === "top" ? 0 : 52, viewMode === "top" ? 108 : 62, viewMode === "top" ? 0.01 : 73);
+      controls.target.set(0, 0, 0);
+      controls.update();
+    };
+    const zoomBy = (factor) => {
+      const direction = camera.position.clone().sub(controls.target);
+      const nextLength = Math.max(controls.minDistance, Math.min(controls.maxDistance, direction.length() * factor));
+      camera.position.copy(controls.target).add(direction.setLength(nextLength));
+      controls.update();
+    };
+    setCameraHome();
+    let handledControlId = controlActionRef.current?.id;
 
     scene.add(new THREE.HemisphereLight(0xf6ffe9, 0x52704f, 2.25));
     const sun = new THREE.DirectionalLight(0xfff5d4, 2.6);
@@ -164,6 +180,17 @@ export default function ThreeGardenScene({
     scene.add(makePath([[-25, -8], [-10, -17], [4, -24], [18, -24], [31, -15]], 0xe8dbb7, 0.58));
     scene.add(makePath([[-18, 8], [-11, 18], [-2, 27], [12, 30]], 0xe8dbb7, 0.58));
     scene.add(makePath([[18, -9], [14, 2], [4, 6], [-4, 1], [-3, -12], [4, -23], [15, -21], [18, -9]], 0xa97952, 0.32, true));
+
+    if (layer === "stakeholder" || layer === "collections") {
+      TBJ_STAKEHOLDER_PLOTS.forEach((plot, index) => {
+        const marker = new THREE.Mesh(
+          new THREE.CylinderGeometry(layer === "collections" ? 1.55 : 1.15, layer === "collections" ? 1.55 : 1.15, 0.22, 24),
+          new THREE.MeshStandardMaterial({ color: index % 2 ? 0xd7a927 : 0x2d7f67, transparent: true, opacity: 0.86, roughness: 0.82 }),
+        );
+        marker.position.set(plot.x, 0.84, plot.z);
+        scene.add(marker);
+      });
+    }
 
     addBuilding(scene, { x: -35, z: -4, width: 6, depth: 4 });
     addBuilding(scene, { x: -28, z: -6, width: 4.5, depth: 3.6, color: 0xc7aa7e });
@@ -237,10 +264,11 @@ export default function ThreeGardenScene({
       return { left: `${((position.x + 1) * 50).toFixed(2)}%`, top: `${((1 - position.y) * 50).toFixed(2)}%` };
     };
     const projectPositions = () => {
-      const next = { trees: {}, zones: {}, landmarks: {}, route: {} };
+      const next = { trees: {}, zones: {}, landmarks: {}, plots: {}, route: {} };
       visibleTrees.forEach((tree) => { next.trees[tree.id] = project(treeToWorldPosition(tree)); });
       MAP_ZONES.forEach((zone) => { next.zones[zone.id] = project({ x: zone.label[0], z: zone.label[1] }); });
       MAP_LANDMARKS.forEach((landmark) => { next.landmarks[landmark.id] = project(landmark); });
+      TBJ_STAKEHOLDER_PLOTS.forEach((plot) => { next.plots[plot.id] = project(plot); });
       routePath.forEach((point) => {
         if (point.x !== null && point.y !== null) next.route[point.id] = project(percentToWorldPosition(point));
       });
@@ -280,6 +308,13 @@ export default function ThreeGardenScene({
 
     let frame;
     const animate = () => {
+      const action = controlActionRef.current;
+      if (action?.id && action.id !== handledControlId) {
+        handledControlId = action.id;
+        if (action.type === "zoom-in") zoomBy(0.78);
+        if (action.type === "zoom-out") zoomBy(1.28);
+        if (action.type === "reset") setCameraHome();
+      }
       controls.update();
       renderer.render(scene, camera);
       projectPositions();

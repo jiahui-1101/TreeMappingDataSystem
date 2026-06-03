@@ -2,6 +2,8 @@ import { useState } from "react";
 import Card from "../../components/common/Card.jsx";
 import Modal from "../../components/common/Modal.jsx";
 import { RANGERS } from "../../data/rangers.js";
+import { ZONES } from "../../data/trees.js";
+import { buildUrgentTask } from "../../services/adminService.js";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 const ASSIGNMENTS = [
@@ -11,9 +13,20 @@ const ASSIGNMENTS = [
   ["Mei", "Riparian", "Riparian", "Pemuliharaan", "Tapak Semaian", "Arboretum"],
 ];
 
-export default function SchedulePage({ showToast }) {
+export default function SchedulePage({ tasks = [], onAddTask, showToast }) {
   const [urgentOpen, setUrgentOpen] = useState(false);
   const [conflict, setConflict] = useState(false);
+  const [urgentRanger, setUrgentRanger] = useState("Ahmad Razif");
+  const [urgentIssue, setUrgentIssue] = useState("");
+  const [urgentTreeId, setUrgentTreeId] = useState("TBJ-004");
+  const [urgentZone, setUrgentZone] = useState("Tanaman");
+  const [urgentPriority, setUrgentPriority] = useState("urgent");
+  const dispatchUrgentTask = () => {
+    const task = onAddTask(buildUrgentTask({ ranger: urgentRanger, issue: urgentIssue, treeId: urgentTreeId, zone: urgentZone, priority: urgentPriority }, tasks));
+    setUrgentOpen(false);
+    setUrgentIssue("");
+    showToast(`${task.id} created and synced to ${task.ranger}'s task bar.`);
+  };
 
   return (
     <>
@@ -30,10 +43,12 @@ export default function SchedulePage({ showToast }) {
         <button className="button schedule-approve" onClick={() => showToast("Schedule approved. Ranger notification mock dispatched.")}>Approve & Dispatch Schedule</button>
       </Card>
       {urgentOpen && <Modal title="Create Urgent Field Task" onClose={() => setUrgentOpen(false)}>
-        <label className="field-label">Ranger</label><select>{RANGERS.filter((ranger) => ranger.status === "active").map((ranger) => <option key={ranger.id}>{ranger.name}</option>)}</select>
-        <label className="field-label">Issue</label><input placeholder="e.g. Fallen branch near lake" />
-        <label className="field-label">Priority</label><select><option>Emergency</option><option>High</option></select>
-        <button className="button button-block" onClick={() => { setUrgentOpen(false); showToast("Urgent task pinned to ranger task bar."); }}>Dispatch Urgent Task</button>
+        <label className="field-label">Ranger</label><select value={urgentRanger} onChange={(event) => setUrgentRanger(event.target.value)}>{RANGERS.filter((ranger) => ranger.status === "active").map((ranger) => <option key={ranger.id}>{ranger.name}</option>)}</select>
+        <label className="field-label">Issue</label><input value={urgentIssue} onChange={(event) => setUrgentIssue(event.target.value)} placeholder="e.g. Fallen branch near lake" />
+        <label className="field-label">Tree ID / area</label><input value={urgentTreeId} onChange={(event) => setUrgentTreeId(event.target.value)} placeholder="e.g. TBJ-004 or lake path" />
+        <label className="field-label">Zone</label><select value={urgentZone} onChange={(event) => setUrgentZone(event.target.value)}>{ZONES.map((zone) => <option key={zone}>{zone}</option>)}</select>
+        <label className="field-label">Priority</label><select value={urgentPriority} onChange={(event) => setUrgentPriority(event.target.value)}><option value="urgent">Emergency</option><option value="high">High</option></select>
+        <button className="button button-block" disabled={!urgentRanger || !urgentIssue.trim()} onClick={dispatchUrgentTask}>Dispatch Urgent Task</button>
       </Modal>}
     </>
   );

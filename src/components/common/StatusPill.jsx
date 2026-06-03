@@ -21,6 +21,10 @@ const LABELS = {
   info: "Info",
   warning: "Warning",
   error: "Error",
+  synced: "Synced",
+  failed: "Failed",
+  manual: "Manual",
+  ai: "AI",
 };
 
 export default function StatusPill({ status }) {

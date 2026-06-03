@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DIAGNOSES } from "../../data/diagnoses.js";
 import { getPublicTreeCard } from "../../data/visitorTreeProfiles.js";
 import { ROLE } from "../../models.js";
 import { findTree, maskTreeForRole } from "../../services/mockTreeService.js";
+import { analyzeFieldPhoto } from "../../services/rangerService.js";
 import { visitorText } from "../../services/visitorI18n.js";
 import Modal from "../common/Modal.jsx";
 import StatusPill from "../common/StatusPill.jsx";
@@ -15,14 +15,23 @@ export default function QRScanner({ role, trees, language, onClose, onComplete }
   const [cameraState, setCameraState] = useState("idle");
   const [detectorAvailable, setDetectorAvailable] = useState(true);
   const [photo, setPhoto] = useState("");
-  const [diagnosis, setDiagnosis] = useState("");
+  const [reportMode, setReportMode] = useState("manual");
+  const [observedStatus, setObservedStatus] = useState("monitor");
+  const [manualCause, setManualCause] = useState("");
+  const [manualTreatment, setManualTreatment] = useState("");
+  const [aiResult, setAiResult] = useState(null);
+  const [selectedAiPossibilityId, setSelectedAiPossibilityId] = useState("");
+  const [aiState, setAiState] = useState("idle");
   const [notes, setNotes] = useState("");
+  const [submittedReport, setSubmittedReport] = useState(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const isVisitor = role === ROLE.VISITOR;
   const t = useCallback((path) => visitorText(language, path), [language]);
   const visibleTree = maskTreeForRole(tree, role);
   const publicProfile = visibleTree && isVisitor ? getPublicTreeCard(visibleTree, language) : null;
+  const aiPossibilities = aiResult?.possibilities || [];
+  const selectedAiPossibility = aiPossibilities.find((item) => item.id === selectedAiPossibilityId) || aiPossibilities[0] || null;
 
   const scan = useCallback((rawId = treeId) => {
     const parsedId = String(rawId).toUpperCase().match(/TBJ-\d{3}/)?.[0] || String(rawId).trim();
@@ -89,8 +98,55 @@ export default function QRScanner({ role, trees, language, onClose, onComplete }
   }, [cameraState, scan]);
 
   const finish = () => {
-    onComplete(tree, isVisitor ? t("qr.found") : "Field report submitted successfully.");
-    onClose();
+    if (isVisitor) {
+      onComplete(tree, t("qr.found"));
+      onClose();
+      return;
+    }
+    if (!tree) {
+      setError("Scan a valid tree QR code before submitting a field report.");
+      return;
+    }
+    if (reportMode === "ai" && (!photo || !aiResult || !selectedAiPossibility)) {
+      setError("Attach a field photo and run AI photo analysis before submitting this AI-assisted report.");
+      return;
+    }
+    if (reportMode === "manual" && (!manualCause.trim() || !manualTreatment.trim())) {
+      setError("Add the issue cause and treatment action for a manual ranger assessment.");
+      return;
+    }
+    const report = onComplete(tree, "Field report submitted successfully.", {
+      reportMode,
+      photoName: reportMode === "ai" ? photo : "",
+      observedStatus,
+      manualCause,
+      manualTreatment,
+      aiPossibilities: reportMode === "ai" ? aiPossibilities : [],
+      selectedAiPossibilityId: reportMode === "ai" ? selectedAiPossibility.id : "",
+      diagnosis: selectedAiPossibility?.name || "",
+      confidence: selectedAiPossibility?.confidence ?? null,
+      treatment: selectedAiPossibility?.treatment || selectedAiPossibility?.solutions?.[0] || "",
+      photoAnalysisStatus: aiResult?.photoAnalysisStatus || (reportMode === "ai" ? "pending" : "not-requested"),
+      notes,
+      gpsLabel: `Mock GPS: ${tree.zone} patrol point`,
+      timestamp: "Just now",
+    });
+    if (report) setSubmittedReport(report);
+  };
+
+  const runPhotoAnalysis = () => {
+    if (!photo) {
+      setError("Attach a field photo before running AI diagnosis.");
+      return;
+    }
+    setError("");
+    setAiState("analyzing");
+    window.setTimeout(() => {
+      const result = analyzeFieldPhoto({ tree, photoName: photo });
+      setAiResult(result);
+      setSelectedAiPossibilityId(result.selectedAiPossibilityId || result.possibilities?.[0]?.id || "");
+      setAiState("complete");
+    }, 450);
   };
 
   return (
@@ -113,7 +169,7 @@ export default function QRScanner({ role, trees, language, onClose, onComplete }
           </div>
           {isVisitor && <button className="text-button scanner-demo" onClick={() => scan("TBJ-004")}>{t("qr.demoScan")}</button>}
           {error && <p className="form-error">{error}</p>}
-          {visibleTree && (
+          {visibleTree && !submittedReport && (
             <div className="scanner-result">
               <div className="split-heading">
                 <div>
@@ -125,27 +181,85 @@ export default function QRScanner({ role, trees, language, onClose, onComplete }
               <p>{visibleTree.id} · {visibleTree.zone}{!isVisitor && ` · Health ${visibleTree.health}%`}</p>
               {role === ROLE.RANGER ? (
                 <>
-                  <label className="field-label">Field photo preview</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => setPhoto(event.target.files?.[0]?.name || "")}
-                  />
-                  {photo && <div className="upload-preview">Photo ready: {photo}</div>}
-                  <label className="field-label">AI diagnosis result</label>
-                  <div className="diagnosis-list">
-                    {DIAGNOSES.map((item) => (
-                      <button
-                        key={item.name}
-                        className={`diagnosis-card ${diagnosis === item.name ? "selected" : ""}`}
-                        onClick={() => setDiagnosis(item.name)}
-                      >
-                        <strong>{item.name}</strong>
-                        <span>{item.confidence}% confidence</span>
-                        <small>{item.treatment}</small>
-                      </button>
-                    ))}
+                  <label className="field-label">Report mode</label>
+                  <div className="segmented report-mode-toggle">
+                    <button className={reportMode === "manual" ? "active" : ""} onClick={() => setReportMode("manual")}>I know the issue</button>
+                    <button className={reportMode === "ai" ? "active" : ""} onClick={() => setReportMode("ai")}>Use AI diagnosis</button>
                   </div>
+                  <label className="field-label">Observed health status</label>
+                  <select value={observedStatus} onChange={(event) => setObservedStatus(event.target.value)}>
+                    <option value="healthy">Healthy</option>
+                    <option value="monitor">Monitor</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                  <div className="report-meta-strip">
+                    <span><b>Time</b><small>Just now</small></span>
+                    <span><b>GPS</b><small>Mock GPS: {visibleTree.zone} patrol point</small></span>
+                  </div>
+                  {reportMode === "manual" ? (
+                    <>
+                      <label className="field-label">Issue cause</label>
+                      <input value={manualCause} onChange={(event) => setManualCause(event.target.value)} placeholder="e.g. Water stress after hot weather" />
+                      <label className="field-label">Treatment action</label>
+                      <textarea value={manualTreatment} onChange={(event) => setManualTreatment(event.target.value)} placeholder="Describe the treatment or follow-up action..." />
+                    </>
+                  ) : (
+                    <>
+                      <label className="field-label">Field photo for AI recognition</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => {
+                          setPhoto(event.target.files?.[0]?.name || "");
+                          setAiResult(null);
+                          setSelectedAiPossibilityId("");
+                          setAiState("idle");
+                        }}
+                      />
+                      <div className="photo-upload-strip">
+                        <span><b>AI recognition photo</b><small>{photo || "Waiting for uploaded photo"}</small></span>
+                        <span><b>Admin upload</b><small>{photo ? "Will sync with AI report" : "Only AI mode uploads photo"}</small></span>
+                      </div>
+                      <label className="field-label">AI photo diagnosis</label>
+                      <div className={`ai-analysis-card ai-analysis-${aiState}`}>
+                        {!photo && <p>Attach or capture a field photo to unlock AI diagnosis.</p>}
+                        {photo && aiState === "idle" && (
+                          <>
+                            <p>Ready to analyze uploaded photo: <strong>{photo}</strong></p>
+                            <button className="button button-small" onClick={runPhotoAnalysis}>Analyze Photo</button>
+                          </>
+                        )}
+                        {aiState === "analyzing" && <p>Analyzing uploaded photo...</p>}
+                        {aiResult && aiState === "complete" && (
+                          <>
+                            <span className="premium-eyebrow">Photo analyzed: {aiResult.photoName}</span>
+                            <strong>3 possible AI diagnoses generated</strong>
+                            <div className="ai-possibility-list">
+                              {aiPossibilities.map((possibility) => (
+                                <button
+                                  type="button"
+                                  className={`ai-possibility-card ${selectedAiPossibility?.id === possibility.id ? "selected" : ""}`}
+                                  key={possibility.id}
+                                  onClick={() => setSelectedAiPossibilityId(possibility.id)}
+                                >
+                                  <span><b>{possibility.name}</b><small>{possibility.confidence}% confidence</small></span>
+                                  <div>
+                                    <strong>3 possible reasons</strong>
+                                    <ol>{possibility.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ol>
+                                  </div>
+                                  <div>
+                                    <strong>3 suggested solutions</strong>
+                                    <ol>{possibility.solutions.map((solution) => <li key={solution}>{solution}</li>)}</ol>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                            <button className="button button-small button-outline" onClick={runPhotoAnalysis}>Re-analyze Photo</button>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
                   <label className="field-label">Field notes</label>
                   <textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Add observed symptoms..." />
                   <button className="button button-block" onClick={finish}>Submit Field Report</button>
@@ -168,6 +282,25 @@ export default function QRScanner({ role, trees, language, onClose, onComplete }
                   <button className="button button-block" onClick={finish}>{t("qr.openCard")}</button>
                 </>
               )}
+            </div>
+          )}
+          {submittedReport && role === ROLE.RANGER && (
+            <div className="report-analysis-panel">
+              <span className="premium-eyebrow">Submit report analysis</span>
+              <h3>{submittedReport.analysis.source === "manual" ? "Manual ranger assessment" : "AI-assisted field diagnosis"}</h3>
+              <div className="report-analysis-grid">
+                <article><span>Severity</span><strong>{submittedReport.analysis.severity}</strong></article>
+                <article><span>Sync</span><strong>{submittedReport.syncStatus}</strong></article>
+                <article><span>Report</span><strong>{submittedReport.id}</strong></article>
+              </div>
+              <p>{submittedReport.analysis.summary}</p>
+              <p><strong>Recommendation:</strong> {submittedReport.analysis.recommendation}</p>
+              <p><strong>Task sync:</strong> {submittedReport.analysis.taskSyncMessage}</p>
+              <p><strong>Tree update:</strong> {submittedReport.analysis.treeUpdateMessage}</p>
+              <p><strong>Photo:</strong> {submittedReport.analysis.photoSyncMessage}</p>
+              {submittedReport.reportMode === "ai" && <p><strong>AI photo analysis:</strong> {submittedReport.analysis.photoAnalysisMessage}</p>}
+              <p><strong>Next action:</strong> {submittedReport.analysis.nextAction}</p>
+              <button className="button button-block" onClick={onClose}>Close Report</button>
             </div>
           )}
         </div>

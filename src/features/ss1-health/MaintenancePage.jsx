@@ -2,11 +2,18 @@ import { useState } from "react";
 import Card from "../../components/common/Card.jsx";
 import StatusPill from "../../components/common/StatusPill.jsx";
 import { MAINTENANCE_ALERTS } from "../../data/tasks.js";
+import { buildMaintenanceTask } from "../../services/adminService.js";
 
-export default function MaintenancePage({ showToast }) {
+export default function MaintenancePage({ tasks = [], onAddTask, showToast }) {
   const [alerts, setAlerts] = useState(MAINTENANCE_ALERTS);
   const act = (id, status) => {
-    setAlerts((current) => current.map((alert) => alert.id === id ? { ...alert, status } : alert));
+    const alert = alerts.find((item) => item.id === id);
+    setAlerts((current) => current.map((item) => item.id === id ? { ...item, status } : item));
+    if (status === "approved" && alert) {
+      const task = onAddTask(buildMaintenanceTask(alert, "Ahmad Razif", tasks));
+      showToast(`${task.id} created from predictive alert and synced to Ranger task bar.`);
+      return;
+    }
     showToast(`Predictive alert ${status}. Audit event queued.`);
   };
 

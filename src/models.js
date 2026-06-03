@@ -67,6 +67,30 @@
  * @property {"info" | "warning" | "error"} level
  * @property {string} source
  * @property {string} message
+ *
+ * @typedef {Object} FieldReport
+ * @property {string} id
+ * @property {string} taskId
+ * @property {string} treeId
+ * @property {string} treeName
+ * @property {string} ranger
+ * @property {"manual" | "ai"} reportMode
+ * @property {string} photoName
+ * @property {"uploaded" | "pending" | "none"} photoSyncStatus
+ * @property {"analyzed" | "not-requested" | "pending"} photoAnalysisStatus
+ * @property {"healthy" | "monitor" | "critical"} observedStatus
+ * @property {string} manualCause
+ * @property {string} manualTreatment
+ * @property {{ id: string, name: string, confidence: number, reasons: string[], solutions: string[], treatment: string }[]} aiPossibilities
+ * @property {string} selectedAiPossibilityId
+ * @property {string} diagnosis
+ * @property {number | null} confidence
+ * @property {string} treatment
+ * @property {string} notes
+ * @property {string} gpsLabel
+ * @property {string} timestamp
+ * @property {"synced" | "pending" | "failed"} syncStatus
+ * @property {{ source: "manual" | "ai", severity: string, summary: string, recommendation: string, taskSyncMessage: string, treeUpdateMessage: string, photoSyncMessage: string, photoAnalysisMessage: string, nextAction: string }} analysis
  */
 
 export const ROLE = Object.freeze({

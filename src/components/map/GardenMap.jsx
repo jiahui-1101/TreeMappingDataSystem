@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from "react";
-import { MAP_LANDMARKS, MAP_ZONES, countZoneRecords } from "../../data/gardenMap.js";
+import { MAP_LANDMARKS, MAP_ZONES, TBJ_STAKEHOLDER_PLOTS, countZoneRecords, formatPlotQuantity } from "../../data/gardenMap.js";
 import { ROLE } from "../../models.js";
 import { maskTreeForRole } from "../../services/mockTreeService.js";
 import { visitorText } from "../../services/visitorI18n.js";
@@ -23,13 +23,15 @@ export default function GardenMap({
   selectedZoneId,
   onTreeClick,
   onZoneClick,
+  onPlotClick,
   proposedPoint,
   onMapClick,
   compact = false,
   language,
 }) {
-  const [positions, setPositions] = useState({ trees: {}, zones: {}, landmarks: {}, route: {} });
+  const [positions, setPositions] = useState({ trees: {}, zones: {}, landmarks: {}, plots: {}, route: {} });
   const [viewMode, setViewMode] = useState("perspective");
+  const [controlAction, setControlAction] = useState(null);
   const showMarkers = layer !== "visitors";
   const canSeeProtected = role === ROLE.ADMIN || role === ROLE.IT_SUPPORT;
   const visitorView = role === ROLE.VISITOR;
@@ -37,12 +39,16 @@ export default function GardenMap({
     .map((tree) => maskTreeForRole(tree, role))
     .filter((tree) => tree.x !== null || canSeeProtected)
     .filter((tree) => !visitorView || route.some((step) => step.id === tree.id)) : [], [canSeeProtected, role, route, showMarkers, trees, visitorView]);
+  const markerLabel = (tree) => visitorView
+    ? String(route.findIndex((step) => step.id === tree.id) + 1)
+    : tree.id.replace("TBJ-", "");
 
   return (
     <div className={`garden-map garden-map-3d ${compact ? "garden-map-compact" : ""} layer-${layer}`}>
       <Suspense fallback={<p className="three-map-fallback">Loading 3D garden map...</p>}>
         <ThreeGardenScene
           compact={compact}
+          controlAction={controlAction}
           layer={layer}
           onMapClick={onMapClick}
           onZoneClick={onZoneClick}
@@ -58,7 +64,7 @@ export default function GardenMap({
 
       <div className="map-source-ribbon">
         <b>TBJ 3D concept map</b>
-        <small>Official zones · demo inventory counts</small>
+        <small>Official JLN zones · stakeholder inventory docs</small>
       </div>
 
       {!compact && MAP_ZONES.map((zone) => (
@@ -82,6 +88,19 @@ export default function GardenMap({
         </span>
       ))}
 
+      {!compact && (layer === "stakeholder" || layer === "collections") && TBJ_STAKEHOLDER_PLOTS.map((plot) => (
+        <button
+          className={`map-plot-tag map-plot-${layer}`}
+          key={plot.id}
+          onClick={() => onPlotClick?.(plot)}
+          style={clampLabelPosition(positions.plots[plot.id])}
+          title={`${plot.name} - ${plot.source}`}
+        >
+          <b>{plot.name}</b>
+          <small>{layer === "collections" ? formatPlotQuantity(plot.id).split(" · ")[0] : plot.officialZone}</small>
+        </button>
+      ))}
+
       {visibleTrees.map((tree) => {
         const inRoute = route.some((step) => step.id === tree.id);
         return (
@@ -92,7 +111,7 @@ export default function GardenMap({
             onClick={() => onTreeClick?.(tree)}
             title={`${tree.name} - ${tree.id}`}
           >
-            <span>{visitorView ? route.findIndex((step) => step.id === tree.id) + 1 : tree.id.replace("TBJ-", "T-")}</span>
+            <span>{markerLabel(tree)}</span>
           </button>
         );
       })}
@@ -118,6 +137,9 @@ export default function GardenMap({
       )}
 
       <div className="map-view-controls">
+        <button onClick={() => setControlAction({ type: "zoom-in", id: Date.now() })}>+</button>
+        <button onClick={() => setControlAction({ type: "zoom-out", id: Date.now() })}>-</button>
+        <button onClick={() => setControlAction({ type: "reset", id: Date.now() })}>Reset</button>
         <button className={viewMode === "perspective" ? "active" : ""} onClick={() => setViewMode("perspective")}>3D</button>
         <button className={viewMode === "top" ? "active" : ""} onClick={() => setViewMode("top")}>Top</button>
       </div>

@@ -36,6 +36,7 @@ export const NAVIGATION = {
       items: [
         { id: "ranger-tasks", icon: "check", label: "My Tasks" },
         { id: "qr", icon: "scan", label: "QR Tree Scan" },
+        { id: "ranger-reports", icon: "chart", label: "My Reports" },
         { id: "map", icon: "map", label: "Garden Map" },
       ],
     },
@@ -89,6 +90,7 @@ export const PAGE_META = {
   rangers: ["Ranger Management", "Manage field access and zones"],
   tasks: ["Task Tracker", "Field report resolution board"],
   "ranger-tasks": ["My Tasks", "Today's field task management"],
+  "ranger-reports": ["My Field Reports", "Submitted field report history"],
   qr: ["QR Tree Scanner", "Role-based tree interaction"],
   map: ["Garden Map", "Taman Botani Johor spatial overview"],
   spatial: ["Spatial Planning", "AI tree placement simulation"],

@@ -39,7 +39,7 @@ export default function QRPage({ role, language, onOpenScanner }) {
         <span className="qr-page-icon">▦</span>
         <div>
           <h2>{isRanger ? "Field QR Tree Scanner" : t("qr.pageTitle")}</h2>
-          <p>{isRanger ? "Scan a physical tree tag to update health status, attach a field photo, and review AI diagnosis results." : t("qr.pageDescription")}</p>
+          <p>{isRanger ? "Scan a physical tree tag, choose manual assessment or AI photo diagnosis, and sync the report to Admin." : t("qr.pageDescription")}</p>
         </div>
         <button className="button" onClick={onOpenScanner}>{isRanger ? "Open QR Scanner" : t("qr.openScanner")}</button>
       </section>
