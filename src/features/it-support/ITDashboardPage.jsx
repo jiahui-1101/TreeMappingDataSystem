@@ -3,11 +3,11 @@ import StatusPill from "../../components/common/StatusPill.jsx";
 import { AUDIT_LOGS } from "../../data/auditLogs.js";
 import { ACCESS_USERS, SUPPORT_TICKETS, SYSTEM_SERVICES } from "../../data/itSupport.js";
 
-export default function ITDashboardPage({ onNavigate, showToast }) {
+export default function ITDashboardPage({ auditLogs = AUDIT_LOGS, onNavigate, showToast }) {
   const degradedServices = SYSTEM_SERVICES.filter((service) => service.status !== "online").length;
-  const failedLogins = AUDIT_LOGS.filter((log) => log.event.toLowerCase().includes("failed")).length;
+  const failedLogins = auditLogs.filter((log) => log.event.toLowerCase().includes("failed")).length;
   const lockedAccounts = ACCESS_USERS.filter((user) => user.status === "locked").length;
-  const highRiskEvents = AUDIT_LOGS.filter((log) => log.severity === "high").length;
+  const highRiskEvents = auditLogs.filter((log) => log.severity === "high").length;
   const activeTickets = SUPPORT_TICKETS.filter((ticket) => ticket.status !== "resolved");
 
   return (

@@ -10,6 +10,8 @@ const LABELS = {
   deferred: "Deferred",
   rejected: "Rejected",
   active: "Active",
+  invalidated: "Invalidated",
+  regenerated: "Regenerated",
   inactive: "Inactive",
   locked: "Locked",
   online: "Online",
@@ -25,6 +27,8 @@ const LABELS = {
   failed: "Failed",
   manual: "Manual",
   ai: "AI",
+  confirmed: "Confirmed",
+  discarded: "Discarded",
 };
 
 export default function StatusPill({ status }) {

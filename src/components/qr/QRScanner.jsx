@@ -8,7 +8,7 @@ import Modal from "../common/Modal.jsx";
 import StatusPill from "../common/StatusPill.jsx";
 import TreePhoto from "../common/TreePhoto.jsx";
 
-export default function QRScanner({ role, trees, language, onClose, onComplete }) {
+export default function QRScanner({ role, trees, qrCodes = [], language, onClose, onComplete, onScanEvent }) {
   const [treeId, setTreeId] = useState("TBJ-004");
   const [tree, setTree] = useState(null);
   const [error, setError] = useState("");
@@ -26,6 +26,7 @@ export default function QRScanner({ role, trees, language, onClose, onComplete }
   const [submittedReport, setSubmittedReport] = useState(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  const recentScanRef = useRef({ key: "", time: 0 });
   const isVisitor = role === ROLE.VISITOR;
   const t = useCallback((path) => visitorText(language, path), [language]);
   const visibleTree = maskTreeForRole(tree, role);
@@ -34,17 +35,39 @@ export default function QRScanner({ role, trees, language, onClose, onComplete }
   const selectedAiPossibility = aiPossibilities.find((item) => item.id === selectedAiPossibilityId) || aiPossibilities[0] || null;
 
   const scan = useCallback((rawId = treeId) => {
-    const parsedId = String(rawId).toUpperCase().match(/TBJ-\d{3}/)?.[0] || String(rawId).trim();
+    const rawText = String(rawId).trim();
+    const normalized = rawText.toLowerCase();
+    const qrCode = qrCodes.find((qr) => (
+      qr.qrId.toLowerCase() === normalized ||
+      qr.qrEndpoint.toLowerCase() === normalized ||
+      qr.treeId.toLowerCase() === normalized
+    ));
+    const parsedId = qrCode?.treeId || String(rawId).toUpperCase().match(/TBJ-\d{3}/)?.[0] || rawText;
     const found = findTree(parsedId, trees);
-    setTreeId(parsedId);
+    const recordOnce = (scanResult, resolvedTree = found) => {
+      const key = `${rawText}-${scanResult}`;
+      const now = Date.now();
+      if (recentScanRef.current.key === key && now - recentScanRef.current.time < 1500) return;
+      recentScanRef.current = { key, time: now };
+      onScanEvent?.({ rawId: rawText, qrCode, tree: resolvedTree, scanResult });
+    };
+    setTreeId(qrCode?.qrId || parsedId);
+    if (qrCode?.qrStatus === "invalidated") {
+      setError(isVisitor ? t("qr.invalid") : "This QR code was invalidated after the tree was archived.");
+      setTree(null);
+      recordOnce("archived_qr", null);
+      return;
+    }
     if (!found) {
       setError(isVisitor ? t("qr.invalid") : "This QR code is invalid or no longer active.");
       setTree(null);
+      recordOnce("invalid_qr", null);
       return;
     }
     setTree(found);
     setError("");
-  }, [isVisitor, t, treeId, trees]);
+    recordOnce("success", found);
+  }, [isVisitor, onScanEvent, qrCodes, t, treeId, trees]);
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());

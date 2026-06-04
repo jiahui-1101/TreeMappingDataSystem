@@ -13,7 +13,7 @@ const MAP_LAYERS = [
   { id: "visitors", label: "visitor activity" },
 ];
 
-export default function MapPage({ role, trees, onOpenScanner }) {
+export default function MapPage({ role, trees, qrCodes = [], qrScanEvents = [], visitorHeatmapAggregates = [], onOpenScanner }) {
   const [layer, setLayer] = useState("health");
   const [selected, setSelected] = useState(null);
   const [selectedZone, setSelectedZone] = useState(null);
@@ -21,6 +21,11 @@ export default function MapPage({ role, trees, onOpenScanner }) {
   const activeZonePlots = selectedZone ? getStakeholderPlotsByZone(selectedZone.id) : [];
   const selectedInventory = selectedPlot?.inventory;
   const selectedGroup = selectedInventory?.groupId ? getStakeholderSourceGroup(selectedInventory.groupId) : null;
+  const activeQr = qrCodes.filter((qr) => qr.qrStatus === "active").length;
+  const invalidatedQr = qrCodes.filter((qr) => qr.qrStatus === "invalidated").length;
+  const successfulScans = qrScanEvents.filter((event) => event.scanResult === "success").length;
+  const totalVisitorScans = visitorHeatmapAggregates.reduce((total, aggregate) => total + aggregate.scanCount, 0);
+  const topTrafficPoint = visitorHeatmapAggregates.slice().sort((a, b) => b.scanCount - a.scanCount)[0];
   return (
     <>
       <Card title="Taman Botani Johor 3D Map" subtitle="Official JLN zones combined with stakeholder plant inventory docs" actions={<div className="layer-buttons">{MAP_LAYERS.map((item) => <button key={item.id} className={layer === item.id ? "active" : ""} onClick={() => setLayer(item.id)}>{item.label}</button>)}</div>}>
@@ -28,6 +33,7 @@ export default function MapPage({ role, trees, onOpenScanner }) {
           role={role}
           trees={trees}
           layer={layer}
+          visitorHeatmapAggregates={visitorHeatmapAggregates}
           onTreeClick={setSelected}
           onZoneClick={(zone) => { setSelectedZone(zone); setSelectedPlot(null); }}
           onPlotClick={(plot) => { setSelectedPlot(plot); setSelectedZone(null); }}
@@ -38,6 +44,25 @@ export default function MapPage({ role, trees, onOpenScanner }) {
         <article><strong>6</strong><span>official main zones</span><small>Mapped as conceptual 3D operational areas</small></article>
         <article><strong>{TBJ_STAKEHOLDER_PLOTS.length}</strong><span>stakeholder plots</span><small>Added from plant inventory documents</small></article>
       </div>
+      <div className="map-fact-grid">
+        <article><strong>{activeQr}</strong><span>active QR labels</span><small>QRCodes.qr_status = active</small></article>
+        <article><strong>{invalidatedQr}</strong><span>invalidated QR</span><small>Archived tree labels blocked at scan time</small></article>
+        <article><strong>{successfulScans}</strong><span>scan ledger events</span><small>QRScanEvents routed by detected role</small></article>
+      </div>
+      {layer === "visitors" && (
+        <Card title="Visitor Activity Heatmap" subtitle="VisitorHeatmapAggregate records shown on the map layer">
+          <div className="zone-record-list">
+            <p><span>Total anonymous scans</span><b>{totalVisitorScans}</b></p>
+            <p><span>Highest traffic point</span><b>{topTrafficPoint ? `${topTrafficPoint.treeId} · ${topTrafficPoint.trafficLevel}` : "No visitor aggregate"}</b></p>
+            {visitorHeatmapAggregates.map((aggregate) => (
+              <p key={aggregate.aggregateId}>
+                <span>{aggregate.treeId} · {aggregate.zoneId}</span>
+                <b>{aggregate.scanCount} scans · {aggregate.uniqueSessions} sessions</b>
+              </p>
+            ))}
+          </div>
+        </Card>
+      )}
       <div className="two-column map-stats">
         <Card title="Demo Inventory Records by Official Zone" subtitle="Counts below come from loaded prototype records, not official tree totals.">
           <div className="zone-record-list">{MAP_ZONES.map((zone) => <p key={zone.id}><span>{zone.name}</span><b>{countZoneRecords(trees, zone)}</b></p>)}</div>

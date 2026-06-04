@@ -85,6 +85,7 @@ export default function ThreeGardenScene({
   routePath = [],
   selectedZoneId,
   trees,
+  visitorHeatmapAggregates = [],
   viewMode,
 }) {
   const canvasRef = useRef(null);
@@ -218,14 +219,19 @@ export default function ThreeGardenScene({
       scene.add(treeMesh);
     });
 
-    if (layer === "heatmap") {
-      const heat = new THREE.Mesh(
-        new THREE.CircleGeometry(15, 48),
-        new THREE.MeshBasicMaterial({ color: 0xef7338, transparent: true, opacity: 0.3 }),
-      );
-      heat.rotation.x = -Math.PI / 2;
-      heat.position.set(9, 0.72, 15);
-      scene.add(heat);
+    if (layer === "visitors") {
+      visitorHeatmapAggregates.forEach((aggregate) => {
+        const { x, z } = percentToWorldPosition({ x: aggregate.x, y: aggregate.y });
+        const radius = aggregate.trafficLevel === "high" ? 11 : aggregate.trafficLevel === "medium" ? 8 : 5.5;
+        const opacity = aggregate.trafficLevel === "high" ? 0.36 : aggregate.trafficLevel === "medium" ? 0.27 : 0.2;
+        const heat = new THREE.Mesh(
+          new THREE.CircleGeometry(radius, 48),
+          new THREE.MeshBasicMaterial({ color: 0xef7338, transparent: true, opacity, depthWrite: false }),
+        );
+        heat.rotation.x = -Math.PI / 2;
+        heat.position.set(x, 0.72, z);
+        scene.add(heat);
+      });
     }
 
     const routeWorldPoints = routePath
@@ -264,13 +270,16 @@ export default function ThreeGardenScene({
       return { left: `${((position.x + 1) * 50).toFixed(2)}%`, top: `${((1 - position.y) * 50).toFixed(2)}%` };
     };
     const projectPositions = () => {
-      const next = { trees: {}, zones: {}, landmarks: {}, plots: {}, route: {} };
+      const next = { trees: {}, zones: {}, landmarks: {}, plots: {}, route: {}, heatmap: {} };
       visibleTrees.forEach((tree) => { next.trees[tree.id] = project(treeToWorldPosition(tree)); });
       MAP_ZONES.forEach((zone) => { next.zones[zone.id] = project({ x: zone.label[0], z: zone.label[1] }); });
       MAP_LANDMARKS.forEach((landmark) => { next.landmarks[landmark.id] = project(landmark); });
       TBJ_STAKEHOLDER_PLOTS.forEach((plot) => { next.plots[plot.id] = project(plot); });
       routePath.forEach((point) => {
         if (point.x !== null && point.y !== null) next.route[point.id] = project(percentToWorldPosition(point));
+      });
+      visitorHeatmapAggregates.forEach((aggregate) => {
+        next.heatmap[aggregate.aggregateId] = project(percentToWorldPosition({ x: aggregate.x, y: aggregate.y }));
       });
       const serialized = JSON.stringify(next);
       if (serialized !== projectionCache) {
@@ -334,7 +343,7 @@ export default function ThreeGardenScene({
       });
       renderer.dispose();
     };
-  }, [compact, layer, proposedPoint, role, routePath, selectedZoneId, trees, viewMode]);
+  }, [compact, layer, proposedPoint, role, routePath, selectedZoneId, trees, visitorHeatmapAggregates, viewMode]);
 
   return (
     <div className="three-map-host" ref={hostRef}>

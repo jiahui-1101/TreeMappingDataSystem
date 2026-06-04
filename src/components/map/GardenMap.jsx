@@ -18,6 +18,7 @@ export default function GardenMap({
   role,
   trees,
   layer = "health",
+  visitorHeatmapAggregates = [],
   route = [],
   routePath = [],
   selectedZoneId,
@@ -29,7 +30,7 @@ export default function GardenMap({
   compact = false,
   language,
 }) {
-  const [positions, setPositions] = useState({ trees: {}, zones: {}, landmarks: {}, plots: {}, route: {} });
+  const [positions, setPositions] = useState({ trees: {}, zones: {}, landmarks: {}, plots: {}, route: {}, heatmap: {} });
   const [viewMode, setViewMode] = useState("perspective");
   const [controlAction, setControlAction] = useState(null);
   const showMarkers = layer !== "visitors";
@@ -58,6 +59,7 @@ export default function GardenMap({
           routePath={routePath}
           selectedZoneId={selectedZoneId}
           trees={trees}
+          visitorHeatmapAggregates={visitorHeatmapAggregates}
           viewMode={viewMode}
         />
       </Suspense>
@@ -99,6 +101,17 @@ export default function GardenMap({
           <b>{plot.name}</b>
           <small>{layer === "collections" ? formatPlotQuantity(plot.id).split(" · ")[0] : plot.officialZone}</small>
         </button>
+      ))}
+
+      {!compact && layer === "visitors" && visitorHeatmapAggregates.map((aggregate) => (
+        <span
+          className={`visitor-heatmap-tag visitor-heatmap-${aggregate.trafficLevel}`}
+          key={aggregate.aggregateId}
+          style={clampLabelPosition(positions.heatmap[aggregate.aggregateId])}
+        >
+          <b>{aggregate.scanCount}</b>
+          <small>{aggregate.treeId}</small>
+        </span>
       ))}
 
       {visibleTrees.map((tree) => {
