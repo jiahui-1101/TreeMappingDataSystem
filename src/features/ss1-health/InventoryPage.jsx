@@ -2,10 +2,11 @@ import { useMemo, useState } from "react";
 import Card from "../../components/common/Card.jsx";
 import Modal from "../../components/common/Modal.jsx";
 import StatusPill from "../../components/common/StatusPill.jsx";
+import TreeQrLabel from "../../components/qr/TreeQrLabel.jsx";
 import { ZONES } from "../../data/trees.js";
 import { filterTrees } from "../../services/mockTreeService.js";
 
-export default function InventoryPage({ trees, onAddTree, onArchiveTree, onUpdateTree, showToast }) {
+export default function InventoryPage({ trees, qrCodes = [], onAddTree, onArchiveTree, onUpdateTree, showToast }) {
   const [query, setQuery] = useState("");
   const [zone, setZone] = useState("all");
   const [status, setStatus] = useState("all");
@@ -33,7 +34,7 @@ export default function InventoryPage({ trees, onAddTree, onArchiveTree, onUpdat
         </table></div>
       </Card>
       {selected && <Modal title={`${selected.name} - ${selected.id}`} onClose={() => setSelected(null)}>
-        <div className="qr-label"><div className="qr-pattern">▦</div><strong>{selected.id}</strong><small>Tree QR label preview</small></div>
+        <TreeQrLabel tree={selected} qrCode={qrCodes.find((qr) => qr.treeId === selected.id && qr.qrStatus === "active") || qrCodes.find((qr) => qr.treeId === selected.id)} />
         <p>{selected.description}</p>
         <div className="modal-footer-grid">
           <button className="button" onClick={() => showToast(`QR label preview exported for ${selected.id}.`)}>Export QR Label</button>

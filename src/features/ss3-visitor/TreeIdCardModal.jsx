@@ -6,32 +6,15 @@ import { visitorText } from "../../services/visitorI18n.js";
 
 const GROWTH_YEARS = [5, 10, 25, 50];
 
-function GrowthVisual({ profile, projection, t }) {
-  const heightScale = Math.min(1, projection.height / 46);
-  const canopyScale = Math.min(1, projection.canopy / 35);
-  const rootScale = Math.min(1, projection.root / 25);
+function GrowthVisual({ profile, projection, confidence, t }) {
   return (
     <div className="growth-photo-model" aria-label={`${t("profiles.aiSimulator")} ${projection.years}${t("profiles.yearSuffix")}`}>
       <TreePhoto src={profile.photoUrl} alt={profile.photoAlt} className="growth-photo">
-        <span className="growth-current-year">{projection.years}{t("profiles.yearSuffix")}</span>
-        <span
-          className="growth-canopy-overlay"
-          style={{ "--canopy-scale": 0.62 + canopyScale * 0.46 }}
-        />
-        <span
-          className="growth-height-ruler"
-          style={{ "--height-scale": 0.35 + heightScale * 0.58 }}
-        >
-          <b>{projection.height} m</b>
-        </span>
-        <span
-          className="growth-root-zone"
-          style={{ "--root-scale": 0.5 + rootScale * 0.6 }}
-        />
+        <span className="growth-current-year">+{projection.years}{t("profiles.yearSuffix")} {t("profiles.ecologyForecast")}</span>
       </TreePhoto>
       <div className="growth-model-legend">
-        <span>{t("profiles.canopyWidth")}: <b>{projection.canopy} m</b></span>
-        <span>{t("profiles.rootRadius")}: <b>{projection.root} m</b></span>
+        <span>{t("profiles.representativePhoto")}: <b>{profile.name}</b></span>
+        <span>{t("profiles.modelConfidence")}: <b>{confidence}%</b></span>
       </div>
     </div>
   );
@@ -43,6 +26,7 @@ export default function TreeIdCardModal({ tree, language, onClose, onCollect }) 
   const t = (path, values) => visitorText(language, path, values);
   const profile = getPublicTreeCard(tree, language);
   const projection = projectGrowth(profile, growth);
+  const confidence = Math.max(80, Math.round(96 - projection.years * 0.28));
   return (
     <Modal title={t("profiles.treeIdCard", { name: profile.name })} onClose={onClose} wide>
       <div className="tree-id-premium">
@@ -122,9 +106,12 @@ export default function TreeIdCardModal({ tree, language, onClose, onCollect }) 
             <p>{t("profiles.simulatorNote")}</p>
           </div>
           <div className="growth-stage-layout">
-            <GrowthVisual profile={profile} projection={projection} t={t} />
+            <GrowthVisual profile={profile} projection={projection} confidence={confidence} t={t} />
             <div className="growth-stage-panel">
-              <label className="field-label">{t("profiles.simulation", { years: growth })}</label>
+              <div className="growth-panel-header">
+                <span className="field-label">{t("profiles.simulation", { years: growth })}</span>
+                <b>{t("profiles.ecologyForecast")}</b>
+              </div>
               <input
                 className="growth-slider"
                 aria-label={t("profiles.aiSimulator")}
@@ -138,9 +125,10 @@ export default function TreeIdCardModal({ tree, language, onClose, onCollect }) 
                 {GROWTH_YEARS.map((year) => <button key={year} className={growth === year ? "active" : ""} onClick={() => setGrowth(year)}>{year}{t("profiles.yearSuffix")}</button>)}
               </div>
               <div className="simulator-output simulator-output-grid">
-                <span>{t("profiles.projectedShort")}<strong>{projection.height} m</strong></span>
-                <span>{t("profiles.canopyWidth")}<strong>{projection.canopy} m</strong></span>
-                <span>{t("profiles.rootRadius")}<strong>{projection.root} m</strong></span>
+                <span style={{ "--metric-level": `${Math.min(100, projection.height * 2.1)}%` }}>{t("profiles.projectedShort")}<strong>{projection.height} m</strong></span>
+                <span style={{ "--metric-level": `${Math.min(100, projection.canopy * 2.8)}%` }}>{t("profiles.canopyWidth")}<strong>{projection.canopy} m</strong></span>
+                <span style={{ "--metric-level": `${Math.min(100, projection.root * 4)}%` }}>{t("profiles.rootRadius")}<strong>{projection.root} m</strong></span>
+                <span style={{ "--metric-level": `${confidence}%` }}>{t("profiles.modelConfidence")}<strong>{confidence}%</strong></span>
               </div>
               <p className="growth-milestone">{projection.milestone}</p>
             </div>

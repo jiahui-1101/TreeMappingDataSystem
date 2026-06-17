@@ -96,6 +96,15 @@
   .tree-id-photo { min-height: 220px; }.tree-id-photo img { min-height: 220px; }.tree-id-hero-copy { padding: 18px; }
   .growth-stage-layout, .simulator-output-grid, .zone-drawer-grid, .growth-model-legend { grid-template-columns: 1fr; }
   .growth-photo { min-height: 245px; }
+  .qr-label-real { padding: 14px; }
+  .qr-label-body, .qr-label-meta { grid-template-columns: 1fr; }
+  .qr-code-plate { width: min(100%, 210px); height: auto; aspect-ratio: 1; margin: 0 auto; }
+  .qr-code-plate img { width: 88%; height: 88%; }
+  .qr-label-copy { text-align: center; }
+  .qr-label-copy strong { font-size: 28px; }
+  .growth-stage-panel { padding: 12px; }
+  .growth-panel-header { flex-direction: column; gap: 4px; }
+  .growth-current-year { font-size: 11px; }
   .tree-id-visual { min-height: 108px; }.tree-id-visual span { font-size: 58px; }
   .tree-id-meta-grid, .qr-preview-meta { grid-template-columns: 1fr 1fr; }
   .qr-hero-premium, .qr-hero-glass { align-items: flex-start; flex-direction: column; }
