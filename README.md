@@ -172,3 +172,14 @@ src/
   services/         Mock business logic, auth, storage, ranger, admin, and visitor helpers
   styles/           Global styles, responsive rules, tokens, and component styles
 ```
+
+## Team Contributions
+
+This repository is the earlier prototype that preceded the team's consolidated [`Tree_Mapping_Data_System`](https://github.com/jiahui-1101/Tree_Mapping_Data_System) repository.
+
+| Team member | Role | Contributions evidenced in this repository | Visible non-merge commits* |
+|---|---|---|---:|
+| **Wong Jia Hui** | **Team Leader · Prototype Integrator** | Maintained and integrated the prototype; implemented map/3D and QR improvements, visitor localisation, shared styling, service tests and cross-subsystem fixes. | **10 / 11** |
+| **Lee Mei Shuet** | **Early Prototype Contributor** | Contributed an early integrated prototype update captured in the initial HTML application snapshot. | **1 / 11** |
+
+<sub>*Counts reflect this predecessor repository only. Later contributions by the full team are documented in the consolidated repository.</sub>
